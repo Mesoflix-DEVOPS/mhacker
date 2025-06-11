@@ -59,7 +59,7 @@
       <block type="text_print" id=")J1(pHFl]elGq*pgN)0Q">
         <value name="TEXT">
           <shadow type="text" id="9fO$}GCCGs/RoRg-ta2,">
-            <field name="TEXT">⚡️🔥Nexis prime v2 AI speed bot🚀 📡••</field>
+            <field name="TEXT">⚡️🔥PipRhino v2 AI speed bot🚀 📡••</field>
           </shadow>
         </value>
         <next>
@@ -131,7 +131,7 @@
                                                     <field name="TEXT"></field>
                                                   </shadow>
                                                   <block type="text" id="OJ1~E$Q]JqZX#A`PUOTy">
-                                                    <field name="TEXT">⚡️🔥Nexis prime v2 AI speed bot🚀 📡• •Expected currency-&gt; $</field>
+                                                    <field name="TEXT">⚡️🔥PipRhino v2 AI speed bot🚀 📡• •Expected currency-&gt; $</field>
                                                   </block>
                                                 </value>
                                                 <next>
@@ -840,7 +840,7 @@
                                     <field name="TEXT"></field>
                                   </shadow>
                                   <block type="text" id="|0r,rn%dpAV#vkAZ*SaE">
-                                    <field name="TEXT">⚡️🔥Nexis prime v2 AI speed bot🚀 📡• •Expected currency&gt; $</field>
+                                    <field name="TEXT">⚡️🔥PipRhino v2 AI speed bot🚀 📡• •Expected currency&gt; $</field>
                                   </block>
                                 </value>
                                 <next>
@@ -1018,7 +1018,7 @@
         <field name="NOTIFICATION_SOUND">silent</field>
         <value name="MESSAGE">
           <shadow type="text" id="p:@2jG@*l;;PUpZqp$,W">
-            <field name="TEXT">⚡️🔥Nexis prime v2 AI speed bot🚀 📡• •Expected currency-&gt; $</field>
+            <field name="TEXT">⚡️🔥PipRhino v2 AI speed bot🚀 📡• •Expected currency-&gt; $</field>
           </shadow>
         </value>
         <next>
