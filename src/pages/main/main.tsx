@@ -117,10 +117,11 @@ const AppWrapper = observer(() => {
         // Fetch the XML files and parse them
         const fetchBots = async () => {
             const botFiles = [
-                'Upgraded Candlemine.xml',
-                'Envy-differ.xml',
+               'Upgraded Candlemine.xml',
+                'Master Bot V6 CEO Gatimu.xml',
+                'Anonymous recovery.xml ',
                 'H_L auto vault.xml',
-                'Top-notch 2.xml',
+                'Expert_Speed_Bot_By_CHOSEN_DOLLAR_PRINTER_FX📉📉📉📈📈📈_1_1.xml',
                 // Add more paths to your XML files
             ];
             const botPromises = botFiles.map(async (file) => {
