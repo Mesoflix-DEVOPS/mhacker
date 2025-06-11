@@ -285,7 +285,7 @@ const AppWrapper = observer(() => {
                                 'dashboard__chart-wrapper--expanded': is_drawer_open && isDesktop,
                                 'dashboard__chart-wrapper--modal': is_chart_modal_visible && isDesktop,
                             })}>
-                                <iframe src='http://tracktool.netlify.app' width="100%" height="600" style="border:none;"/>
+                              <iframe src='http://www.mesoflix.online' height='600px' frameBorder='0' />
                             </div>
                         </div>
                         <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
