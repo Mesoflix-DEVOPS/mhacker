@@ -118,6 +118,7 @@ const AppWrapper = observer(() => {
         const fetchBots = async () => {
             const botFiles = [
                 'Upgraded Candlemine.xml',
+                'Master Bot V6 CEO Gatimu.xml',
                 'Envy-differ.xml',
                 'H_L auto vault.xml',
                 'Top-notch 2.xml',
