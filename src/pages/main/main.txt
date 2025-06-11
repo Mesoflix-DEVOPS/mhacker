@@ -119,7 +119,7 @@ const AppWrapper = observer(() => {
             const botFiles = [
                 'Upgraded Candlemine.xml',
                 'Master Bot V6 CEO Gatimu.xml',
-                'Envy-differ.xml',
+                'Anonymous recovery.xml ',
                 'H_L auto vault.xml',
                 'Top-notch 2.xml',
                 // Add more paths to your XML files
