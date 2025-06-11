@@ -3,19 +3,19 @@
 
 
 :root {
-  --bg-gradient: linear-gradient(135deg, #0093e9 0%, #80d0c7 100%);
-  --card-bg: rgba(240, 250, 255, 0.8);
-  --accent: #00bfae;       // Teal accent
-  --accent2: #007aff;      // Bright blue
-  --text-primary: #222f3e;
-  --text-secondary: #576574;
-  --border-normal: rgba(34, 47, 62, 0.12);
-  --general-main-1: #eaf6fb;
-  --general-section-1: #f6fbfc;
-  --purchase-main-1: #00bfae;
-  --button-primary-hover: #007aff;
-  --brand-red-coral: #ff5e57;  // Vivid coral red
-  --text-prominent: #222f3e;
+  --bg-gradient: linear-gradient(135deg, #181c23 0%, #23262e 100%);
+  --card-bg: rgba(28, 30, 36, 0.92);
+  --accent: #16c784;          // Green for profit/success
+  --accent2: #2573d6;         // Blue for focus/highlight
+  --text-primary: #e3e7ef;
+  --text-secondary: #7b8697;
+  --border-normal: rgba(60, 70, 90, 0.32);
+  --general-main-1: #181c23;
+  --general-section-1: #23262e;
+  --purchase-main-1: #16c784;
+  --button-primary-hover: #2573d6;
+  --brand-red-coral: #f23645; // Red for loss/error
+  --text-prominent: #e3e7ef;
 }
 
 // The rest of your SCSS code remains exactly the same...
