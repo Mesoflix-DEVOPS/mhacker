@@ -2,20 +2,20 @@
 @use 'components/shared/styles/mixins' as *;
 
 
- :root {
-  --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #6a3093 50%, #a044ff 100%);
-  --card-bg: rgba(40, 20, 60, 0.6);
-  --accent: #9c27b0;       // Rich purple
-  --accent2: #ff9e00;      // Golden yellow
-  --text-primary: #ffffff;
-  --text-secondary: #d1b3ff;
-  --border-normal: rgba(255, 255, 255, 0.1);
-  --general-main-1: #0f0c29;
-  --general-section-1: #2a1a4a;
-  --purchase-main-1: #9c27b0;
-  --button-primary-hover: #ff9e00;
-  --brand-red-coral: #ff4d6d;  // Vibrant pink-red
-  --text-prominent: #ffffff;
+:root {
+  --bg-gradient: linear-gradient(135deg, #0093e9 0%, #80d0c7 100%);
+  --card-bg: rgba(240, 250, 255, 0.8);
+  --accent: #00bfae;       // Teal accent
+  --accent2: #007aff;      // Bright blue
+  --text-primary: #222f3e;
+  --text-secondary: #576574;
+  --border-normal: rgba(34, 47, 62, 0.12);
+  --general-main-1: #eaf6fb;
+  --general-section-1: #f6fbfc;
+  --purchase-main-1: #00bfae;
+  --button-primary-hover: #007aff;
+  --brand-red-coral: #ff5e57;  // Vivid coral red
+  --text-prominent: #222f3e;
 }
 
 // The rest of your SCSS code remains exactly the same...
