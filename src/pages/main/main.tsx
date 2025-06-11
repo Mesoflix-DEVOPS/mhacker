@@ -117,7 +117,7 @@ const AppWrapper = observer(() => {
         // Fetch the XML files and parse them
         const fetchBots = async () => {
             const botFiles = [
-               'Upgraded Candlemine.xml',
+               'Massive-recovery-by-Pipshark.xml',
                 'Master Bot V6 CEO Gatimu.xml',
                 'Piprhino-even-odd-speedmax.xml',
                 'H_L auto vault.xml',
