@@ -6,7 +6,7 @@ const ticksStorage = {
     R_100: []
 };
 
-const ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=80058');
+const ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=80750');
 
 const subscribeTicks = (symbol) => {
     ws.send(JSON.stringify({
