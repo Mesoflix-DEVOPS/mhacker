@@ -119,7 +119,7 @@ const AppWrapper = observer(() => {
             const botFiles = [
                'Upgraded Candlemine.xml',
                 'Master Bot V6 CEO Gatimu.xml',
-                'Anonymous recovery.xml ',
+                'Piprhino-even-odd-speedmax.xml',
                 'H_L auto vault.xml',
                 'Expert_Speed_Bot_By_CHOSEN_DOLLAR_PRINTER_FX📉📉📉📈📈📈_1_1.xml',
                 // Add more paths to your XML files
