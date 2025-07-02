@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
@@ -61,6 +61,12 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
         theme: ui.is_dark_mode_on ? 'dark' : 'light',
     };
 
+    // State for toggling between SmartChart and Deriv Trading View
+    const [is_trading_view, setIsTradingView] = useState(false);
+
+    // Deriv TradingView Embed URL (static as per your request)
+    const derivTradingViewURL = "https://charts.deriv.com/deriv";
+
     useEffect(() => {
         return () => {
             chart_api.api.forgetAll('ticks');
@@ -112,37 +118,84 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
             })}
             dir='ltr'
         >
-            <SmartChart
-                id='dbot'
-                barriers={barriers}
-                showLastDigitStats={show_digits_stats}
-                chartControlsWidgets={null}
-                enabledChartFooter={false}
-                chartStatusListener={(v: boolean) => setChartStatus(!v)}
-                toolbarWidget={() => (
-                    <ToolbarWidgets
-                        updateChartType={updateChartType}
-                        updateGranularity={updateGranularity}
-                        position={!isDesktop ? 'bottom' : 'top'}
-                        isDesktop={isDesktop}
-                    />
+            {/* Toggle Button at the top of the chart */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '8px' }}>
+                {is_trading_view ? (
+                    <button
+                        onClick={() => setIsTradingView(false)}
+                        style={{
+                            backgroundColor: 'lightblue',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Charts
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => setIsTradingView(true)}
+                        style={{
+                            backgroundColor: 'lightblue',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        Trading View
+                    </button>
                 )}
-                chartType={chart_type}
-                isMobile={isMobile}
-                enabledNavigationWidget={isDesktop}
-                granularity={granularity}
-                requestAPI={requestAPI}
-                requestForget={() => {}}
-                requestForgetStream={() => {}}
-                requestSubscribe={requestSubscribe}
-                settings={settings}
-                symbol={symbol}
-                topWidgets={() => <ChartTitle onChange={onSymbolChange} />}
-                isConnectionOpened={is_connection_opened}
-                getMarketsOrder={getMarketsOrder}
-                isLive
-                leftMargin={80}
-            />
+            </div>
+
+            {/* Chart Area */}
+            {is_trading_view ? (
+                // Deriv Trading View Embedded Widget (iframe)
+                <iframe
+                    src={derivTradingViewURL}
+                    style={{ width: '100%', height: '600px', border: 'none' }}
+                    title="Deriv Trading View"
+                    allowFullScreen
+                />
+            ) : (
+                // Your existing SmartChart as before
+                <SmartChart
+                    id='dbot'
+                    barriers={barriers}
+                    showLastDigitStats={show_digits_stats}
+                    chartControlsWidgets={null}
+                    enabledChartFooter={false}
+                    chartStatusListener={(v: boolean) => setChartStatus(!v)}
+                    toolbarWidget={() => (
+                        <ToolbarWidgets
+                            updateChartType={updateChartType}
+                            updateGranularity={updateGranularity}
+                            position={!isDesktop ? 'bottom' : 'top'}
+                            isDesktop={isDesktop}
+                        />
+                    )}
+                    chartType={chart_type}
+                    isMobile={isMobile}
+                    enabledNavigationWidget={isDesktop}
+                    granularity={granularity}
+                    requestAPI={requestAPI}
+                    requestForget={() => {}}
+                    requestForgetStream={() => {}}
+                    requestSubscribe={requestSubscribe}
+                    settings={settings}
+                    symbol={symbol}
+                    topWidgets={() => <ChartTitle onChange={onSymbolChange} />}
+                    isConnectionOpened={is_connection_opened}
+                    getMarketsOrder={getMarketsOrder}
+                    isLive
+                    leftMargin={80}
+                />
+            )}
         </div>
     );
 });
