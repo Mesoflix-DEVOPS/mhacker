@@ -79,39 +79,9 @@ const InfoIcon = () => {
                 className="info-icon"
                 onClick={() => setShowModal(true)}
             >
-                <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Main circle background */}
-                    <circle cx="32" cy="32" r="30" fill="url(#socialGradient)"/>
-                    
-                    {/* Decorative rings */}
-                    <circle cx="32" cy="32" r="24" stroke="#FFF" strokeWidth="2" strokeDasharray="4 4"/>
-                    <circle cx="32" cy="32" r="18" fill="rgba(255,255,255,0.1)"/>
-                    
-                    {/* Connect dots pattern */}
-                    <circle cx="32" cy="20" r="3" fill="#FFD700"/>
-                    <circle cx="44" cy="32" r="3" fill="#4CAF50"/>
-                    <circle cx="32" cy="44" r="3" fill="#FF5722"/>
-                    <circle cx="20" cy="32" r="3" fill="#2196F3"/>
-                    
-                    {/* Connection lines */}
-                    <path d="M32 23L44 32" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
-                    <path d="M44 32L32 44" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
-                    <path d="M32 44L20 32" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
-                    <path d="M20 32L32 20" stroke="rgba(255,255,255,0.6)" strokeWidth="1"/>
-                    
-                    {/* Center hub */}
-                    <circle cx="32" cy="32" r="6" fill="white"/>
-                    <circle cx="32" cy="32" r="4" fill="#E91E63"/>
-                    
-                    {/* Gradient definition */}
-                    <defs>
-                        <linearGradient id="socialGradient" x1="0" y1="0" x2="64" y2="64">
-                            <stop offset="0%" stopColor="#6b48ff"/>
-                            <stop offset="50%" stopColor="#5c27fe"/>
-                            <stop offset="100%" stopColor="#3311bb"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+  <path d="M21 6.5a2.5 2.5 0 0 0-2.5-2.5h-13A2.5 2.5 0 0 0 3 6.5v11A2.5 2.5 0 0 0 5.5 20H19l2 2V6.5zM5.5 5h13A1.5 1.5 0 0 1 20 6.5v11a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 17.5v-11A1.5 1.5 0 0 1 5.5 5z" fill="#555"/>
+</svg>
             </button>
 
             <Modal
