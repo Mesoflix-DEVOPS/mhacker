@@ -135,7 +135,7 @@ const AppWrapper = observer(() => {
     const [bots, setBots] = useState([]);
 
     // External URLs for iframes (customize as needed)
-    const analysisUrl = "https://your.analysis.tool.url";
+    const analysisUrl = "https://api.binarytool.site/";
     const signalGeneratorUrl = "https://your.signal.generator.url";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
 
