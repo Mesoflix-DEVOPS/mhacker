@@ -23,7 +23,6 @@ import RunStrategy from '../dashboard/run-strategy';
 const Chart = lazy(() => import('../chart'));
 const Tutorial = lazy(() => import('../tutorials'));
 const Risk = lazy(() => import('../risk/risk'));
-const Strategy = lazy(() => import('../strategy/strategy'));
 
 /** ICONS **/
 
