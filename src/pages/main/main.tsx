@@ -22,7 +22,6 @@ import RunStrategy from '../dashboard/run-strategy';
 
 const Chart = lazy(() => import('../chart'));
 const Tutorial = lazy(() => import('../tutorials'));
-const Risk = lazy(() => import('../risk/risk'));
 
 /** ICONS **/
 
@@ -128,7 +127,7 @@ const BotIcon = FreeBotsIcon;
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
-    const { dashboard, load_modal, run_panel, quick_strategy, summary_card } = useStore();
+    const { dashboard, load_modal, run_panel, summary_card } = useStore();
     const {
         active_tab,
         is_chart_modal_visible,
@@ -146,6 +145,8 @@ const AppWrapper = observer(() => {
     const analysisUrl = "https://api.binarytool.site/";
     const signalGeneratorUrl = "https://your.signal.generator.url";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
+    const riskUrl = "https://example.com/risk"; // <-- Replace with your Risk page URL
+    const strategyUrl = "https://example.com/strategy"; // <-- Replace with your Strategy page URL
 
     useEffect(() => {
         if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -320,17 +321,31 @@ const AppWrapper = observer(() => {
                                 </div>
                             </div>
                         </div>
-                        {/* Risk tab */}
+                        {/* Risk as iframe tab */}
                         <div label={<><RiskIcon /><Localize i18n_default_text='Risk' /></>} id='id-risk'>
-                            <Suspense fallback={<ChunkLoader message={localize('Please wait, loading risk page...')} />}>
-                                <Risk />
-                            </Suspense>
+                            <div style={{ width: '100%', height: 600 }}>
+                                <iframe
+                                    src={riskUrl}
+                                    width="100%"
+                                    height="100%"
+                                    title="Risk"
+                                    style={{ border: 'none', display: 'block', borderRadius: 16, background: '#fff7fa' }}
+                                    scrolling="yes"
+                                />
+                            </div>
                         </div>
-                        {/* Strategy tab */}
+                        {/* Strategy as iframe tab */}
                         <div label={<><StrategyIcon /><Localize i18n_default_text='Strategy' /></>} id='id-strategy'>
-                            <Suspense fallback={<ChunkLoader message={localize('Please wait, loading strategy page...')} />}>
-                                <Strategy />
-                            </Suspense>
+                            <div style={{ width: '100%', height: 600 }}>
+                                <iframe
+                                    src={strategyUrl}
+                                    width="100%"
+                                    height="100%"
+                                    title="Strategy"
+                                    style={{ border: 'none', display: 'block', borderRadius: 16, background: '#f8f7ff' }}
+                                    scrolling="yes"
+                                />
+                            </div>
                         </div>
                     </Tabs>
                 </div>
