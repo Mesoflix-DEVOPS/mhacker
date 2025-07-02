@@ -53,18 +53,15 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
     const { is_drawer_open } = run_panel;
     const { is_chart_modal_visible } = dashboard;
     const settings = {
-        assetInformation: false, // ui.is_chart_asset_info_visible,
+        assetInformation: false,
         countdown: true,
-        isHighestLowestMarkerEnabled: false, // TODO: Pending UI,
+        isHighestLowestMarkerEnabled: false,
         language: common.current_language.toLowerCase(),
         position: ui.is_chart_layout_default ? 'bottom' : 'left',
         theme: ui.is_dark_mode_on ? 'dark' : 'light',
     };
 
-    // State for toggling between SmartChart and Deriv Trading View
     const [is_trading_view, setIsTradingView] = useState(false);
-
-    // Deriv TradingView Embed URL (static as per your request)
     const derivTradingViewURL = "https://charts.deriv.com/deriv";
 
     useEffect(() => {
@@ -102,8 +99,7 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
                     });
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
-            (e as TError)?.error?.code === 'MarketIsClosed' && callback([]); //if market is closed sending a empty array  to resolve
+            (e as TError)?.error?.code === 'MarketIsClosed' && callback([]);
             console.log((e as TError)?.error?.message);
         }
     };
@@ -117,53 +113,45 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
                 'dashboard__chart-wrapper--modal': is_chart_modal_visible && isDesktop,
             })}
             dir='ltr'
+            style={{ position: 'relative' }}
         >
-            {/* Toggle Button at the top of the chart */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '8px' }}>
-                {is_trading_view ? (
-                    <button
-                        onClick={() => setIsTradingView(false)}
-                        style={{
-                            backgroundColor: 'lightblue',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: 4,
-                            padding: '8px 16px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        Charts
-                    </button>
-                ) : (
-                    <button
-                        onClick={() => setIsTradingView(true)}
-                        style={{
-                            backgroundColor: 'lightblue',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: 4,
-                            padding: '8px 16px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        Trading View
-                    </button>
-                )}
+            {/* Always show the toggle button, adapt label and action */}
+            <div
+                style={{
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    zIndex: 100,
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                }}
+            >
+                <button
+                    onClick={() => setIsTradingView(v => !v)}
+                    style={{
+                        backgroundColor: 'lightblue',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 4,
+                        padding: '8px 16px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: 16,
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                    }}
+                >
+                    {is_trading_view ? 'Charts' : 'Trading View'}
+                </button>
             </div>
 
-            {/* Chart Area */}
             {is_trading_view ? (
-                // Deriv Trading View Embedded Widget (iframe)
                 <iframe
                     src={derivTradingViewURL}
-                    style={{ width: '100%', height: '600px', border: 'none' }}
+                    style={{ width: '100%', height: '600px', border: 'none', marginTop: 16 }}
                     title="Deriv Trading View"
                     allowFullScreen
                 />
             ) : (
-                // Your existing SmartChart as before
                 <SmartChart
                     id='dbot'
                     barriers={barriers}
