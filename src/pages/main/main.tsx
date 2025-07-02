@@ -23,115 +23,107 @@ import RunStrategy from '../dashboard/run-strategy';
 const Chart = lazy(() => import('../chart'));
 const Tutorial = lazy(() => import('../tutorials'));
 
-/** NEW REALISTIC ICONS **/
+/** ICONS **/
 
 const DashboardIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="10" width="4" height="10" rx="1" fill="#1565C0" />
-    <rect x="10" y="4" width="4" height="16" rx="1" fill="#42A5F5" />
-    <rect x="17" y="14" width="4" height="6" rx="1" fill="#90CAF9" />
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <path d="M3 12L12 5l9 7v7a2 2 0 01-2 2h-3a1 1 0 01-1-1v-3H9v3a1 1 0 01-1 1H5a2 2 0 01-2-2v-7z"
+      stroke="#4F8CFF" strokeWidth="2" strokeLinejoin="round" fill="none" />
   </svg>
 );
 
 const BotBuilderIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <g stroke="#616161" strokeWidth="2" strokeLinejoin="round">
-      <rect x="6" y="6" width="12" height="12" rx="3" fill="#FFFDE7"/>
-      <path d="M9 10h6M9 14h3" stroke="#616161"/>
-      <circle cx="17" cy="7" r="2" fill="#FFA726" />
-    </g>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a3 3 0 104.242 4.242l-1.414-1.414-4.242 4.242 1.414 1.414a3 3 0 10-4.242-4.242l4.242-4.242z"
+      stroke="#A259FF" strokeWidth="2" strokeLinejoin="round" fill="none" />
+    <circle cx="7" cy="17" r="3" stroke="#A259FF" strokeWidth="2" fill="none" />
+    <path d="M7 20v2m0-2a3 3 0 003-3H4a3 3 0 003 3z" stroke="#A259FF" strokeWidth="2" fill="none" />
   </svg>
 );
 
 const ChartsIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <g>
-      <rect x="3" y="14" width="2.5" height="7" rx="1.25" fill="#0288D1"/>
-      <rect x="8.25" y="6" width="2.5" height="15" rx="1.25" fill="#43A047"/>
-      <rect x="13.5" y="1" width="2.5" height="20" rx="1.25" fill="#FFA726"/>
-      <rect x="18.75" y="10" width="2.5" height="11" rx="1.25" fill="#8E24AA"/>
-    </g>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <rect x="3" y="10" width="4" height="10" rx="1" fill="#4F8CFF" />
+    <rect x="10" y="6" width="4" height="14" rx="1" fill="#FFB84F" />
+    <rect x="17" y="2" width="4" height="18" rx="1" fill="#A5DC86" />
   </svg>
 );
 
 const DCirclesIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="#00ACC1" strokeWidth="2" fill="#E0F7FA"/>
-    <circle cx="12" cy="12" r="6" stroke="#00897B" strokeWidth="2" fill="#B2DFDB"/>
-    <circle cx="12" cy="12" r="3" stroke="#FF7043" strokeWidth="2" fill="#FFCCBC"/>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" stroke="#4F8CFF" strokeWidth="2" fill="#F0F8FF"/>
+    <circle cx="12" cy="12" r="6" stroke="#A259FF" strokeWidth="2" fill="#E0E7FF"/>
+    <circle cx="12" cy="12" r="3" stroke="#FFD700" strokeWidth="2" fill="#FFF7E0"/>
+    <circle cx="12" cy="12" r="1" fill="#FF4F81" />
   </svg>
 );
 
 const TutorialsIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <rect x="4" y="4" width="16" height="16" rx="2" fill="#FFF3E0" stroke="#FFA726" strokeWidth="2"/>
-    <polygon points="10,8 17,12 10,16" fill="#FFA726" />
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" stroke="#FFD700" strokeWidth="2" fill="none" />
+    <polygon points="10,8 17,12 10,16" fill="#FFD700" />
   </svg>
 );
 
 const CopyTradingIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <g>
-      <circle cx="7" cy="7" r="3" fill="#43A047"/>
-      <circle cx="17" cy="7" r="3" fill="#0288D1"/>
-      <rect x="2" y="15" width="8" height="6" rx="2" fill="#B2DFDB"/>
-      <rect x="14" y="15" width="8" height="6" rx="2" fill="#BBDEFB"/>
-    </g>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <path d="M7 17a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8z" stroke="#FF4F81" strokeWidth="2" />
+    <path d="M7 13h10" stroke="#FF4F81" strokeWidth="2" />
   </svg>
 );
 
 const AnalysisToolIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="#5C6BC0" strokeWidth="2" fill="#E8EAF6"/>
-    <path d="M12 12L12 3A9 9 0 0 1 21 12Z" fill="#FFA726"/>
-    <path d="M12 12L21 12A9 9 0 0 1 12 21Z" fill="#42A5F5"/>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" stroke="#4F8CFF" strokeWidth="2" fill="none" />
+    <path d="M12 2a10 10 0 0110 10h-10z" fill="#4F8CFF" />
+    <path d="M12 12v10A10 10 0 012 12h10z" fill="#FFD700" />
   </svg>
 );
 
 const SignalsIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <ellipse cx="12" cy="19" rx="2" ry="2" fill="#43A047" />
-    <path d="M12 17V5" stroke="#43A047" strokeWidth="2"/>
-    <path d="M7 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#0288D1" strokeWidth="2"/>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <circle cx="12" cy="18" r="2" fill="#A5DC86" />
+    <path d="M12 16v-4" stroke="#A5DC86" strokeWidth="2" />
+    <path d="M8.5 15.5a6 6 0 117 0" stroke="#A5DC86" strokeWidth="2" fill="none" />
   </svg>
 );
 
 const TradingHubIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <rect x="5" y="5" width="14" height="14" rx="4" fill="#E0E0E0"/>
-    <path d="M12 7v6l4 2" stroke="#FFA726" strokeWidth="2" strokeLinecap="round"/>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <polygon points="13 2 3 14 11 14 11 22 21 10 13 10 13 2"
+      fill="#FF4F81" stroke="#FF4F81" strokeWidth="2" />
   </svg>
 );
 
 const FreeBotsIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <rect x="6" y="10" width="12" height="8" rx="3" fill="#FFFDE7" stroke="#FFA726" strokeWidth="2"/>
-    <rect x="10" y="16" width="4" height="3" rx="1" fill="#FFA726"/>
-    <circle cx="9" cy="14" r="1" fill="#616161" />
-    <circle cx="15" cy="14" r="1" fill="#616161" />
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <rect x="6" y="8" width="12" height="8" rx="2" fill="#A259FF" />
+    <rect x="9" y="16" width="6" height="3" rx="1" fill="#FFD700" />
+    <circle cx="9" cy="12" r="1" fill="#FFF" />
+    <circle cx="15" cy="12" r="1" fill="#FFF" />
   </svg>
 );
 
 const RiskIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
     <path d="M12 3l8 4v5c0 5.25-3.5 9.74-8 11-4.5-1.26-8-5.75-8-11V7l8-4z"
-      stroke="#B71C1C" strokeWidth="2" fill="#F8BBD0"/>
-    <path d="M13 10l-2 4h3l-2 4" stroke="#B71C1C" strokeWidth="2" fill="none"/>
+      stroke="#FF4F81" strokeWidth="2" fill="#FFF0F3"/>
+    <path d="M13 10l-2 4h3l-2 4" stroke="#FF4F81" strokeWidth="2" fill="none"/>
   </svg>
 );
 
 const StrategyIcon = () => (
-  <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="18" width="18" height="3" rx="1.5" fill="#789262"/>
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <rect x="3" y="18" width="18" height="3" rx="1.5" fill="#A5DC86"/>
     <path d="M18 18V8.5c0-3.59-2.91-6.5-6.5-6.5S5 4.91 5 8.5V18"
-      stroke="#5C6BC0" strokeWidth="2" fill="none"/>
-    <circle cx="15" cy="9" r="1" fill="#FFA726"/>
+      stroke="#A259FF" strokeWidth="2" fill="none"/>
+    <path d="M8 13c1-1 3-1 4 1s3-1 3-2.5c0-.92-1.5-2.5-4-2.5S7 11.08 7 12c0 1.5 2 3.5 4 3.5" 
+      stroke="#FFD700" strokeWidth="2" fill="none"/>
+    <circle cx="15" cy="9" r="1" fill="#FFD700"/>
   </svg>
 );
 
 const BotIcon = FreeBotsIcon;
-
-// --- END ICONS ---
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -153,8 +145,8 @@ const AppWrapper = observer(() => {
     const analysisUrl = "https://api.binarytool.site/";
     const signalGeneratorUrl = "https://your.signal.generator.url";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
-    const riskUrl = "https://example.com/risk";
-    const strategyUrl = "https://example.com/strategy";
+    const riskUrl = "https://example.com/risk"; // <-- Replace with your Risk page URL
+    const strategyUrl = "https://example.com/strategy"; // <-- Replace with your Strategy page URL
 
     useEffect(() => {
         if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -235,36 +227,22 @@ const AppWrapper = observer(() => {
 
     const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
-    // Font and menu tab adjustments
-    const tabLabelStyle = {
-        fontSize: '15px',
-        fontWeight: 500,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '7px'
-    };
-
     return (
         <React.Fragment>
             <div className='main'>
                 <div className='main__container' style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
-                    <Tabs active_index={active_tab} className='main__tabs'
-                        onTabItemChange={onEntered}
-                        onTabItemClick={handleTabChange}
-                        top
-                        tab_item_style={tabLabelStyle}
-                    >
-                        <div label={<span style={tabLabelStyle}><DashboardIcon /><Localize i18n_default_text='Dashboard' /></span>} id='id-dbot-dashboard'>
+                    <Tabs active_index={active_tab} className='main__tabs' onTabItemChange={onEntered} onTabItemClick={handleTabChange} top>
+                        <div label={<><DashboardIcon /><Localize i18n_default_text='Dashboard' /></>} id='id-dbot-dashboard'>
                             <Dashboard handleTabChange={handleTabChange} />
                             <button onClick={handleOpen}>Load Bot</button>
                         </div>
-                        <div label={<span style={tabLabelStyle}><BotBuilderIcon /><Localize i18n_default_text='Bot Builder' /></span>} id='id-bot-builder' />
-                        <div label={<span style={tabLabelStyle}><ChartsIcon /><Localize i18n_default_text='Charts' /></span>} id='id-charts'>
+                        <div label={<><BotBuilderIcon /><Localize i18n_default_text='Bot Builder' /></>} id='id-bot-builder' />
+                        <div label={<><ChartsIcon /><Localize i18n_default_text='Charts' /></>} id='id-charts'>
                             <Suspense fallback={<ChunkLoader message={localize('Please wait, loading chart...')} />}>
                                 <Chart show_digits_stats={false} />
                             </Suspense>
                         </div>
-                        <div label={<span style={tabLabelStyle}><DCirclesIcon /><Localize i18n_default_text='Dcircles' /></span>} id='id-dcircles'>
+                        <div label={<><DCirclesIcon /><Localize i18n_default_text='Dcircles' /></>} id='id-dcircles'>
                             <div style={{ width: '100%', height: 600 }}>
                                 <iframe
                                     src={dcirclesUrl}
@@ -276,17 +254,17 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
-                        <div label={<span style={tabLabelStyle}><TutorialsIcon /><Localize i18n_default_text='Tutorials' /></span>} id='id-tutorials'>
+                        <div label={<><TutorialsIcon /><Localize i18n_default_text='Tutorials' /></>} id='id-tutorials'>
                             <Suspense fallback={<ChunkLoader message={localize('Please wait, loading tutorials...')} />}>
                                 <Tutorial handleTabChange={handleTabChange} />
                             </Suspense>
                         </div>
-                        <div label={<span style={tabLabelStyle}><CopyTradingIcon /><Localize i18n_default_text='Copytrading' /></span>} id='id-copytrading'>
+                        <div label={<><CopyTradingIcon /><Localize i18n_default_text='Copytrading' /></>} id='id-copytrading'>
                             <div style={{ padding: 32, textAlign: 'center', fontSize: 20, color: '#A259FF' }}>
                                 Part under development
                             </div>
                         </div>
-                        <div label={<span style={tabLabelStyle}><AnalysisToolIcon /><Localize i18n_default_text='Analysis' /></span>} id='id-analysis'>
+                        <div label={<><AnalysisToolIcon /><Localize i18n_default_text='Analysis' /></>} id='id-analysis'>
                             <div style={{ width: '100%', height: 600 }}>
                                 <iframe
                                     src={analysisUrl}
@@ -298,7 +276,7 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
-                        <div label={<span style={tabLabelStyle}><SignalsIcon /><Localize i18n_default_text='Signals' /></span>} id='id-signals'>
+                        <div label={<><SignalsIcon /><Localize i18n_default_text='Signals' /></>} id='id-signals'>
                             <div className={classNames('dashboard__chart-wrapper', {
                                 'dashboard__chart-wrapper--expanded': is_drawer_open && isDesktop,
                                 'dashboard__chart-wrapper--modal': is_chart_modal_visible && isDesktop,
@@ -312,7 +290,7 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
-                        <div label={<span style={tabLabelStyle}><TradingHubIcon /><Localize i18n_default_text='Signal Generator' /></span>} id='id-Trading-Hub'>
+                        <div label={<><TradingHubIcon /><Localize i18n_default_text='Signal Generator' /></>} id='id-Trading-Hub'>
                             <div style={{ width: '100%', height: 750 }}>
                                 <iframe
                                     src={signalGeneratorUrl}
@@ -324,76 +302,27 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
-                        {/* FREE BOTS MODERNIZED */}
-                        <div label={<span style={tabLabelStyle}><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></span>} id='id-free-bots'>
-                            <div style={{
-                                minHeight: 700,
-                                background: '#f6f6f6',
-                                padding: '36px 0'
-                            }}>
-                                <h2 style={{
-                                    textAlign: 'center',
-                                    color: '#232323',
-                                    fontWeight: 700,
-                                    fontSize: 28,
-                                    marginBottom: 30
-                                }}>
-                                    <Localize i18n_default_text='Free Bots' />
-                                </h2>
-                                <div style={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'center',
-                                    gap: 32
-                                }}>
-                                    {bots.map((bot, index) => (
-                                        <div key={index} style={{
-                                            background: '#fffdfa',
-                                            borderRadius: 15,
-                                            boxShadow: '0 2px 18px 0 #efefef',
-                                            padding: '24px 24px 20px 24px',
-                                            minWidth: 220,
-                                            maxWidth: 270,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            margin: 0
-                                        }}>
-                                            <BotIcon />
-                                            <div style={{
-                                                fontSize: 17,
-                                                fontWeight: 700,
-                                                color: '#2a2121',
-                                                margin: '14px 0 18px 0',
-                                                textAlign: 'center',
-                                                letterSpacing: '0.5px'
-                                            }}>{bot.title}</div>
-                                            <button
-                                                onClick={() => handleBotClick(bot)}
-                                                style={{
-                                                    marginTop: 10,
-                                                    padding: '9px 22px',
-                                                    fontSize: 15,
-                                                    background: '#FFA726',
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                    borderRadius: 25,
-                                                    fontWeight: 600,
-                                                    cursor: 'pointer',
-                                                    transition: 'background 0.2s',
-                                                }}
-                                                onMouseOver={e => e.currentTarget.style.background = '#FB8C00'}
-                                                onMouseOut={e => e.currentTarget.style.background = '#FFA726'}
-                                            >
-                                                Load
-                                            </button>
-                                        </div>
-                                    ))}
+                        <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
+                            <div className='free-bots'>
+                                <h2 className='free-bots__heading'><Localize i18n_default_text='Free Bots' /></h2>
+                                <div className='free-bots__content-wrapper'>
+                                    <ul className='free-bots__content'>
+                                        {bots.map((bot, index) => (
+                                            <li className='free-bot' key={index} onClick={() => {
+                                                handleBotClick(bot);
+                                            }}>
+                                                <BotIcon />
+                                                <div className='free-bot__details'>
+                                                    <h3 className='free-bot__title'>{bot.title}</h3>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                         {/* Risk as iframe tab */}
-                        <div label={<span style={tabLabelStyle}><RiskIcon /><Localize i18n_default_text='Risk' /></span>} id='id-risk'>
+                        <div label={<><RiskIcon /><Localize i18n_default_text='Risk' /></>} id='id-risk'>
                             <div style={{ width: '100%', height: 600 }}>
                                 <iframe
                                     src={riskUrl}
@@ -406,5 +335,37 @@ const AppWrapper = observer(() => {
                             </div>
                         </div>
                         {/* Strategy as iframe tab */}
-                        <div label={<span style={tabLabelStyle}><StrategyIcon /><Localize i18n_default_text='Strategy' /></span>} id='id-strategy'>
-       
+                        <div label={<><StrategyIcon /><Localize i18n_default_text='Strategy' /></>} id='id-strategy'>
+                            <div style={{ width: '100%', height: 600 }}>
+                                <iframe
+                                    src={strategyUrl}
+                                    width="100%"
+                                    height="100%"
+                                    title="Strategy"
+                                    style={{ border: 'none', display: 'block', borderRadius: 16, background: '#f8f7ff' }}
+                                    scrolling="yes"
+                                />
+                            </div>
+                        </div>
+                    </Tabs>
+                </div>
+            </div>
+            <DesktopWrapper>
+                <div className='main__run-strategy-wrapper'>
+                    <RunStrategy />
+                    {showRunPanel && <RunPanel />}
+                </div>
+                <ChartModal />
+                <TradingViewModal />
+            </DesktopWrapper>
+            <MobileWrapper>
+                <RunPanel />
+            </MobileWrapper>
+            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onClose={onCloseDialog} onConfirm={onOkButtonClick || onCloseDialog} title={title}>
+                {message}
+            </Dialog>
+        </React.Fragment>
+    );
+});
+
+export default AppWrapper;
