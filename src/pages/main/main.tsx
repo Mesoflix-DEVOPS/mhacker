@@ -53,6 +53,16 @@ const ChartsIcon = () => (
   </svg>
 );
 
+// Dcircles: Abstract colorful concentric circles icon
+const DCirclesIcon = () => (
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" stroke="#4F8CFF" strokeWidth="2" fill="#F0F8FF"/>
+    <circle cx="12" cy="12" r="6" stroke="#A259FF" strokeWidth="2" fill="#E0E7FF"/>
+    <circle cx="12" cy="12" r="3" stroke="#FFD700" strokeWidth="2" fill="#FFF7E0"/>
+    <circle cx="12" cy="12" r="1" fill="#FF4F81" />
+  </svg>
+);
+
 // Tutorials: Play icon
 const TutorialsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -127,6 +137,7 @@ const AppWrapper = observer(() => {
     // External URLs for iframes (customize as needed)
     const analysisUrl = "https://your.analysis.tool.url";
     const signalGeneratorUrl = "https://your.signal.generator.url";
+    const dcirclesUrl = "https://nilotetrader.netlify.app/";
 
     useEffect(() => {
         if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -221,6 +232,19 @@ const AppWrapper = observer(() => {
                             <Suspense fallback={<ChunkLoader message={localize('Please wait, loading chart...')} />}>
                                 <Chart show_digits_stats={false} />
                             </Suspense>
+                        </div>
+                        {/* DCircles tab after Charts */}
+                        <div label={<><DCirclesIcon /><Localize i18n_default_text='Dcircles' /></>} id='id-dcircles'>
+                            <div style={{ width: '100%', height: 600 }}>
+                                <iframe
+                                    src={dcirclesUrl}
+                                    width="100%"
+                                    height="100%"
+                                    title="Dcircles"
+                                    style={{ border: 'none', display: 'block', borderRadius: 16, background: '#f0f4fa' }}
+                                    scrolling="yes"
+                                />
+                            </div>
                         </div>
                         <div label={<><TutorialsIcon /><Localize i18n_default_text='Tutorials' /></>} id='id-tutorials'>
                             <Suspense fallback={<ChunkLoader message={localize('Please wait, loading tutorials...')} />}>
