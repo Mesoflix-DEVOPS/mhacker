@@ -143,7 +143,7 @@ const AppWrapper = observer(() => {
     const [bots, setBots] = useState([]);
 
     const analysisUrl = "https://api.binarytool.site/";
-    const signalGeneratorUrl = "https://your.signal.generator.url";
+    const signalGeneratorUrl = "https://mesoflix-percentage.netlify.app/";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
     const riskUrl = "https://example.com/risk"; // <-- Replace with your Risk page URL
     const strategyUrl = "https://mesoflixstrategies.netlify.app/"; // <-- Replace with your Strategy page URL
@@ -227,56 +227,9 @@ const AppWrapper = observer(() => {
 
     const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
-    // ----------- NEW Free Bots Card Styles -----------
-    const mainLightBg = {
-        background: '#f7f7fa',
-        minHeight: '100vh',
-    };
-    const freeBotCard = {
-        background: '#fffbe6',
-        borderRadius: 12,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '18px 20px',
-        marginBottom: 18,
-        transition: 'box-shadow 0.2s',
-    };
-    const botIcon = {
-        marginRight: 16,
-        display: 'flex',
-        alignItems: 'center',
-    };
-    const botDetails = {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'flex-start',
-    };
-    const botTitle = {
-        color: '#002F6C',
-        fontSize: '1.15rem',
-        fontWeight: 700,
-        marginBottom: 10,
-        wordBreak: 'break-word' as const,
-    };
-    const loadBtn = {
-        background: '#FFB84F',
-        color: '#fff',
-        fontWeight: 'bold' as const,
-        border: 'none',
-        borderRadius: 6,
-        padding: '7px 18px',
-        fontSize: '0.98rem',
-        cursor: 'pointer',
-        transition: 'background 0.2s',
-        marginTop: 2,
-    };
-    // --------------------------------------------------
-
     return (
         <React.Fragment>
-            <div className='main' style={mainLightBg}>
+            <div className='main'>
                 <div className='main__container' style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
                     <Tabs active_index={active_tab} className='main__tabs' onTabItemChange={onEntered} onTabItemClick={handleTabChange} top>
                         <div label={<><DashboardIcon /><Localize i18n_default_text='Dashboard' /></>} id='id-dbot-dashboard'>
@@ -349,30 +302,18 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
-                        {/* ----------- UPDATED FREE BOTS SECTION ----------- */}
                         <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
                             <div className='free-bots'>
                                 <h2 className='free-bots__heading'><Localize i18n_default_text='Free Bots' /></h2>
                                 <div className='free-bots__content-wrapper'>
-                                    <ul className='free-bots__content' style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                    <ul className='free-bots__content'>
                                         {bots.map((bot, index) => (
-                                            <li style={freeBotCard} key={index}>
-                                                <div style={botIcon}>
-                                                    <BotIcon />
-                                                </div>
-                                                <div style={botDetails}>
-                                                    <h3 style={botTitle}>{bot.title}</h3>
-                                                    <button
-                                                        style={loadBtn}
-                                                        onClick={e => {
-                                                            e.stopPropagation();
-                                                            handleBotClick(bot);
-                                                        }}
-                                                        onMouseOver={e => (e.currentTarget.style.background = '#FFA500')}
-                                                        onMouseOut={e => (e.currentTarget.style.background = '#FFB84F')}
-                                                    >
-                                                        Load Bot
-                                                    </button>
+                                            <li className='free-bot' key={index} onClick={() => {
+                                                handleBotClick(bot);
+                                            }}>
+                                                <BotIcon />
+                                                <div className='free-bot__details'>
+                                                    <h3 className='free-bot__title'>{bot.title}</h3>
                                                 </div>
                                             </li>
                                         ))}
@@ -380,7 +321,7 @@ const AppWrapper = observer(() => {
                                 </div>
                             </div>
                         </div>
-                        {/* ----------- END UPDATED FREE BOTS SECTION ----------- */}
+                        {/* Risk as iframe tab */}
                         <div label={<><RiskIcon /><Localize i18n_default_text='Risk' /></>} id='id-risk'>
                             <div style={{ width: '100%', height: 600 }}>
                                 <iframe
@@ -393,6 +334,7 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
+                        {/* Strategy as iframe tab */}
                         <div label={<><StrategyIcon /><Localize i18n_default_text='Strategy' /></>} id='id-strategy'>
                             <div style={{ width: '100%', height: 600 }}>
                                 <iframe
@@ -419,9 +361,8 @@ const AppWrapper = observer(() => {
             <MobileWrapper>
                 <RunPanel />
             </MobileWrapper>
-           
-          <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onConfirm
-            {message}
+            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onClose={onCloseDialog} onConfirm={onOkButtonClick || onCloseDialog} title={title}>
+                {message}
             </Dialog>
         </React.Fragment>
     );
