@@ -419,4 +419,12 @@ const AppWrapper = observer(() => {
             <MobileWrapper>
                 <RunPanel />
             </MobileWrapper>
-            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={
+        
+          <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={
+{message}
+            </Dialog>
+        </React.Fragment>
+    );
+});
+
+export default AppWrapper;
