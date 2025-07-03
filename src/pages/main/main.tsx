@@ -23,7 +23,7 @@ import RunStrategy from '../dashboard/run-strategy';
 const Chart = lazy(() => import('../chart'));
 const Tutorial = lazy(() => import('../tutorials'));
 
-/** ICONS (unchanged, you can swap with your original if desired) **/
+/** ICONS **/
 
 const DashboardIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -419,9 +419,9 @@ const AppWrapper = observer(() => {
             <MobileWrapper>
                 <RunPanel />
             </MobileWrapper>
-        
-          <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_vi
-{message}
+           
+          <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onConfirm
+            {message}
             </Dialog>
         </React.Fragment>
     );
