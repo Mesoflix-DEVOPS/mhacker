@@ -1,4 +1,4 @@
-    import React, { lazy, Suspense, useEffect, useState, useCallback } from 'react';
+import React, { lazy, Suspense, useEffect, useState, useCallback } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -24,103 +24,109 @@ import RunStrategy from '../dashboard/run-strategy';
 const Chart = lazy(() => import('../chart'));
 const Tutorial = lazy(() => import('../tutorials'));
 
-/** ICONS **/
+/** NEW REALISTIC ICONS **/
 
 const DashboardIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path d="M3 12L12 5l9 7v7a2 2 0 01-2 2h-3a1 1 0 01-1-1v-3H9v3a1 1 0 01-1 1H5a2 2 0 01-2-2v-7z"
-      stroke="#4F8CFF" strokeWidth="2" strokeLinejoin="round" fill="none" />
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="#1976D2" />
+    <rect x="7" y="7" width="4" height="10" rx="1" fill="#fff" />
+    <rect x="13" y="7" width="4" height="5" rx="1" fill="#90CAF9" />
+    <rect x="13" y="14" width="4" height="3" rx="1" fill="#64B5F6" />
   </svg>
 );
 
 const BotBuilderIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a3 3 0 104.242 4.242l-1.414-1.414-4.242 4.242 1.414 1.414a3 3 0 10-4.242-4.242l4.242-4.242z"
-      stroke="#A259FF" strokeWidth="2" strokeLinejoin="round" fill="none" />
-    <circle cx="7" cy="17" r="3" stroke="#A259FF" strokeWidth="2" fill="none" />
-    <path d="M7 20v2m0-2a3 3 0 003-3H4a3 3 0 003 3z" stroke="#A259FF" strokeWidth="2" fill="none" />
+    <rect x="5" y="16" width="14" height="3" rx="1.5" fill="#388E3C"/>
+    <rect x="7" y="5" width="10" height="8" rx="2" fill="#A5D6A7"/>
+    <circle cx="12" cy="9" r="2" fill="#388E3C"/>
+    <rect x="10" y="13" width="4" height="2" rx="1" fill="#fff"/>
   </svg>
 );
 
 const ChartsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="10" width="4" height="10" rx="1" fill="#4F8CFF" />
-    <rect x="10" y="6" width="4" height="14" rx="1" fill="#FFB84F" />
-    <rect x="17" y="2" width="4" height="18" rx="1" fill="#A5DC86" />
+    <rect x="4" y="14" width="3" height="6" rx="1" fill="#FFA000" />
+    <rect x="10" y="10" width="3" height="10" rx="1" fill="#1976D2" />
+    <rect x="16" y="6" width="3" height="14" rx="1" fill="#388E3C" />
+    <line x1="3" y1="21" x2="21" y2="21" stroke="#aaa" strokeWidth="1"/>
   </svg>
 );
 
 const DCirclesIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="9" stroke="#4F8CFF" strokeWidth="2" fill="#F0F8FF"/>
-    <circle cx="12" cy="12" r="6" stroke="#A259FF" strokeWidth="2" fill="#E0E7FF"/>
-    <circle cx="12" cy="12" r="3" stroke="#FFD700" strokeWidth="2" fill="#FFF7E0"/>
-    <circle cx="12" cy="12" r="1" fill="#FF4F81" />
+    <circle cx="12" cy="12" r="9" stroke="#7B1FA2" strokeWidth="2" fill="#E1BEE7"/>
+    <circle cx="12" cy="12" r="5" stroke="#8BC34A" strokeWidth="2" fill="#C5E1A5"/>
+    <circle cx="12" cy="12" r="2" stroke="#FFD600" strokeWidth="2" fill="#FFF9C4"/>
   </svg>
 );
 
 const TutorialsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="#FFD700" strokeWidth="2" fill="none" />
-    <polygon points="10,8 17,12 10,16" fill="#FFD700" />
+    <rect x="3" y="4" width="18" height="16" rx="2" fill="#FF7043"/>
+    <rect x="6" y="7" width="12" height="2" fill="#fff"/>
+    <rect x="6" y="11" width="8" height="2" fill="#fff"/>
+    <rect x="6" y="15" width="6" height="2" fill="#fff"/>
   </svg>
 );
 
 const CopyTradingIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path d="M7 17a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8z" stroke="#FF4F81" strokeWidth="2" />
-    <path d="M7 13h10" stroke="#FF4F81" strokeWidth="2" />
+    <rect x="4" y="5" width="16" height="7" rx="2" fill="#00ACC1"/>
+    <rect x="6" y="13" width="12" height="5" rx="2" fill="#4DD0E1"/>
+    <circle cx="8" cy="16" r="1" fill="#fff"/>
+    <circle cx="16" cy="16" r="1" fill="#fff"/>
   </svg>
 );
 
 const AnalysisToolIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" stroke="#4F8CFF" strokeWidth="2" fill="none" />
-    <path d="M12 2a10 10 0 0110 10h-10z" fill="#4F8CFF" />
-    <path d="M12 12v10A10 10 0 012 12h10z" fill="#FFD700" />
+    <ellipse cx="12" cy="12" rx="9" ry="7" stroke="#FBC02D" strokeWidth="2" fill="#FFFDE7"/>
+    <path d="M6 12h12M12 5v14" stroke="#FBC02D" strokeWidth="2"/>
+    <circle cx="12" cy="12" r="2.5" fill="#FBC02D"/>
   </svg>
 );
 
 const SignalsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="18" r="2" fill="#A5DC86" />
-    <path d="M12 16v-4" stroke="#A5DC86" strokeWidth="2" />
-    <path d="M8.5 15.5a6 6 0 117 0" stroke="#A5DC86" strokeWidth="2" fill="none" />
+    <rect x="10" y="4" width="4" height="16" rx="2" fill="#43A047"/>
+    <rect x="4" y="10" width="4" height="10" rx="2" fill="#A5D6A7"/>
+    <rect x="16" y="13" width="4" height="7" rx="2" fill="#388E3C"/>
   </svg>
 );
 
 const TradingHubIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <polygon points="13 2 3 14 11 14 11 22 21 10 13 10 13 2"
-      fill="#FF4F81" stroke="#FF4F81" strokeWidth="2" />
+    <circle cx="12" cy="12" r="10" fill="#F06292" />
+    <path d="M12 7v5l4 2" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+    <circle cx="12" cy="12" r="4" fill="#fff" opacity="0.4"/>
   </svg>
 );
 
 const FreeBotsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="6" y="8" width="12" height="8" rx="2" fill="#A259FF" />
-    <rect x="9" y="16" width="6" height="3" rx="1" fill="#FFD700" />
-    <circle cx="9" cy="12" r="1" fill="#FFF" />
-    <circle cx="15" cy="12" r="1" fill="#FFF" />
+    <rect x="5" y="10" width="14" height="8" rx="4" fill="#FFD600"/>
+    <ellipse cx="12" cy="14" rx="3" ry="2" fill="#fff"/>
+    <rect x="8" y="6" width="8" height="4" rx="2" fill="#FFEE58"/>
+    <circle cx="9" cy="12" r="1" fill="#555"/>
+    <circle cx="15" cy="12" r="1" fill="#555"/>
   </svg>
 );
 
 const RiskIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path d="M12 3l8 4v5c0 5.25-3.5 9.74-8 11-4.5-1.26-8-5.75-8-11V7l8-4z"
-      stroke="#FF4F81" strokeWidth="2" fill="#FFF0F3"/>
-    <path d="M13 10l-2 4h3l-2 4" stroke="#FF4F81" strokeWidth="2" fill="none"/>
+    <polygon points="12,2 22,20 2,20" fill="#D32F2F"/>
+    <rect x="11" y="8" width="2" height="6" rx="1" fill="#fff"/>
+    <rect x="11" y="16" width="2" height="2" rx="1" fill="#fff"/>
   </svg>
 );
 
 const StrategyIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="18" width="18" height="3" rx="1.5" fill="#A5DC86"/>
-    <path d="M18 18V8.5c0-3.59-2.91-6.5-6.5-6.5S5 4.91 5 8.5V18"
-      stroke="#A259FF" strokeWidth="2" fill="none"/>
-    <path d="M8 13c1-1 3-1 4 1s3-1 3-2.5c0-.92-1.5-2.5-4-2.5S7 11.08 7 12c0 1.5 2 3.5 4 3.5" 
-      stroke="#FFD700" strokeWidth="2" fill="none"/>
-    <circle cx="15" cy="9" r="1" fill="#FFD700"/>
+    <rect x="3" y="19" width="18" height="2" rx="1" fill="#0288D1"/>
+    <rect x="7" y="5" width="10" height="10" rx="4" fill="#B3E5FC"/>
+    <path d="M9 9h6v2H9z" fill="#0288D1"/>
+    <circle cx="12" cy="10" r="1.5" fill="#0288D1"/>
   </svg>
 );
 
@@ -417,11 +423,8 @@ const AppWrapper = observer(() => {
             <MobileWrapper>
                 <RunPanel />
             </MobileWrapper>
-            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onClose={onCloseDialog} onConfirm={onOkButtonClick || onCloseDialog} title={title}>
+            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onConfirm={onOkButtonClick} onClose={onCloseDialog} title={title || ''}>
                 {message}
             </Dialog>
         </>
-    );
-});
-
-export default AppWrapper;
+ 
