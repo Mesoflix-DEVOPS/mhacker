@@ -146,7 +146,7 @@ const AppWrapper = observer(() => {
     const signalGeneratorUrl = "https://your.signal.generator.url";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
     const riskUrl = "https://example.com/risk"; // <-- Replace with your Risk page URL
-    const strategyUrl = "https://example.com/strategy"; // <-- Replace with your Strategy page URL
+    const strategyUrl = "https://mesoflixstrategies.netlify.app/"; // <-- Replace with your Strategy page URL
 
     useEffect(() => {
         if (connectionStatus !== CONNECTION_STATUS.OPENED) {
