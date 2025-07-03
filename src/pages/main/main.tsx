@@ -11,7 +11,6 @@ import TradingViewModal from '@/components/trading-view-chart/trading-view-modal
 import { DBOT_TABS, TAB_IDS } from '@/constants/bot-contents';
 import { api_base, updateWorkspaceName } from '@/external/bot-skeleton';
 import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
-import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useStore } from '@/hooks/useStore';
 import { Localize, localize } from '@deriv-com/translations';
@@ -24,109 +23,103 @@ import RunStrategy from '../dashboard/run-strategy';
 const Chart = lazy(() => import('../chart'));
 const Tutorial = lazy(() => import('../tutorials'));
 
-/** NEW REALISTIC ICONS **/
+/** ICONS (unchanged, you can swap with your original if desired) **/
 
 const DashboardIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="3" width="18" height="18" rx="3" fill="#1976D2" />
-    <rect x="7" y="7" width="4" height="10" rx="1" fill="#fff" />
-    <rect x="13" y="7" width="4" height="5" rx="1" fill="#90CAF9" />
-    <rect x="13" y="14" width="4" height="3" rx="1" fill="#64B5F6" />
+    <path d="M3 12L12 5l9 7v7a2 2 0 01-2 2h-3a1 1 0 01-1-1v-3H9v3a1 1 0 01-1 1H5a2 2 0 01-2-2v-7z"
+      stroke="#4F8CFF" strokeWidth="2" strokeLinejoin="round" fill="none" />
   </svg>
 );
 
 const BotBuilderIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="5" y="16" width="14" height="3" rx="1.5" fill="#388E3C"/>
-    <rect x="7" y="5" width="10" height="8" rx="2" fill="#A5D6A7"/>
-    <circle cx="12" cy="9" r="2" fill="#388E3C"/>
-    <rect x="10" y="13" width="4" height="2" rx="1" fill="#fff"/>
+    <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a3 3 0 104.242 4.242l-1.414-1.414-4.242 4.242 1.414 1.414a3 3 0 10-4.242-4.242l4.242-4.242z"
+      stroke="#A259FF" strokeWidth="2" strokeLinejoin="round" fill="none" />
+    <circle cx="7" cy="17" r="3" stroke="#A259FF" strokeWidth="2" fill="none" />
+    <path d="M7 20v2m0-2a3 3 0 003-3H4a3 3 0 003 3z" stroke="#A259FF" strokeWidth="2" fill="none" />
   </svg>
 );
 
 const ChartsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="4" y="14" width="3" height="6" rx="1" fill="#FFA000" />
-    <rect x="10" y="10" width="3" height="10" rx="1" fill="#1976D2" />
-    <rect x="16" y="6" width="3" height="14" rx="1" fill="#388E3C" />
-    <line x1="3" y1="21" x2="21" y2="21" stroke="#aaa" strokeWidth="1"/>
+    <rect x="3" y="10" width="4" height="10" rx="1" fill="#4F8CFF" />
+    <rect x="10" y="6" width="4" height="14" rx="1" fill="#FFB84F" />
+    <rect x="17" y="2" width="4" height="18" rx="1" fill="#A5DC86" />
   </svg>
 );
 
 const DCirclesIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="9" stroke="#7B1FA2" strokeWidth="2" fill="#E1BEE7"/>
-    <circle cx="12" cy="12" r="5" stroke="#8BC34A" strokeWidth="2" fill="#C5E1A5"/>
-    <circle cx="12" cy="12" r="2" stroke="#FFD600" strokeWidth="2" fill="#FFF9C4"/>
+    <circle cx="12" cy="12" r="9" stroke="#4F8CFF" strokeWidth="2" fill="#F0F8FF"/>
+    <circle cx="12" cy="12" r="6" stroke="#A259FF" strokeWidth="2" fill="#E0E7FF"/>
+    <circle cx="12" cy="12" r="3" stroke="#FFD700" strokeWidth="2" fill="#FFF7E0"/>
+    <circle cx="12" cy="12" r="1" fill="#FF4F81" />
   </svg>
 );
 
 const TutorialsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="4" width="18" height="16" rx="2" fill="#FF7043"/>
-    <rect x="6" y="7" width="12" height="2" fill="#fff"/>
-    <rect x="6" y="11" width="8" height="2" fill="#fff"/>
-    <rect x="6" y="15" width="6" height="2" fill="#fff"/>
+    <circle cx="12" cy="12" r="10" stroke="#FFD700" strokeWidth="2" fill="none" />
+    <polygon points="10,8 17,12 10,16" fill="#FFD700" />
   </svg>
 );
 
 const CopyTradingIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="4" y="5" width="16" height="7" rx="2" fill="#00ACC1"/>
-    <rect x="6" y="13" width="12" height="5" rx="2" fill="#4DD0E1"/>
-    <circle cx="8" cy="16" r="1" fill="#fff"/>
-    <circle cx="16" cy="16" r="1" fill="#fff"/>
+    <path d="M7 17a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8z" stroke="#FF4F81" strokeWidth="2" />
+    <path d="M7 13h10" stroke="#FF4F81" strokeWidth="2" />
   </svg>
 );
 
 const AnalysisToolIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <ellipse cx="12" cy="12" rx="9" ry="7" stroke="#FBC02D" strokeWidth="2" fill="#FFFDE7"/>
-    <path d="M6 12h12M12 5v14" stroke="#FBC02D" strokeWidth="2"/>
-    <circle cx="12" cy="12" r="2.5" fill="#FBC02D"/>
+    <circle cx="12" cy="12" r="10" stroke="#4F8CFF" strokeWidth="2" fill="none" />
+    <path d="M12 2a10 10 0 0110 10h-10z" fill="#4F8CFF" />
+    <path d="M12 12v10A10 10 0 012 12h10z" fill="#FFD700" />
   </svg>
 );
 
 const SignalsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="10" y="4" width="4" height="16" rx="2" fill="#43A047"/>
-    <rect x="4" y="10" width="4" height="10" rx="2" fill="#A5D6A7"/>
-    <rect x="16" y="13" width="4" height="7" rx="2" fill="#388E3C"/>
+    <circle cx="12" cy="18" r="2" fill="#A5DC86" />
+    <path d="M12 16v-4" stroke="#A5DC86" strokeWidth="2" />
+    <path d="M8.5 15.5a6 6 0 117 0" stroke="#A5DC86" strokeWidth="2" fill="none" />
   </svg>
 );
 
 const TradingHubIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" fill="#F06292" />
-    <path d="M12 7v5l4 2" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
-    <circle cx="12" cy="12" r="4" fill="#fff" opacity="0.4"/>
+    <polygon points="13 2 3 14 11 14 11 22 21 10 13 10 13 2"
+      fill="#FF4F81" stroke="#FF4F81" strokeWidth="2" />
   </svg>
 );
 
 const FreeBotsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="5" y="10" width="14" height="8" rx="4" fill="#FFD600"/>
-    <ellipse cx="12" cy="14" rx="3" ry="2" fill="#fff"/>
-    <rect x="8" y="6" width="8" height="4" rx="2" fill="#FFEE58"/>
-    <circle cx="9" cy="12" r="1" fill="#555"/>
-    <circle cx="15" cy="12" r="1" fill="#555"/>
+    <rect x="6" y="8" width="12" height="8" rx="2" fill="#A259FF" />
+    <rect x="9" y="16" width="6" height="3" rx="1" fill="#FFD700" />
+    <circle cx="9" cy="12" r="1" fill="#FFF" />
+    <circle cx="15" cy="12" r="1" fill="#FFF" />
   </svg>
 );
 
 const RiskIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <polygon points="12,2 22,20 2,20" fill="#D32F2F"/>
-    <rect x="11" y="8" width="2" height="6" rx="1" fill="#fff"/>
-    <rect x="11" y="16" width="2" height="2" rx="1" fill="#fff"/>
+    <path d="M12 3l8 4v5c0 5.25-3.5 9.74-8 11-4.5-1.26-8-5.75-8-11V7l8-4z"
+      stroke="#FF4F81" strokeWidth="2" fill="#FFF0F3"/>
+    <path d="M13 10l-2 4h3l-2 4" stroke="#FF4F81" strokeWidth="2" fill="none"/>
   </svg>
 );
 
 const StrategyIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="3" y="19" width="18" height="2" rx="1" fill="#0288D1"/>
-    <rect x="7" y="5" width="10" height="10" rx="4" fill="#B3E5FC"/>
-    <path d="M9 9h6v2H9z" fill="#0288D1"/>
-    <circle cx="12" cy="10" r="1.5" fill="#0288D1"/>
+    <rect x="3" y="18" width="18" height="3" rx="1.5" fill="#A5DC86"/>
+    <path d="M18 18V8.5c0-3.59-2.91-6.5-6.5-6.5S5 4.91 5 8.5V18"
+      stroke="#A259FF" strokeWidth="2" fill="none"/>
+    <path d="M8 13c1-1 3-1 4 1s3-1 3-2.5c0-.92-1.5-2.5-4-2.5S7 11.08 7 12c0 1.5 2 3.5 4 3.5" 
+      stroke="#FFD700" strokeWidth="2" fill="none"/>
+    <circle cx="15" cy="9" r="1" fill="#FFD700"/>
   </svg>
 );
 
@@ -134,7 +127,7 @@ const BotIcon = FreeBotsIcon;
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
-    const { dashboard, load_modal, run_panel, quick_strategy, summary_card } = useStore();
+    const { dashboard, load_modal, run_panel, summary_card } = useStore();
     const {
         active_tab,
         is_chart_modal_visible,
@@ -149,11 +142,11 @@ const AppWrapper = observer(() => {
 
     const [bots, setBots] = useState([]);
 
-    const analysisUrl = "https://mesoflix-percentage.netlify.app/";
+    const analysisUrl = "https://api.binarytool.site/";
     const signalGeneratorUrl = "https://your.signal.generator.url";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
-    const riskUrl = "https://example.com/risk";
-    const strategyUrl = "https://example.com/strategy";
+    const riskUrl = "https://example.com/risk"; // <-- Replace with your Risk page URL
+    const strategyUrl = "https://mesoflixstrategies.netlify.app/"; // <-- Replace with your Strategy page URL
 
     useEffect(() => {
         if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -234,7 +227,7 @@ const AppWrapper = observer(() => {
 
     const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
-    // Inline styles for new requirements
+    // ----------- NEW Free Bots Card Styles -----------
     const mainLightBg = {
         background: '#f7f7fa',
         minHeight: '100vh',
@@ -279,9 +272,10 @@ const AppWrapper = observer(() => {
         transition: 'background 0.2s',
         marginTop: 2,
     };
+    // --------------------------------------------------
 
     return (
-        <>
+        <React.Fragment>
             <div className='main' style={mainLightBg}>
                 <div className='main__container' style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
                     <Tabs active_index={active_tab} className='main__tabs' onTabItemChange={onEntered} onTabItemClick={handleTabChange} top>
@@ -355,6 +349,7 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
+                        {/* ----------- UPDATED FREE BOTS SECTION ----------- */}
                         <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
                             <div className='free-bots'>
                                 <h2 className='free-bots__heading'><Localize i18n_default_text='Free Bots' /></h2>
@@ -369,7 +364,7 @@ const AppWrapper = observer(() => {
                                                     <h3 style={botTitle}>{bot.title}</h3>
                                                     <button
                                                         style={loadBtn}
-                                                        onClick={(e) => {
+                                                        onClick={e => {
                                                             e.stopPropagation();
                                                             handleBotClick(bot);
                                                         }}
@@ -385,6 +380,7 @@ const AppWrapper = observer(() => {
                                 </div>
                             </div>
                         </div>
+                        {/* ----------- END UPDATED FREE BOTS SECTION ----------- */}
                         <div label={<><RiskIcon /><Localize i18n_default_text='Risk' /></>} id='id-risk'>
                             <div style={{ width: '100%', height: 600 }}>
                                 <iframe
@@ -423,8 +419,4 @@ const AppWrapper = observer(() => {
             <MobileWrapper>
                 <RunPanel />
             </MobileWrapper>
-            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onConfirm={onOkButtonClick} onClose={onCloseDialog} title={title || ''}>
-                {message}
-            </Dialog>
-        </>
- 
+            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={
