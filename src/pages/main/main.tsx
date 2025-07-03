@@ -143,7 +143,7 @@ const AppWrapper = observer(() => {
 
     const [bots, setBots] = useState([]);
 
-    const analysisUrl = "https://your.analysis.tool.url";
+    const analysisUrl = "https://mesoflix-percentage.netlify.app/";
     const signalGeneratorUrl = "https://your.signal.generator.url";
     const dcirclesUrl = "https://nilotetrader.netlify.app/";
     const riskUrl = "https://example.com/risk";
