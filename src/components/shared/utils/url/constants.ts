@@ -3,9 +3,9 @@ const isBrowser = () => typeof window !== 'undefined';
 const deriv_com_url = 'deriv.com';
 const deriv_me_url = 'deriv.me';
 const deriv_be_url = 'deriv.be';
-const mesoflix_url = 'mesoflix.online'; // ✅ Added support for your domain
+const osam_url = 'osamhnr.com'; // ✅ Added support for your domain
 
-const supported_domains = [deriv_com_url, deriv_me_url, deriv_be_url, mesoflix_url];
+const supported_domains = [deriv_com_url, deriv_me_url, deriv_be_url, osam_url];
 const domain_url_initial =
     (isBrowser() && window.location.hostname.replace(/^app\./, '').replace(/^bot\./, '')) || '';
 const domain_url = supported_domains.includes(domain_url_initial) ? domain_url_initial : deriv_com_url;
