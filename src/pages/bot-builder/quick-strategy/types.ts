@@ -114,7 +114,7 @@ export type TApiHelpersInstance = {
 };
 
 export type TRsStrategyName =
-    | `tickshark d'alembert`
+    | `OSAMHNR d'alembert`
     | `martingale`
     | `oscar's-grind`
     | `reverse martingale`
