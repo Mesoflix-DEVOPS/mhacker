@@ -421,3 +421,10 @@ const AppWrapper = observer(() => {
             </MobileWrapper>
         
           <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_vi
+{message}
+            </Dialog>
+        </React.Fragment>
+    );
+});
+
+export default AppWrapper;
