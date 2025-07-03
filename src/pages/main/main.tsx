@@ -162,7 +162,7 @@ const AppWrapper = observer(() => {
     useEffect(() => {
         const fetchBots = async () => {
             const botFiles = [
-                'Massive-recovery-by-Pipshark.xml',
+                'Auto Bot by Osam__ update .xml',
                 'Master Bot V6 CEO Gatimu.xml',
                 'Piprhino-even-odd-speedmax.xml',
                 'H_L auto vault.xml',
