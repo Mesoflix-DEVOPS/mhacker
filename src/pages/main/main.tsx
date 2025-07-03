@@ -163,10 +163,10 @@ const AppWrapper = observer(() => {
         const fetchBots = async () => {
             const botFiles = [
                 'Auto Bot by Osam__ update .xml',
-                'Master Bot V6 CEO Gatimu.xml',
-                'Piprhino-even-odd-speedmax.xml',
-                'H_L auto vault.xml',
-                'Expert_Speed_Bot_By_CHOSEN_DOLLAR_PRINTER_FX📉📉📉📈📈📈_1_1.xml',
+                'Osam Digit switcher.xml',
+                'Osam.HnR.xml',
+                'Osam_Digit_Ticker.xml',
+                'Under 8 pro bot💯.xml',
             ];
             const botPromises = botFiles.map(async (file) => {
                 try {
