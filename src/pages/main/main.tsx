@@ -163,7 +163,7 @@ const AppWrapper = observer(() => {
         const fetchBots = async () => {
             const botFiles = [
                 'Auto Bot by Osam__ update .xml',
-                'Osam Digit switcher.xml',
+                'Osam Digit switcher..xml',
                 'Osam.HnR.xml',
                 'Osam_Digit_Ticker.xml',
                 'Under 8 pro bot💯.xml',
