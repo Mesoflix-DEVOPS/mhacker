@@ -9,9 +9,9 @@ type TOption = {
     language?: string;
 };
 
-const default_domain = 'tickshark.top';
+const default_domain = 'osamtradinghub.com';
 const host_map = {
-    'tickshark.top': 'tickshark.top'
+    'osamtradinghub.com': 'osamtradinghub.com'
 };
 
 let location_url: Location, default_language: string;
@@ -52,11 +52,11 @@ export const urlFor = (path: string, options: TOption = {}) => {
     const { legacy, language, query_string } = options;
 
     if (legacy && /^bot$/.test(path)) {
-        return `https://osamhnr.com/`;
+        return `https://osamtradinghub.com/`;
     }
 
     const lang = language?.toLowerCase?.() ?? default_language;
-    let domain = `https://osamhnr.com/`;
+    let domain = `https://osatradinghub.com/`;
 
     if (legacy) {
         if (getPlatformFromUrl().is_staging_deriv_app) {
@@ -64,7 +64,7 @@ export const urlFor = (path: string, options: TOption = {}) => {
         } else if (getPlatformFromUrl().is_deriv_app) {
             domain = domain.replace(/app\.deriv\.com/, `tickshark.top/${lang || 'en'}`);
         } else {
-            domain = `https://osamhnr.com/${lang || 'en'}/`;
+            domain = `https://osamtradinghub.com/${lang || 'en'}/`;
         }
     }
 
@@ -111,7 +111,7 @@ export const setUrlLanguage = (lang: string) => {
 };
 
 export const getStaticUrl = (path = '', is_document = false, is_eu_url = false) => {
-    const host = is_eu_url ? 'osamhnr.com/' : 'osamhnr.com';
+    const host = is_eu_url ? 'osamtradinghub.com/' : 'osamtrading.com';
     let lang = default_language?.toLowerCase();
 
     if (lang && lang !== 'en') {
