@@ -55,7 +55,7 @@ const useMobileMenuConfig = (client?: RootStore['client']) => {
         [
             {
                 as: 'a',
-                href: 'https://osamhnr.com',
+                href: 'https://osamtradinghub.com',
                 label: localize('osamhnr'),
                 LeftComponent: BrandDerivLogoCoralIcon,
             },
@@ -71,7 +71,7 @@ const useMobileMenuConfig = (client?: RootStore['client']) => {
                 cs_chat_whatsapp
                     ? {
                           as: 'a',
-                          href: 'https://wa.link/2xcwcb',
+                          href: 'https://wa.link/vr3sao',
                           label: localize('WhatsApp'),
                           LeftComponent: LegacyWhatsappIcon,
                           target: '_blank',
