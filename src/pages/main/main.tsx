@@ -58,6 +58,15 @@ const DCirclesIcon = () => (
   </svg>
 );
 
+const FreeBotsIcon = () => (
+  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <rect x="6" y="8" width="12" height="8" rx="2" fill="#A259FF" />
+    <rect x="9" y="16" width="6" height="3" rx="1" fill="#FFD700" />
+    <circle cx="9" cy="12" r="1" fill="#FFF" />
+    <circle cx="15" cy="12" r="1" fill="#FFF" />
+  </svg>
+);
+
 const TutorialsIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="10" stroke="#FFD700" strokeWidth="2" fill="none" />
@@ -95,14 +104,7 @@ const TradingHubIcon = () => (
   </svg>
 );
 
-const FreeBotsIcon = () => (
-  <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <rect x="6" y="8" width="12" height="8" rx="2" fill="#A259FF" />
-    <rect x="9" y="16" width="6" height="3" rx="1" fill="#FFD700" />
-    <circle cx="9" cy="12" r="1" fill="#FFF" />
-    <circle cx="15" cy="12" r="1" fill="#FFF" />
-  </svg>
-);
+
 
 const RiskIcon = () => (
   <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -163,6 +165,7 @@ const AppWrapper = observer(() => {
         const fetchBots = async () => {
             const botFiles = [
                 'Auto Bot by Osam__ update .xml',
+                'Under-Destroyer💀.xml',
                 'dec  entry point.xml',
                 'Osam Digit_switcher.xml',
                 'Osam.HnR.xml',
