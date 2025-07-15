@@ -258,6 +258,25 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
+                      <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
+                            <div className='free-bots'>
+                                <h2 className='free-bots__heading'><Localize i18n_default_text='Free Bots' /></h2>
+                                <div className='free-bots__content-wrapper'>
+                                    <ul className='free-bots__content'>
+                                        {bots.map((bot, index) => (
+                                            <li className='free-bot' key={index} onClick={() => {
+                                                handleBotClick(bot);
+                                            }}>
+                                                <BotIcon />
+                                                <div className='free-bot__details'>
+                                                    <h3 className='free-bot__title'>{bot.title}</h3>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <div label={<><TutorialsIcon /><Localize i18n_default_text='Tutorials' /></>} id='id-tutorials'>
                             <Suspense fallback={<ChunkLoader message={localize('Please wait, loading tutorials...')} />}>
                                 <Tutorial handleTabChange={handleTabChange} />
@@ -306,25 +325,7 @@ const AppWrapper = observer(() => {
                                 />
                             </div>
                         </div>
-                        <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
-                            <div className='free-bots'>
-                                <h2 className='free-bots__heading'><Localize i18n_default_text='Free Bots' /></h2>
-                                <div className='free-bots__content-wrapper'>
-                                    <ul className='free-bots__content'>
-                                        {bots.map((bot, index) => (
-                                            <li className='free-bot' key={index} onClick={() => {
-                                                handleBotClick(bot);
-                                            }}>
-                                                <BotIcon />
-                                                <div className='free-bot__details'>
-                                                    <h3 className='free-bot__title'>{bot.title}</h3>
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        
                         {/* Risk as iframe tab */}
                         <div label={<><RiskIcon /><Localize i18n_default_text='Risk' /></>} id='id-risk'>
                             <div style={{ width: '100%', height: 600 }}>
