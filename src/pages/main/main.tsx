@@ -164,7 +164,7 @@ const AppWrapper = observer(() => {
     useEffect(() => {
         const fetchBots = async () => {
             const botFiles = [
-                'Auto Bot by Osam__ update .xml',
+                'Auto Bot by Osam💯.xml',
                 'Under-Destroyer💀.xml',
                 'dec  entry point.xml',
                 'Osam Digit_switcher.xml',
