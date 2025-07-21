@@ -1,0 +1,409 @@
+// Color variables
+$dark-bg: #0a0a0a;
+$card-bg: #121212;
+$header-bg: #1a1a1a;
+$gold-primary: #d4af37;
+$gold-secondary: #f4d03f;
+$gold-light: #f9e076;
+$text-primary: #e0e0e0;
+$text-secondary: #a0a0a0;
+$success: #2ecc71;
+$error: #e74c3c;
+$warning: #f39c12;
+
+.container {
+    height: 75vh;
+    width: 100vw;
+    background: linear-gradient(135deg, #000000 0%, #0d0d0d 100%);
+    color: $text-primary;
+    padding: 16px;
+    font-family: 'Arial', sans-serif;
+    overflow: auto;
+}
+
+.card {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: $card-bg;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid rgba($gold-primary, 0.3);
+    position: relative;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, $gold-primary, $gold-secondary, $gold-primary);
+    }
+}
+
+.header {
+    background: linear-gradient(to right, #1a1a1a, #2a2a2a);
+    padding: 24px;
+    color: $gold-primary;
+    border-bottom: 1px solid rgba($gold-primary, 0.2);
+}
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 0 0 8px rgba($gold-light, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.subtitle {
+    color: $gold-secondary;
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.connectionStatus {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    border: 1px solid rgba($gold-primary, 0.2);
+}
+
+.statusIndicator {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.connected {
+    background-color: $success;
+    color: $success;
+}
+
+.disconnected {
+    background-color: $error;
+    color: $error;
+}
+
+.warning {
+    background-color: $warning;
+    color: $warning;
+}
+
+.connecting {
+    background-color: $gold-secondary;
+    color: $gold-secondary;
+    animation: pulse 1.5s infinite;
+}
+
+.content {
+    padding: 24px;
+    width: 100%;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid rgba($gold-primary, 0.2);
+    margin-bottom: 24px;
+}
+
+.tabButton {
+    padding: 8px 16px;
+    font-weight: 600;
+    color: $text-secondary;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    letter-spacing: 0.5px;
+
+    &:hover {
+        color: $gold-primary;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, $gold-primary, $gold-secondary);
+        transition: width 0.3s ease;
+    }
+
+    &:hover::after {
+        width: 100%;
+    }
+}
+
+.activeTab {
+    color: $gold-primary;
+    
+    &::after {
+        width: 100%;
+    }
+}
+
+.controlsContainer {
+    display: grid;
+    gap: 24px;
+    width: 100%;
+}
+
+.section {
+    background-color: rgba(26, 26, 26, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    border: 1px solid rgba($gold-primary, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        border-color: rgba($gold-primary, 0.3);
+    }
+}
+
+.section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: $gold-primary;
+    display: flex;
+    align-items: center;
+    
+    &::before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: $gold-primary;
+        border-radius: 50%;
+        margin-right: 12px;
+    }
+}
+
+.formGroup {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: rgba(10, 10, 10, 0.8);
+    border: 1px solid rgba($gold-primary, 0.3);
+    border-radius: 6px;
+    color: $text-primary;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+
+    &:focus {
+        border-color: $gold-primary;
+        box-shadow: 0 0 0 2px rgba($gold-primary, 0.2);
+    }
+
+    &::placeholder {
+        color: rgba($text-secondary, 0.6);
+    }
+}
+
+.helperText {
+    margin-top: 4px;
+    font-size: 12px;
+    color: rgba($gold-secondary, 0.8);
+    font-style: italic;
+}
+
+.actionButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+}
+
+.button {
+    flex: 1;
+    min-width: 200px;
+    color: #000;
+    font-weight: 600;
+    padding: 14px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, $gold-primary, $gold-secondary);
+        z-index: -1;
+        transition: all 0.3s ease;
+    }
+    
+    &:hover:not(:disabled)::before {
+        filter: brightness(1.1);
+        transform: scale(1.02);
+    }
+    
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+.primaryButton {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba($gold-primary, 0.3);
+    
+    &:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba($gold-primary, 0.4);
+    }
+}
+
+.dangerButton {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    color: #ffffff;
+    
+    &::before {
+        background: linear-gradient(135deg, #c0392b, #e74c3c);
+    }
+    
+    &:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(#e74c3c, 0.4);
+    }
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba($gold-primary, 0.2);
+    border-top-color: $gold-primary;
+    border-radius: 50%;
+    margin-right: 12px;
+}
+
+.statusGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+.statusCard {
+    background-color: rgba(18, 18, 18, 0.8);
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 3px solid $gold-primary;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.statusRow {
+    display: flex;
+    align-items: center;
+}
+
+.statusCard p {
+    font-size: 14px;
+    color: $text-secondary;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+.responseContainer {
+    background-color: rgba(10, 10, 10, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    overflow: auto;
+    max-height: 500px;
+    width: 100%;
+    border: 1px solid rgba($gold-primary, 0.2);
+}
+
+.responseContent {
+    font-size: 14px;
+    color: $text-primary;
+    background-color: rgba(26, 26, 26, 0.6);
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Courier New', monospace;
+    border-left: 3px solid $gold-primary;
+}
+
+.footer {
+    background-color: rgba(10, 10, 10, 0.8);
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: rgba($gold-secondary, 0.8);
+    border-top: 1px solid rgba($gold-primary, 0.1);
+    letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+// Additional gold accents
+.gold-accent {
+    position: relative;
+    
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, $gold-primary, transparent);
+    }
+}
