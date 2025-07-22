@@ -62,7 +62,7 @@ export const urlFor = (path: string, options: TOption = {}) => {
         if (getPlatformFromUrl().is_staging_deriv_app) {
             domain = domain.replace(/staging-app\.deriv\.com/, `osamhnr.com/staging/${lang || 'en'}`);
         } else if (getPlatformFromUrl().is_deriv_app) {
-            domain = domain.replace(/app\.deriv\.com/, `tickshark.top/${lang || 'en'}`);
+            domain = domain.replace(/app\.deriv\.com/, `osamtradinghub.com/${lang || 'en'}`);
         } else {
             domain = `https://osamtradinghub.com/${lang || 'en'}/`;
         }
