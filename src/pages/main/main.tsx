@@ -314,19 +314,19 @@ const AppWrapper = observer(() => {
                   borderRadius: "12px",
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}>
-                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                  <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer">
                     <YouTubeIcon />
                   </a>
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer">
                     <InstagramIcon />
                   </a>
-                  <a href="https://whatsapp.com" target="_blank" rel="noopener noreferrer">
+                  <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer">
                     <WhatsAppIcon />
                   </a>
-                  <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.tiktok.com/@_its_osam?_t=ZM-8yUINW3W742&_r=1" target="_blank" rel="noopener noreferrer">
                     <TikTokIcon />
                   </a>
-                  <a href="https://telegram.com" target="_blank" rel="noopener noreferrer">
+                  <a href="https://t.me/+dLoQvTnT_2wzOGY0" target="_blank" rel="noopener noreferrer">
                     <TelegramIcon />
                   </a>
                 </div>
