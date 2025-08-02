@@ -163,7 +163,7 @@ const AppWrapper = observer(() => {
   const [bots, setBots] = useState([]);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const analysisUrl = "https://mesoflixldpnew.vercel.app/";
-  const dcirclesUrl = "https://nilotetrader.netlify.app/";
+  const dcirclesUrl = "https://analysern.netlify.app/";
   const strategyUrl = "https://mesoflixstrategies.netlify.app/";
   const toolsUrl = "https://alltools-ten.vercel.app/";
 
