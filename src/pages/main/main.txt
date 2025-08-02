@@ -1,331 +1,870 @@
-import React, { lazy, Suspense, useEffect, useState, useCallback } from 'react';
-import classNames from 'classnames';
-import { observer } from 'mobx-react-lite';
-import { useLocation, useNavigate } from 'react-router-dom';
-import ChunkLoader from '@/components/loader/chunk-loader';
-import DesktopWrapper from '@/components/shared_ui/desktop-wrapper';
-import Dialog from '@/components/shared_ui/dialog';
-import MobileWrapper from '@/components/shared_ui/mobile-wrapper';
-import Tabs from '@/components/shared_ui/tabs/tabs';
-import TradingViewModal from '@/components/trading-view-chart/trading-view-modal';
-import { DBOT_TABS, TAB_IDS } from '@/constants/bot-contents';
-import { api_base, updateWorkspaceName } from '@/external/bot-skeleton';
-import { CONNECTION_STATUS } from '@/external/bot-skeleton/services/api/observables/connection-status-stream';
-import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
-import { useApiBase } from '@/hooks/useApiBase';
-import { useStore } from '@/hooks/useStore';
-import { Localize, localize } from '@deriv-com/translations';
-import { useDevice } from '@deriv-com/ui';
-import RunPanel from '../../components/run-panel';
-import ChartModal from '../chart/chart-modal';
-import Dashboard from '../dashboard';
-import RunStrategy from '../dashboard/run-strategy';
+import React, { lazy, Suspense, useEffect, useState, useCallback } from "react";
+import classNames from "classnames";
+import { observer } from "mobx-react-lite";
+import ChunkLoader from "@/components/loader/chunk-loader";
+import DesktopWrapper from "@/components/shared_ui/desktop-wrapper";
+import Dialog from "@/components/shared_ui/dialog";
+import MobileWrapper from "@/components/shared_ui/mobile-wrapper";
+import Tabs from "@/components/shared_ui/tabs/tabs";
+import TradingViewModal from "@/components/trading-view-chart/trading-view-modal";
+import { DBOT_TABS } from "@/constants/bot-contents";
+import { api_base, updateWorkspaceName } from "@/external/bot-skeleton";
+import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream";
+import { useApiBase } from "@/hooks/useApiBase";
+import { useStore } from "@/hooks/useStore";
+import { Localize, localize } from "@deriv-com/translations";
+import { useDevice } from "@deriv-com/ui";
+import RunPanel from "../../components/run-panel";
+import ChartModal from "../chart/chart-modal";
+import Dashboard from "../dashboard";
+import RunStrategy from "../dashboard/run-strategy";
 
-const Chart = lazy(() => import('../chart'));
-const Tutorial = lazy(() => import('../tutorials'));
+const Chart = lazy(() => import("../chart"));
+const Tutorial = lazy(() => import("../tutorials"));
+const Copytrading = lazy(() => import("../copytrading"));
 
-const DashboardIcon = () => (
-    <svg width="20" height="20" fill="var(--text-general)" viewBox="0 0 24 24">
-        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-    </svg>
-);
+/** NEW ICONS WITH OUTLINE STYLE **/
+const FreeBotsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <circle cx="15.5" cy="8.5" r="1.5" />
+    <line x1="8" y1="15" x2="16" y2="15" />
+    <line x1="10" y1="18" x2="14" y2="18" />
+  </svg>
+)
 
-const BotBuilderIcon = () => (
-   <svg fill="var(--text-general)" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M20,9.85714286 L20,14.1428571 C20,15.2056811 19.0732946,16 18,16 L6,16 C4.92670537,16 4,15.2056811 4,14.1428571 L4,9.85714286 C4,8.79431889 4.92670537,8 6,8 L18,8 C19.0732946,8 20,8.79431889 20,9.85714286 Z M6,10 L6,14 L18,14 L18,10 L6,10 Z M2,19 L2,17 L22,17 L22,19 L2,19 Z M2,7 L2,5 L22,5 L22,7 L2,7 Z"/>
-</svg>
-);
+const BotSettingsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 3.417 1.415 2 2 0 0 1-.587 1.415l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+)
 
 const ChartsIcon = () => (
-    <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M21 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V3M6 15L10 11L14 15L20 9M20 9V13M20 9H16" stroke="var(--text-general)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-);
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+)
 
-const TutorialsIcon = () => (
-   <svg width="24px" height="24px" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg" fill="none"><path stroke="var(--text-general)" stroke-width="12" d="M170 96c0-45-4.962-49.999-50-50H72c-45.038.001-50 5-50 50s4.962 49.999 50 50h48c45.038-.001 50-5 50-50Z"/><path stroke="var(--text-general)" stroke-linecap="round" stroke-linejoin="round" stroke-width="12" d="m82 74 34 22-34 22"/></svg>
-);
+const DCirclesIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+)
 
 const AnalysisToolIcon = () => (
-    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M7.5 3.5V6.5" stroke="var(--text-general)" stroke-linecap="round"/>
-<path d="M7.5 14.5V18.5" stroke="var(--text-general)" stroke-linecap="round"/>
-<path d="M6.8 6.5C6.08203 6.5 5.5 7.08203 5.5 7.8V13.2C5.5 13.918 6.08203 14.5 6.8 14.5H8.2C8.91797 14.5 9.5 13.918 9.5 13.2V7.8C9.5 7.08203 8.91797 6.5 8.2 6.5H6.8Z" stroke="var(--text-general)"/>
-<path d="M16.5 6.5V11.5" stroke="var(--text-general)" stroke-linecap="round"/>
-<path d="M16.5 16.5V20.5" stroke="var(--text-general)" stroke-linecap="round"/>
-<path d="M15.8 11.5C15.082 11.5 14.5 12.082 14.5 12.8V15.2C14.5 15.918 15.082 16.5 15.8 16.5H17.2C17.918 16.5 18.5 15.918 18.5 15.2V12.8C18.5 12.082 17.918 11.5 17.2 11.5H15.8Z" stroke="var(--text-general)"/>
-</svg>
-);
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <path d="M21 21l-6-6m6 6l-6 6m6-16a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
+
+const ToolsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a1 1 0 00-.29-1.61l-4.11-1.71a1 1 0 00-1.24.49l-1.13 2.4z" />
+    <path d="M12.19 8.84l-7.9 7.9a1 1 0 00-.29.59l-.53 4.11a1 1 0 001.17 1.09l4.11-.53a1 1 0 00.59-.29l7.9-7.9a1 1 0 000-1.41l-4.24-4.24a1 1 0 00-1.41 0z" />
+    <path d="M6.51 17.49l-1.6-1.6a1 1 0 010-1.42l1.6-1.6a1 1 0 011.41 0l1.6 1.6a1 1 0 010 1.41l-1.6 1.6a1 1 0 01-1.41 0z" />
+  </svg>
+)
+
+const CopyTradingIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.5">
+    <rect x="3" y="3" width="10" height="10" rx="2" />
+    <rect x="11" y="11" width="10" height="10" rx="2" />
+    <path d="M7 7h2M7 9h3M15 15h2M15 17h3M13 3v8M21 11h-8" />
+  </svg>
+)
+
+const StrategyIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+  </svg>
+)
 
 const SignalsIcon = () => (
-    <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M8 6.00067L21 6.00139M8 12.0007L21 12.0015M8 18.0007L21 18.0015M3.5 6H3.51M3.5 12H3.51M3.5 18H3.51M4 6C4 6.27614 3.77614 6.5 3.5 6.5C3.22386 6.5 3 6.27614 3 6C3 5.72386 3.22386 5.5 3.5 5.5C3.77614 5.5 4 5.72386 4 6ZM4 12C4 12.2761 3.77614 12.5 3.5 12.5C3.22386 12.5 3 12.2761 3 12C3 11.7239 3.22386 11.5 3.5 11.5C3.77614 11.5 4 11.7239 4 12ZM4 18C4 18.2761 3.77614 18.5 3.5 18.5C3.22386 18.5 3 18.2761 3 18C3 17.7239 3.22386 17.5 3.5 17.5C3.77614 17.5 4 17.7239 4 18Z" stroke="var(--text-general)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-);
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+  </svg>
+)
 
-const TradingHubIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="var(--text-general)" width="24px" height="24px" viewBox="0 0 24 24"><path d="M21.49 13.926l-3.273 2.48c.054-.663.116-1.435.143-2.275.04-.89.023-1.854-.043-2.835-.043-.487-.097-.98-.184-1.467-.077-.485-.196-.982-.31-1.39-.238-.862-.535-1.68-.9-2.35-.352-.673-.786-1.173-1.12-1.462-.172-.144-.31-.248-.414-.306l-.153-.093c-.083-.05-.187-.056-.275-.003-.13.08-.175.252-.1.388l.01.02s.11.198.258.54c.07.176.155.38.223.63.08.24.14.528.206.838.063.313.114.66.17 1.03l.15 1.188c.055.44.106.826.13 1.246.03.416.033.85.026 1.285.004.872-.063 1.76-.115 2.602-.062.853-.12 1.65-.172 2.335 0 .04-.004.073-.005.11l-.115-.118-2.996-3.028-1.6.454 5.566 6.66 6.394-5.803-1.503-.677z"/><path d="M2.503 9.48L5.775 7c-.054.664-.116 1.435-.143 2.276-.04.89-.023 1.855.043 2.835.043.49.097.98.184 1.47.076.484.195.98.31 1.388.237.862.534 1.68.9 2.35.35.674.785 1.174 1.12 1.463.17.145.31.25.413.307.1.06.152.093.152.093.083.05.187.055.275.003.13-.08.175-.252.1-.388l-.01-.02s-.11-.2-.258-.54c-.07-.177-.155-.38-.223-.63-.082-.242-.14-.528-.207-.84-.064-.312-.115-.658-.172-1.027-.046-.378-.096-.777-.15-1.19-.053-.44-.104-.825-.128-1.246-.03-.415-.033-.85-.026-1.285-.004-.872.063-1.76.115-2.603.064-.853.122-1.65.174-2.334 0-.04.004-.074.005-.11l.114.118 2.996 3.027 1.6-.454L7.394 3 1 8.804l1.503.678z"/></svg>
-);
+const TutorialsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
+)
 
-const FreeBotsIcon = () => (
-   <svg fill="var(--text-general)" width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"><path d="M10,13H4a1,1,0,0,0-1,1v6a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1V14A1,1,0,0,0,10,13ZM9,19H5V15H9ZM20,3H14a1,1,0,0,0-1,1v6a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1V4A1,1,0,0,0,20,3ZM19,9H15V5h4Zm1,7H18V14a1,1,0,0,0-2,0v2H14a1,1,0,0,0,0,2h2v2a1,1,0,0,0,2,0V18h2a1,1,0,0,0,0-2ZM10,3H4A1,1,0,0,0,3,4v6a1,1,0,0,0,1,1h6a1,1,0,0,0,1-1V4A1,1,0,0,0,10,3ZM9,9H5V5H9Z"/></svg>
-);
+// Social Media Icons
+const YouTubeIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"
+      fill="#FF0000"
+    />
+    <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" fill="#fff" />
+  </svg>
+)
 
-const BotIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" fill="var(--text-general)" />
-    </svg>
-);
+const InstagramIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <rect x="2" y="2" width="20" height="20" rx="5" stroke="#E1306C" strokeWidth="2" fill="none" />
+    <circle cx="12" cy="12" r="5" stroke="#E1306C" strokeWidth="2" fill="none" />
+    <circle cx="18" cy="6" r="1" fill="#E1306C" />
+  </svg>
+)
+
+const WhatsAppIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+      fill="#25D366"
+    />
+  </svg>
+)
+
+const TikTokIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+      fill="#000000"
+    />
+  </svg>
+)
+
+const TelegramIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
+      fill="#0088CC"
+    />
+  </svg>
+)
 
 const AppWrapper = observer(() => {
-    const { connectionStatus } = useApiBase();
-    const { dashboard, load_modal, run_panel, quick_strategy, summary_card } = useStore();
-    const {
-        active_tab,
-        is_chart_modal_visible,
-        is_trading_view_modal_visible,
-        setActiveTab,
-    } = dashboard;
-    const { onEntered } = load_modal;
-    const { is_dialog_open, dialog_options, onCancelButtonClick, onCloseDialog, onOkButtonClick, stopBot, is_drawer_open } = run_panel;
-    const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string };
-    const { clear } = summary_card;
-    const { DASHBOARD, BOT_BUILDER, ANALYSIS_TOOL, SIGNALS } = DBOT_TABS;
-    const { isDesktop } = useDevice();
-    const location = useLocation();
-    const navigate = useNavigate();
+  const { connectionStatus } = useApiBase();
+  const { dashboard, load_modal, run_panel, summary_card } = useStore();
+  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard;
+  const { onEntered } = load_modal;
+  const {
+    is_dialog_open,
+    dialog_options,
+    onCancelButtonClick,
+    onCloseDialog,
+    onOkButtonClick,
+    stopBot,
+    is_drawer_open,
+  } = run_panel;
+  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string };
+  const { clear } = summary_card;
+  const { isDesktop } = useDevice();
+  const [bots, setBots] = useState([]);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const analysisUrl = "https://mesoflixldpnew.vercel.app/";
+  const dcirclesUrl = "https://analysern.netlify.app/";
+  const strategyUrl = "https://mesoflixstrategies.netlify.app/";
+  const toolsUrl = "https://alltools-ten.vercel.app/";
 
-    const [bots, setBots] = useState([]);
-    // Add new state for analysis tool URL
-    const [analysisToolUrl, setAnalysisToolUrl] = useState('ai');
+  useEffect(() => {
+    if (connectionStatus !== CONNECTION_STATUS.OPENED) {
+      const is_bot_running = document.getElementById("db-animation__stop-button") !== null;
+      if (is_bot_running) {
+        clear();
+        stopBot();
+        api_base.setIsRunning(false);
+      }
+    }
+  }, [clear, connectionStatus, stopBot]);
 
-    // Add function to check if analysis tool is active
-    const isAnalysisToolActive = active_tab === ANALYSIS_TOOL;
-
-    useEffect(() => {
-        if (connectionStatus !== CONNECTION_STATUS.OPENED) {
-            const is_bot_running = document.getElementById('db-animation__stop-button') !== null;
-            if (is_bot_running) {
-                clear();
-                stopBot();
-                api_base.setIsRunning(false);
-            }
-        }
-    }, [clear, connectionStatus, stopBot]);
-
-    useEffect(() => {
-        // Fetch the XML files and parse them
-        const fetchBots = async () => {
-            const botFiles = [
-                'Upgraded Candlemine.xml',
-                'Master Bot V6 CEO Gatimu.xml',
-                'Anonymous recovery.xml ',
-                'H_L auto vault.xml',
-                'Expert_Speed_Bot_By_CHOSEN_DOLLAR_PRINTER_FX📉📉📉📈📈📈_1_1.xml',
-                // Add more paths to your XML files
-            ];
-            const botPromises = botFiles.map(async (file) => {
-                try {
-                    const response = await fetch(file);
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
-                    }
-                    const text = await response.text();
-                    const parser = new DOMParser();
-                    const xml = parser.parseFromString(text, 'application/xml');
-                    return {
-                        title: file.split('/').pop(), // Use the file name as the title
-                        image: xml.getElementsByTagName('image')[0]?.textContent || 'default_image_path',
-                        filePath: file,
-                        xmlContent: text, // Store the XML content
-                    };
-                } catch (error) {
-                    console.error(error);
-                    return null;
-                }
-            });
-            const bots = (await Promise.all(botPromises)).filter(Boolean);
-            setBots(bots);
-        };
-
-        fetchBots();
-    }, []);
-
-    const runBot = (xmlContent: string) => {
-        // Load the strategy into the bot builder
-        updateWorkspaceName(xmlContent);
-        console.log('Running bot with content:', xmlContent);
-    };
-
-    const handleTabChange = React.useCallback(
-        (tab_index: number) => {
-            setActiveTab(tab_index);
-        },
-        [setActiveTab]
-    );
-
-    const handleBotClick = useCallback(async (bot: { filePath: string; xmlContent: string }) => {
-        setActiveTab(DBOT_TABS.BOT_BUILDER);
+  useEffect(() => {
+    const fetchBots = async () => {
+      const botFiles = [
+          "Osam_Digit_Switcher🤖🤖.xml",
+        "Under-Destroyer💀.xml",
+        "Over HitnRun.xml",
+        "Osam.HnR.xml",
+        "Over-Destroyer💀.xml",
+        "Auto Bot by Osam💯.xml",
+        "DEC_entry_Point.xml",
+        "Under 8 pro bot💯.xml",
+        
+      ];
+      const botPromises = botFiles.map(async (file) => {
         try {
-            console.log("Loading bot:", bot.title, bot.filePath);
-            console.log("XML Content:", bot.xmlContent);
-
-            if (typeof load_modal.loadFileFromContent === 'function') {
-                try {
-                    await load_modal.loadFileFromContent(bot.xmlContent);
-                    console.log("Bot loaded successfully!");
-                } catch (loadError) {
-                    console.error("Error in load_modal.loadFileFromContent:", loadError);
-                }
-            } else {
-                console.error("loadFileFromContent is not defined on load_modal");
-            }
-            updateWorkspaceName(bot.xmlContent);
+          const response = await fetch(file);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
+          }
+          const text = await response.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, "application/xml");
+          return {
+            title: file.split("/").pop(),
+            image: xml.getElementsByTagName("image")[0]?.textContent || "default_image_path",
+            filePath: file,
+            xmlContent: text,
+          };
         } catch (error) {
-            console.error("Error loading bot file:", error);
+          console.error(error);
+          return null;
         }
-    }, [setActiveTab, load_modal, updateWorkspaceName]);
-
-    const handleOpen = useCallback(async () => {
-        await load_modal.loadFileFromRecent();
-        setActiveTab(DBOT_TABS.BOT_BUILDER);
-        // rudderStackSendDashboardClickEvent({ dashboard_click_name: 'open', subpage_name: 'bot_builder' });
-    }, [load_modal, setActiveTab]);
-
-    // Add toggle function
-    const toggleAnalysisTool = (url: string) => {
-        setAnalysisToolUrl(url);
+      });
+      const bots = (await Promise.all(botPromises)).filter(Boolean);
+      setBots(bots);
     };
+    fetchBots();
+  }, []);
 
-    const showRunPanel = [DBOT_TABS.BOT_BUILDER, DBOT_TABS.CHART, DBOT_TABS.ANALYSIS_TOOL, DBOT_TABS.SIGNALS].includes(active_tab);
+  const formatBotName = (name) => {
+    return name.replace(/\.xml$/, '');
+  };
 
-    return (
-        <React.Fragment>
-            <div className='main'>
-                <div className='main__container'>
-                    <Tabs active_index={active_tab} className='main__tabs' onTabItemChange={onEntered} onTabItemClick={handleTabChange} top>
-                        <div label={<><DashboardIcon /><Localize i18n_default_text='Dashboard' /></>} id='id-dbot-dashboard'>
-                            <Dashboard handleTabChange={handleTabChange} />
-                            <button onClick={handleOpen}>Load Bot</button>
-                        </div>
-                        <div label={<><BotBuilderIcon /><Localize i18n_default_text='Bot Builder' /></>} id='id-bot-builder' />
-                        <div label={<><ChartsIcon /><Localize i18n_default_text='Charts' /></>} id='id-charts'>
-                            <Suspense fallback={<ChunkLoader message={localize('Please wait, loading chart...')} />}>
-                                <Chart show_digits_stats={false} />
-                            </Suspense>
-                        </div>
-                        <div label={<><TutorialsIcon /><Localize i18n_default_text='Tutorials' /></>} id='id-tutorials'>
-                            <Suspense fallback={<ChunkLoader message={localize('Please wait, loading tutorials...')} />}>
-                                <Tutorial handleTabChange={handleTabChange} />
-                            </Suspense>
-                        </div>
-                        <div label={<><AnalysisToolIcon /><Localize i18n_default_text='Analysis Tool' /></>} id='id-analysis-tool'>
-                            <div className={classNames('dashboard__chart-wrapper', {
-                                'dashboard__chart-wrapper--expanded': is_drawer_open && isDesktop,
-                                'dashboard__chart-wrapper--modal': is_chart_modal_visible && isDesktop,
-                            })}>
-                                <div style={{ 
-                                    display: 'flex', 
-                                    gap: '8px', 
-                                    padding: '8px', 
-                                    borderBottom: '1px solid var(--border-normal)'
-                                }}>
-                                    <button 
-                                        onClick={() => toggleAnalysisTool('ai')}
-                                        style={{ 
-                                            backgroundColor: analysisToolUrl === 'ai' ? 'var(--button-primary-default)' : 'transparent',
-                                            color: analysisToolUrl === 'ai' ? 'white' : 'var(--text-general)',
-                                            padding: '8px 16px',
-                                            border: '1px solid var(--border-normal)',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        A Tool
-                                    </button>
-                                    <button 
-                                        onClick={() => toggleAnalysisTool('ldpanalyzer')}
-                                        style={{ 
-                                            backgroundColor: analysisToolUrl === 'ldpanalyzer' ? 'var(--button-primary-default)' : 'transparent',
-                                            color: analysisToolUrl === 'ldpanalyzer' ? 'white' : 'var(--text-general)',
-                                            padding: '8px 16px',
-                                            border: '1px solid var(--border-normal)',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        LDP Tool
-                                    </button>
-                                </div>
-                                <iframe 
-                                    src={analysisToolUrl} 
-                                    width="100%"
-                                    height="600px"
-                                    style={{ border: 'none', display: 'block' }}
-                                    scrolling="yes"
-                                />
-                            </div>
-                        </div>
-                        <div label={<><SignalsIcon /><Localize i18n_default_text='Signals' /></>} id='id-signals'>
-                            <div className={classNames('dashboard__chart-wrapper', {
-                                'dashboard__chart-wrapper--expanded': is_drawer_open && isDesktop,
-                                'dashboard__chart-wrapper--modal': is_chart_modal_visible && isDesktop,
-                            })}>
-                                <iframe 
-                                    src='signals' 
-                                    width="100%"
-                                    height="600px"
-                                    style={{ border: 'none', display: 'block' }}
-                                    scrolling="yes" 
-                                />
-                            </div>
-                        </div>
-                        <div label={<><TradingHubIcon /><Localize i18n_default_text='Trading Hub' /></>} id='id-Trading-Hub'>
-                            <div className={classNames('dashboard__chart-wrapper', {
-                                'dashboard__chart-wrapper--expanded': is_drawer_open && isDesktop,
-                                'dashboard__chart-wrapper--modal': is_chart_modal_visible && isDesktop,
-                            })}>
-                                <iframe src='http://www.mesoflix.online' height='600px' frameBorder='0' />
-                            </div>
-                        </div>
-                        <div label={<><FreeBotsIcon /><Localize i18n_default_text='Free Bots' /></>} id='id-free-bots'>
-                            <div className='free-bots'>
-                                <h2 className='free-bots__heading'><Localize i18n_default_text='Free Bots' /></h2>
-                                <div className='free-bots__content-wrapper'>
-                                    <ul className='free-bots__content'>
-                                        {bots.map((bot, index) => (
-                                            <li className='free-bot' key={index} onClick={() => {
-                                                handleBotClick(bot);
-                                            }}>
-                                                <BotIcon />
-                                                <div className='free-bot__details'>
-                                                    <h3 className='free-bot__title'>{bot.title}</h3>
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </Tabs>
+  const handleTabChange = React.useCallback(
+    (tab_index: number) => {
+      setActiveTab(tab_index);
+    },
+    [setActiveTab],
+  );
+
+  const handleBotClick = useCallback(
+    async (bot: { filePath: string; xmlContent: string }) => {
+      setActiveTab(DBOT_TABS.BOT_BUILDER);
+      try {
+        if (typeof load_modal.loadFileFromContent === "function") {
+          try {
+            await load_modal.loadFileFromContent(bot.xmlContent);
+          } catch (loadError) {
+            console.error("Error in load_modal.loadFileFromContent:", loadError);
+          }
+        } else {
+          console.error("loadFileFromContent is not defined on load_modal");
+        }
+        updateWorkspaceName(bot.xmlContent);
+      } catch (error) {
+        console.error("Error loading bot file:", error);
+      }
+    },
+    [setActiveTab, load_modal, updateWorkspaceName],
+  );
+
+  const handleOpen = useCallback(async () => {
+    await load_modal.loadFileFromRecent();
+    setActiveTab(DBOT_TABS.BOT_BUILDER);
+  }, [load_modal, setActiveTab]);
+
+  const showRunPanel = [1, 2, 3, 4].includes(active_tab);
+
+  // Custom tab styling
+  const tabStyle = {
+    activeTab: {
+      backgroundColor: '#3B82F6', // Meaningful blue color for active tab
+      color: 'white',
+      borderBottom: '2px solid #1D4ED8'
+    },
+    inactiveTab: {
+      backgroundColor: '#F3F4F6',
+      color: '#4B5563'
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <div className="main">
+        <div className="main__container" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
+          <Tabs
+            active_index={active_tab}
+            className="main__tabs"
+            onTabItemChange={onEntered}
+            onTabItemClick={handleTabChange}
+            top
+            style={{
+              activeTab: tabStyle.activeTab,
+              inactiveTab: tabStyle.inactiveTab
+            }}
+          >
+            {/* 1. Free Bots - First */}
+            <div
+              label={
+                <>
+                  <FreeBotsIcon />
+                  <Localize i18n_default_text="Free Bots" />
+                </>
+              }
+              id="id-free-bots"
+            >
+              <div
+                className="free-bots"
+                style={{
+                  padding: "16px",
+                  background: "linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%)",
+                  minHeight: "100vh",
+                  width: "100%",
+                  position: "relative",
+                }}
+              >
+                {/* Social Media Icons */}
+                <div style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "16px",
+                  marginBottom: "16px",
+                  padding: "8px",
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                }}>
+                  <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer">
+                    <YouTubeIcon />
+                  </a>
+                  <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer">
+                    <InstagramIcon />
+                  </a>
+                  <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer">
+                    <WhatsAppIcon />
+                  </a>
+                  <a href="https://www.tiktok.com/@_its_osam?_t=ZM-8yUINW3W742&_r=1" target="_blank" rel="noopener noreferrer">
+                    <TikTokIcon />
+                  </a>
+                  <a href="https://t.me/+dLoQvTnT_2wzOGY0" target="_blank" rel="noopener noreferrer">
+                    <TelegramIcon />
+                  </a>
                 </div>
+
+                <div
+                  className="free-bots__content-wrapper"
+                  style={{
+                    width: "100%",
+                    maxHeight: "calc(100vh - 180px)",
+                    overflowY: "auto",
+                    padding: "0 8px",
+                  }}
+                >
+                  <style>
+                    {`
+                      .free-bots__content-wrapper::-webkit-scrollbar {
+                        width: 8px;
+                      }
+                      .free-bots__content-wrapper::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                        border-radius: 10px;
+                      }
+                      .free-bots__content-wrapper::-webkit-scrollbar-thumb {
+                        background: #10B981;
+                        border-radius: 10px;
+                      }
+                      .free-bots__content-wrapper::-webkit-scrollbar-thumb:hover {
+                        background: #059669;
+                      }
+                      @keyframes pulse {
+                        0% { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+                        100% { box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); }
+                      }
+                      @keyframes borderAnimation {
+                        0% { background-position: 0% 50%; }
+                        100% { background-position: 200% 50%; }
+                      }
+                    `}
+                  </style>
+                  <div
+                    className="free-bots__content"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                      width: "100%",
+                    }}
+                  >
+                    {bots.map((bot, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          background: "white",
+                          borderRadius: "8px",
+                          padding: "10px",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                          border: "1px solid #E5E7EB",
+                          transition: "all 0.3s ease",
+                          cursor: "default",
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: "10px",
+                          position: "relative",
+                          overflow: "hidden",
+                          marginBottom: "10px",
+                          transform: "scale(0.97)",
+                          animation: "pulse 2s infinite alternate",
+                          ':hover': {
+                            transform: "scale(0.98)",
+                            boxShadow: "0 6px 16px rgba(0,0,0,0.1)"
+                          }
+                        }}
+                      >
+                        {/* Animated bottom border */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            height: "2px",
+                            background: "linear-gradient(90deg, #3B82F6, #10B981, #3B82F6)",
+                            backgroundSize: "200% 100%",
+                            animation: "borderAnimation 3s linear infinite",
+                          }}
+                        />
+                        
+                        <div style={{ display: "flex", alignItems: "center", flex: "1", minWidth: "180px" }}>
+                          <div
+                            style={{
+                              background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
+                              borderRadius: "6px",
+                              padding: "5px",
+                              marginRight: "8px",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <FreeBotsIcon />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <h3
+                              style={{
+                                fontSize: "14px",
+                                fontWeight: "600",
+                                color: "#1F2937",
+                                margin: "0",
+                                lineHeight: "1.4",
+                                wordBreak: "break-word",
+                              }}
+                            >
+                              {formatBotName(bot.title)}
+                            </h3>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleBotClick(bot)}
+                          style={{
+                            background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "6px",
+                            padding: "8px 16px",
+                            fontSize: "13px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                            flexShrink: 0,
+                            minWidth: "70px",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = "translateY(-1px)";
+                            e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.15)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+                          }}
+                        >
+                          Load Bot
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-            <DesktopWrapper>
-                <div className='main__run-strategy-wrapper'>
-                    <RunStrategy />
-                    {showRunPanel && <RunPanel />}
-                </div>
-                <ChartModal />
-                <TradingViewModal />
-            </DesktopWrapper>
-            <MobileWrapper>
-                <RunPanel />
-            </MobileWrapper>
-            <Dialog cancel_button_text={cancel_button_text || localize('Cancel')} confirm_button_text={ok_button_text || localize('Ok')} has_close_icon is_visible={is_dialog_open} onCancel={onCancelButtonClick} onClose={onCloseDialog} onConfirm={onOkButtonClick || onCloseDialog} title={title}>
-                {message}
-            </Dialog>
-        </React.Fragment>
-    );
+
+            {/* 2. Bot Settings */}
+            <div
+              label={
+                <>
+                  <BotSettingsIcon />
+                  <Localize i18n_default_text="Bot Settings" />
+                </>
+              }
+              id="id-bot-settings"
+            >
+              <Dashboard handleTabChange={handleTabChange} />
+              <button onClick={handleOpen}>Load Bot</button>
+            </div>
+
+            {/* 3. Charts */}
+            <div
+              label={
+                <>
+                  <ChartsIcon />
+                  <Localize i18n_default_text="Charts" />
+                </>
+              }
+              id="id-charts"
+            >
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
+                <Chart show_digits_stats={false} />
+              </Suspense>
+            </div>
+
+            {/* 4. Dcircles */}
+            <div
+              label={
+                <>
+                  <DCirclesIcon />
+                  <Localize i18n_default_text="Dcircles" />
+                </>
+              }
+              id="id-dcircles"
+            >
+              <div style={{ width: "100%", height: 600 }}>
+                <iframe
+                  src={dcirclesUrl}
+                  width="100%"
+                  height="100%"
+                  title="Dcircles"
+                  style={{ border: "none", display: "block", borderRadius: 16, background: "#f0f4fa" }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
+
+            {/* 5. Analysis */}
+            <div
+              label={
+                <>
+                  <AnalysisToolIcon />
+                  <Localize i18n_default_text="Analysis" />
+                </>
+              }
+              id="id-analysis"
+            >
+              <div style={{ width: "100%", height: 600 }}>
+                <iframe
+                  src={analysisUrl}
+                  width="100%"
+                  height="100%"
+                  title="Analysis"
+                  style={{ border: "none", display: "block" }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
+
+            {/* 6. Tools */}
+            <div
+              label={
+                <>
+                  <ToolsIcon />
+                  <Localize i18n_default_text="Tools" />
+                </>
+              }
+              id="id-tools"
+            >
+              <div style={{ width: "100%", height: 600 }}>
+                <iframe
+                  src={toolsUrl}
+                  width="100%"
+                  height="100%"
+                  title="Tools"
+                  style={{ border: "none", display: "block", borderRadius: 16 }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
+
+            {/* 7. Copytrading */}
+            <div
+              label={
+                <>
+                  <CopyTradingIcon />
+                  <Localize i18n_default_text="Copytrading" />
+                </>
+              }
+              id="id-copytrading"
+            >
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
+                <Copytrading />
+              </Suspense>
+            </div>
+
+            {/* 8. Strategies */}
+            <div
+              label={
+                <>
+                  <StrategyIcon />
+                  <Localize i18n_default_text="Strategy" />
+                </>
+              }
+              id="id-strategy"
+            >
+              <div style={{ width: "100%", height: 600 }}>
+                <iframe
+                  src={strategyUrl}
+                  width="100%"
+                  height="100%"
+                  title="Strategy"
+                  style={{ border: "none", display: "block", borderRadius: 16, background: "#f8f7ff" }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
+
+            {/* 9. Signals */}
+            <div
+              label={
+                <>
+                  <SignalsIcon />
+                  <Localize i18n_default_text="Signals" />
+                </>
+              }
+              id="id-signals"
+            >
+              <div
+                className={classNames("dashboard__chart-wrapper", {
+                  "dashboard__chart-wrapper--expanded": is_drawer_open && isDesktop,
+                  "dashboard__chart-wrapper--modal": is_chart_modal_visible && isDesktop,
+                })}
+              >
+                <iframe
+                  src="signals"
+                  width="100%"
+                  height="600px"
+                  style={{ border: "none", display: "block" }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
+
+            {/* 10. Tutorials - Last */}
+            <div
+              label={
+                <>
+                  <TutorialsIcon />
+                  <Localize i18n_default_text="Tutorials" />
+                </>
+              }
+              id="id-tutorials"
+            >
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
+                <Tutorial handleTabChange={handleTabChange} />
+              </Suspense>
+            </div>
+          </Tabs>
+        </div>
+      </div>
+      
+      {/* Floating Disclaimer Button */}
+      <button
+        onClick={() => setShowDisclaimer(true)}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          background: "linear-gradient(135deg, #F59E0B, #EF4444)",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          padding: "8px 16px",
+          fontSize: "12px",
+          fontWeight: "600",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = "scale(1.05)";
+          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        Disclaimer
+      </button>
+
+      {/* Risk Disclaimer Modal */}
+      {showDisclaimer && (
+        <div style={{
+          position: "fixed",
+          top: "0",
+          left: "0",
+          right: "0",
+          bottom: "0",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1001,
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "24px",
+            maxWidth: "600px",
+            width: "90%",
+            maxHeight: "80vh",
+            overflowY: "auto",
+            position: "relative",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+          }}>
+            <button
+              onClick={() => setShowDisclaimer(false)}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                background: "none",
+                border: "none",
+                fontSize: "20px",
+                cursor: "pointer",
+                color: "#6B7280",
+              }}
+            >
+              ×
+            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+              <div style={{
+                background: "#FEE2E2",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
+                  <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1F2937", margin: 0 }}>
+                Deriv Trading Risk Disclaimer
+              </h3>
+            </div>
+            
+            <div style={{ marginBottom: "16px" }}>
+              <p style={{ lineHeight: "1.6", color: "#4B5563", marginBottom: "12px" }}>
+                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
+              </p>
+              
+              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Key Risks:</h4>
+              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563", marginBottom: "16px" }}>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.
+                </li>
+                <li>
+                  <strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may affect your rights as a trader.
+                </li>
+              </ul>
+              
+              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Important Considerations:</h4>
+              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563" }}>
+                <li style={{ marginBottom: "8px" }}>
+                  You could lose some or all of your invested capital.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  Never trade with money you cannot afford to lose.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  Past performance is not indicative of future results.
+                </li>
+                <li>
+                  Seek independent financial advice if you have any doubts about your understanding of these risks.
+                </li>
+              </ul>
+            </div>
+            
+            <div style={{ 
+              backgroundColor: "#F3F4F6",
+              padding: "12px",
+              borderRadius: "8px",
+              marginBottom: "16px"
+            }}>
+              <p style={{ 
+                fontSize: "14px",
+                color: "#6B7280",
+                fontStyle: "italic",
+                margin: 0,
+                lineHeight: "1.5"
+              }}>
+                By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
+              </p>
+            </div>
+            
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowDisclaimer(false)}
+                style={{
+                  background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "10px 20px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                }}
+              >
+                I Understand the Risks
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <DesktopWrapper>
+        <div className="main__run-strategy-wrapper">
+          <RunStrategy />
+          {showRunPanel && <RunPanel />}
+        </div>
+        <ChartModal />
+        <TradingViewModal />
+      </DesktopWrapper>
+      <MobileWrapper>
+        <RunPanel />
+      </MobileWrapper>
+      <Dialog
+        cancel_button_text={cancel_button_text || localize("Cancel")}
+        confirm_button_text={ok_button_text || localize("Ok")}
+        has_close_icon
+        is_visible={is_dialog_open}
+        onCancel={onCancelButtonClick}
+        onClose={onCloseDialog}
+        onConfirm={onOkButtonClick || onCloseDialog}
+        title={title}
+      >
+        {message}
+      </Dialog>
+    </React.Fragment>
+  );
 });
 
 export default AppWrapper;
