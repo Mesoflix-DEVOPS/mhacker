@@ -32,14 +32,14 @@ const FreeBotsIcon = () => (
     <line x1="8" y1="15" x2="16" y2="15" />
     <line x1="10" y1="18" x2="14" y2="18" />
   </svg>
-)
+);
 
 const BotSettingsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
     <circle cx="12" cy="12" r="3" />
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 3.417 1.415 2 2 0 0 1-.587 1.415l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
-)
+);
 
 const ChartsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
@@ -47,7 +47,7 @@ const ChartsIcon = () => (
     <line x1="12" y1="20" x2="12" y2="4" />
     <line x1="6" y1="20" x2="6" y2="14" />
   </svg>
-)
+);
 
 const DCirclesIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
@@ -55,13 +55,13 @@ const DCirclesIcon = () => (
     <circle cx="12" cy="12" r="6" />
     <circle cx="12" cy="12" r="2" />
   </svg>
-)
+);
 
 const AnalysisToolIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
     <path d="M21 21l-6-6m6 6l-6 6m6-16a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
-)
+);
 
 const ToolsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
@@ -69,7 +69,7 @@ const ToolsIcon = () => (
     <path d="M12.19 8.84l-7.9 7.9a1 1 0 00-.29.59l-.53 4.11a1 1 0 001.17 1.09l4.11-.53a1 1 0 00.59-.29l7.9-7.9a1 1 0 000-1.41l-4.24-4.24a1 1 0 00-1.41 0z" />
     <path d="M6.51 17.49l-1.6-1.6a1 1 0 010-1.42l1.6-1.6a1 1 0 011.41 0l1.6 1.6a1 1 0 010 1.41l-1.6 1.6a1 1 0 01-1.41 0z" />
   </svg>
-)
+);
 
 const CopyTradingIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.5">
@@ -77,25 +77,25 @@ const CopyTradingIcon = () => (
     <rect x="11" y="11" width="10" height="10" rx="2" />
     <path d="M7 7h2M7 9h3M15 15h2M15 17h3M13 3v8M21 11h-8" />
   </svg>
-)
+);
 
 const StrategyIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
   </svg>
-)
+);
 
 const SignalsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
     <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
   </svg>
-)
+);
 
 const TutorialsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
     <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
   </svg>
-)
+);
 
 // Social Media Icons
 const YouTubeIcon = () => (
@@ -106,7 +106,7 @@ const YouTubeIcon = () => (
     />
     <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" fill="#fff" />
   </svg>
-)
+);
 
 const InstagramIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -114,7 +114,7 @@ const InstagramIcon = () => (
     <circle cx="12" cy="12" r="5" stroke="#E1306C" strokeWidth="2" fill="none" />
     <circle cx="18" cy="6" r="1" fill="#E1306C" />
   </svg>
-)
+);
 
 const WhatsAppIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -123,7 +123,7 @@ const WhatsAppIcon = () => (
       fill="#25D366"
     />
   </svg>
-)
+);
 
 const TikTokIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -132,7 +132,7 @@ const TikTokIcon = () => (
       fill="#000000"
     />
   </svg>
-)
+);
 
 const TelegramIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -141,7 +141,7 @@ const TelegramIcon = () => (
       fill="#0088CC"
     />
   </svg>
-)
+);
 
 const AppWrapper = observer(() => {
   const { connectionStatus } = useApiBase();
@@ -360,11 +360,14 @@ const AppWrapper = observer(() => {
               id="id-dcircles"
             >
               <div className="iframe-container">
-                <iframe
-                  src={dcirclesUrl}
-                  title="Dcircles"
-                  className="iframe-content"
-                />
+                <div className="iframe-content-wrapper">
+                  <iframe
+                    src={dcirclesUrl}
+                    className="iframe-content"
+                    title="Dcircles"
+                    scrolling="yes"
+                  />
+                </div>
               </div>
             </div>
 
@@ -379,11 +382,14 @@ const AppWrapper = observer(() => {
               id="id-analysis"
             >
               <div className="iframe-container">
-                <iframe
-                  src={analysisUrl}
-                  title="Analysis"
-                  className="iframe-content"
-                />
+                <div className="iframe-content-wrapper">
+                  <iframe
+                    src={analysisUrl}
+                    className="iframe-content"
+                    title="Analysis"
+                    scrolling="yes"
+                  />
+                </div>
               </div>
             </div>
 
@@ -398,11 +404,14 @@ const AppWrapper = observer(() => {
               id="id-tools"
             >
               <div className="iframe-container">
-                <iframe
-                  src={toolsUrl}
-                  title="Tools"
-                  className="iframe-content"
-                />
+                <div className="iframe-content-wrapper">
+                  <iframe
+                    src={toolsUrl}
+                    className="iframe-content"
+                    title="Tools"
+                    scrolling="yes"
+                  />
+                </div>
               </div>
             </div>
 
@@ -432,11 +441,14 @@ const AppWrapper = observer(() => {
               id="id-strategy"
             >
               <div className="iframe-container">
-                <iframe
-                  src={strategyUrl}
-                  title="Strategy"
-                  className="iframe-content"
-                />
+                <div className="iframe-content-wrapper">
+                  <iframe
+                    src={strategyUrl}
+                    className="iframe-content"
+                    title="Strategy"
+                    scrolling="yes"
+                  />
+                </div>
               </div>
             </div>
 
@@ -457,6 +469,7 @@ const AppWrapper = observer(() => {
                 <iframe
                   src="signals"
                   className="iframe-content"
+                  title="Signals"
                 />
               </div>
             </div>
