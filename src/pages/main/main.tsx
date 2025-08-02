@@ -181,7 +181,7 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-          "Osam_Digit_Switcher🤖🤖.xml",
+        "Osam_Digit_Switcher🤖🤖.xml",
         "Under-Destroyer💀.xml",
         "Over HitnRun.xml",
         "Osam.HnR.xml",
@@ -189,7 +189,6 @@ const AppWrapper = observer(() => {
         "Auto Bot by Osam💯.xml",
         "DEC_entry_Point.xml",
         "Under 8 pro bot💯.xml",
-        
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -256,35 +255,18 @@ const AppWrapper = observer(() => {
 
   const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
-  // Custom tab styling
-  const tabStyle = {
-    activeTab: {
-      backgroundColor: '#3B82F6', // Meaningful blue color for active tab
-      color: 'white',
-      borderBottom: '2px solid #1D4ED8'
-    },
-    inactiveTab: {
-      backgroundColor: '#F3F4F6',
-      color: '#4B5563'
-    }
-  };
-
   return (
     <React.Fragment>
       <div className="main">
-        <div className="main__container" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
+        <div className="main__container">
           <Tabs
             active_index={active_tab}
             className="main__tabs"
             onTabItemChange={onEntered}
             onTabItemClick={handleTabChange}
             top
-            style={{
-              activeTab: tabStyle.activeTab,
-              inactiveTab: tabStyle.inactiveTab
-            }}
           >
-            {/* 1. Free Bots - First */}
+            {/* 1. Free Bots */}
             <div
               label={
                 <>
@@ -294,27 +276,8 @@ const AppWrapper = observer(() => {
               }
               id="id-free-bots"
             >
-              <div
-                className="free-bots"
-                style={{
-                  padding: "16px",
-                  background: "linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%)",
-                  minHeight: "100vh",
-                  width: "100%",
-                  position: "relative",
-                }}
-              >
-                {/* Social Media Icons */}
-                <div style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "16px",
-                  marginBottom: "16px",
-                  padding: "8px",
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                }}>
+              <div className="free-bots">
+                <div className="free-bots__social-icons">
                   <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer">
                     <YouTubeIcon />
                   </a>
@@ -332,143 +295,21 @@ const AppWrapper = observer(() => {
                   </a>
                 </div>
 
-                <div
-                  className="free-bots__content-wrapper"
-                  style={{
-                    width: "100%",
-                    maxHeight: "calc(100vh - 180px)",
-                    overflowY: "auto",
-                    padding: "0 8px",
-                  }}
-                >
-                  <style>
-                    {`
-                      .free-bots__content-wrapper::-webkit-scrollbar {
-                        width: 8px;
-                      }
-                      .free-bots__content-wrapper::-webkit-scrollbar-track {
-                        background: #f1f1f1;
-                        border-radius: 10px;
-                      }
-                      .free-bots__content-wrapper::-webkit-scrollbar-thumb {
-                        background: #10B981;
-                        border-radius: 10px;
-                      }
-                      .free-bots__content-wrapper::-webkit-scrollbar-thumb:hover {
-                        background: #059669;
-                      }
-                      @keyframes pulse {
-                        0% { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-                        100% { box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); }
-                      }
-                      @keyframes borderAnimation {
-                        0% { background-position: 0% 50%; }
-                        100% { background-position: 200% 50%; }
-                      }
-                    `}
-                  </style>
-                  <div
-                    className="free-bots__content"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                      width: "100%",
-                    }}
-                  >
+                <div className="free-bots__content-wrapper">
+                  <div className="free-bots__content">
                     {bots.map((bot, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          background: "white",
-                          borderRadius: "8px",
-                          padding: "10px",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                          border: "1px solid #E5E7EB",
-                          transition: "all 0.3s ease",
-                          cursor: "default",
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          flexWrap: "wrap",
-                          gap: "10px",
-                          position: "relative",
-                          overflow: "hidden",
-                          marginBottom: "10px",
-                          transform: "scale(0.97)",
-                          animation: "pulse 2s infinite alternate",
-                          ':hover': {
-                            transform: "scale(0.98)",
-                            boxShadow: "0 6px 16px rgba(0,0,0,0.1)"
-                          }
-                        }}
-                      >
-                        {/* Animated bottom border */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            height: "2px",
-                            background: "linear-gradient(90deg, #3B82F6, #10B981, #3B82F6)",
-                            backgroundSize: "200% 100%",
-                            animation: "borderAnimation 3s linear infinite",
-                          }}
-                        />
-                        
-                        <div style={{ display: "flex", alignItems: "center", flex: "1", minWidth: "180px" }}>
-                          <div
-                            style={{
-                              background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
-                              borderRadius: "6px",
-                              padding: "5px",
-                              marginRight: "8px",
-                              flexShrink: 0,
-                            }}
-                          >
+                      <div key={index} className="free-bots__bot-item">
+                        <div className="free-bots__bot-item-content">
+                          <div className="free-bots__bot-icon">
                             <FreeBotsIcon />
                           </div>
-                          <div style={{ flex: 1 }}>
-                            <h3
-                              style={{
-                                fontSize: "14px",
-                                fontWeight: "600",
-                                color: "#1F2937",
-                                margin: "0",
-                                lineHeight: "1.4",
-                                wordBreak: "break-word",
-                              }}
-                            >
-                              {formatBotName(bot.title)}
-                            </h3>
+                          <div className="free-bots__bot-info">
+                            <h3>{formatBotName(bot.title)}</h3>
                           </div>
                         </div>
-                        <button
+                        <button 
+                          className="free-bots__load-button"
                           onClick={() => handleBotClick(bot)}
-                          style={{
-                            background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "6px",
-                            padding: "8px 16px",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            transition: "all 0.2s ease",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                            flexShrink: 0,
-                            minWidth: "70px",
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.transform = "translateY(-1px)";
-                            e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.15)";
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.transform = "translateY(0)";
-                            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
-                          }}
                         >
                           Load Bot
                         </button>
@@ -490,7 +331,7 @@ const AppWrapper = observer(() => {
               id="id-bot-settings"
             >
               <Dashboard handleTabChange={handleTabChange} />
-              <button onClick={handleOpen}>Load Bot</button>
+              <button className="load-bot-button" onClick={handleOpen}>Load Bot</button>
             </div>
 
             {/* 3. Charts */}
@@ -518,14 +359,11 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div className="iframe-container">
                 <iframe
                   src={dcirclesUrl}
-                  width="100%"
-                  height="100%"
                   title="Dcircles"
-                  style={{ border: "none", display: "block", borderRadius: 16, background: "#f0f4fa" }}
-                  scrolling="yes"
+                  className="iframe-content"
                 />
               </div>
             </div>
@@ -540,14 +378,11 @@ const AppWrapper = observer(() => {
               }
               id="id-analysis"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div className="iframe-container">
                 <iframe
                   src={analysisUrl}
-                  width="100%"
-                  height="100%"
                   title="Analysis"
-                  style={{ border: "none", display: "block" }}
-                  scrolling="yes"
+                  className="iframe-content"
                 />
               </div>
             </div>
@@ -562,14 +397,11 @@ const AppWrapper = observer(() => {
               }
               id="id-tools"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div className="iframe-container">
                 <iframe
                   src={toolsUrl}
-                  width="100%"
-                  height="100%"
                   title="Tools"
-                  style={{ border: "none", display: "block", borderRadius: 16 }}
-                  scrolling="yes"
+                  className="iframe-content"
                 />
               </div>
             </div>
@@ -599,14 +431,11 @@ const AppWrapper = observer(() => {
               }
               id="id-strategy"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div className="iframe-container">
                 <iframe
                   src={strategyUrl}
-                  width="100%"
-                  height="100%"
                   title="Strategy"
-                  style={{ border: "none", display: "block", borderRadius: 16, background: "#f8f7ff" }}
-                  scrolling="yes"
+                  className="iframe-content"
                 />
               </div>
             </div>
@@ -621,23 +450,18 @@ const AppWrapper = observer(() => {
               }
               id="id-signals"
             >
-              <div
-                className={classNames("dashboard__chart-wrapper", {
-                  "dashboard__chart-wrapper--expanded": is_drawer_open && isDesktop,
-                  "dashboard__chart-wrapper--modal": is_chart_modal_visible && isDesktop,
-                })}
-              >
+              <div className={classNames("dashboard__chart-wrapper", {
+                "dashboard__chart-wrapper--expanded": is_drawer_open && isDesktop,
+                "dashboard__chart-wrapper--modal": is_chart_modal_visible && isDesktop,
+              })}>
                 <iframe
                   src="signals"
-                  width="100%"
-                  height="600px"
-                  style={{ border: "none", display: "block" }}
-                  scrolling="yes"
+                  className="iframe-content"
                 />
               </div>
             </div>
 
-            {/* 10. Tutorials - Last */}
+            {/* 10. Tutorials */}
             <div
               label={
                 <>
@@ -655,36 +479,9 @@ const AppWrapper = observer(() => {
         </div>
       </div>
       
-      {/* Floating Disclaimer Button */}
-      <button
+      <button 
+        className="disclaimer-button"
         onClick={() => setShowDisclaimer(true)}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          background: "linear-gradient(135deg, #F59E0B, #EF4444)",
-          color: "white",
-          border: "none",
-          borderRadius: "20px",
-          padding: "8px 16px",
-          fontSize: "12px",
-          fontWeight: "600",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
-          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-        }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -692,146 +489,57 @@ const AppWrapper = observer(() => {
         Disclaimer
       </button>
 
-      {/* Risk Disclaimer Modal */}
       {showDisclaimer && (
-        <div style={{
-          position: "fixed",
-          top: "0",
-          left: "0",
-          right: "0",
-          bottom: "0",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1001,
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            padding: "24px",
-            maxWidth: "600px",
-            width: "90%",
-            maxHeight: "80vh",
-            overflowY: "auto",
-            position: "relative",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-          }}>
+        <div className="disclaimer-modal">
+          <div className="disclaimer-modal__content">
             <button
+              className="disclaimer-modal__close-button"
               onClick={() => setShowDisclaimer(false)}
-              style={{
-                position: "absolute",
-                top: "16px",
-                right: "16px",
-                background: "none",
-                border: "none",
-                fontSize: "20px",
-                cursor: "pointer",
-                color: "#6B7280",
-              }}
             >
               ×
             </button>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-              <div style={{
-                background: "#FEE2E2",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
+            <div className="disclaimer-modal__header">
+              <div className="disclaimer-modal__icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1F2937", margin: 0 }}>
-                Deriv Trading Risk Disclaimer
-              </h3>
+              <h3>Deriv Trading Risk Disclaimer</h3>
             </div>
             
-            <div style={{ marginBottom: "16px" }}>
-              <p style={{ lineHeight: "1.6", color: "#4B5563", marginBottom: "12px" }}>
+            <div className="disclaimer-modal__body">
+              <p>
                 Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
               </p>
               
-              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Key Risks:</h4>
-              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.
-                </li>
-                <li>
-                  <strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may affect your rights as a trader.
-                </li>
+              <h4>Key Risks:</h4>
+              <ul>
+                <li><strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.</li>
+                <li><strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.</li>
+                <li><strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.</li>
+                <li><strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.</li>
+                <li><strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may affect your rights as a trader.</li>
               </ul>
               
-              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Important Considerations:</h4>
-              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563" }}>
-                <li style={{ marginBottom: "8px" }}>
-                  You could lose some or all of your invested capital.
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  Never trade with money you cannot afford to lose.
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  Past performance is not indicative of future results.
-                </li>
-                <li>
-                  Seek independent financial advice if you have any doubts about your understanding of these risks.
-                </li>
+              <h4>Important Considerations:</h4>
+              <ul>
+                <li>You could lose some or all of your invested capital.</li>
+                <li>Never trade with money you cannot afford to lose.</li>
+                <li>Past performance is not indicative of future results.</li>
+                <li>Seek independent financial advice if you have any doubts about your understanding of these risks.</li>
               </ul>
             </div>
             
-            <div style={{ 
-              backgroundColor: "#F3F4F6",
-              padding: "12px",
-              borderRadius: "8px",
-              marginBottom: "16px"
-            }}>
-              <p style={{ 
-                fontSize: "14px",
-                color: "#6B7280",
-                fontStyle: "italic",
-                margin: 0,
-                lineHeight: "1.5"
-              }}>
+            <div className="disclaimer-modal__footer">
+              <p>
                 By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
               </p>
             </div>
             
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div className="disclaimer-modal__actions">
               <button
+                className="disclaimer-modal__confirm-button"
                 onClick={() => setShowDisclaimer(false)}
-                style={{
-                  background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "10px 20px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
-                }}
               >
                 I Understand the Risks
               </button>
