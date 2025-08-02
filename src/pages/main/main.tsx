@@ -187,8 +187,9 @@ const AppWrapper = observer(() => {
         "Osam.HnR.xml",
         "Over-Destroyer💀.xml",
         "Auto Bot by Osam💯.xml",
-        "Under 8 pro bot💯.xml",
         "DEC_entry_Point.xml",
+        "Under 8 pro bot💯.xml",
+        
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
