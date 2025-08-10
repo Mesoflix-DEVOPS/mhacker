@@ -1,69 +1,68 @@
 @use 'components/shared/styles/constants' as *;
 @use 'components/shared/styles/mixins' as *;
 
-
 :root {
   --bg-gradient: linear-gradient(135deg, #181c23 0%, #23262e 100%);
   --card-bg: rgba(28, 30, 36, 0.92);
   --accent: #16c784;          // Green for profit/success
-  --accent2: #2573d6;         // Blue for focus/highlight
+  --accent2: #2563eb;         // Updated blue for better consistency
+  --accent3: #1d4ed8;         // Darker blue for active states
   --text-primary: #e3e7ef;
   --text-secondary: #7b8697;
   --border-normal: rgba(60, 70, 90, 0.32);
   --general-main-1: #181c23;
   --general-section-1: #23262e;
   --purchase-main-1: #16c784;
-  --button-primary-hover: #2573d6;
+  --button-primary-hover: #2563eb;
   --brand-red-coral: #f23645; // Red for loss/error
   --text-prominent: #e3e7ef;
+  --tab-bg: #2563eb;          // Consistent tab background
+  --tab-active-bg: #1d4ed8;   // Active tab background
+  --free-bots-bg: #dbeafe;    // Light blue background for free bots
 }
 
 // The rest of your SCSS code remains exactly the same...
-
-
-
-
-
-
-
-
-
-
-
 
 .run-panel {
   // fix for the RTL issue on tab active line
   .dc-tabs__active-line {
     right: auto;
-    background-color: var(--accent2) !important;
+    background-color: var(--accent3) !important;
   }
 }
 
 .free-bots__content-wrapper {
-  max-height: 400px;
+  max-height: calc(100vh - 180px) !important;
   overflow-y: auto;
+  padding-bottom: 40px !important; // Add padding to prevent cut-off
+  width: 100%;
 }
 
 .free-bots__content {
   list-style: none;
   padding: 0;
   margin: 0;
+  padding-bottom: 20px; // Extra padding for last items
 }
 
 .free-bots {
-  padding: 20px;
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  border: 1px solid var(--border-normal);
-  box-shadow: 0 0 15px rgba(159, 135, 255, 0.1);
+  padding: 0;
+  background: var(--free-bots-bg);
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 .free-bots__heading {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
-  color: var(--accent2);
+  color: var(--accent3);
 }
 
 .free-bots__content {
@@ -71,21 +70,26 @@
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  width: 100%;
+  padding: 0 16px;
 }
 
 .free-bot {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-normal);
-  border-radius: 8px;
-  padding: 15px;
-  width: 400px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  max-width: none;
   text-align: center;
-  box-shadow: 0 0 15px rgba(159, 135, 255, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(159, 135, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    border-color: var(--accent2);
   }
 }
 
@@ -96,31 +100,32 @@
 }
 
 .free-bot__details {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .free-bot__title {
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
 }
 
 .free-bot__description {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #6b7280;
 }
 
 .main {
   display: flex;
   overflow: hidden;
   width: 100%;
-  height: calc(100vh - 9rem);
-  padding: 1.6rem;
+  height: 100vh;
+  padding: 0;
   background: var(--bg-gradient);
   color: var(--text-primary);
 
   @include mobile-or-tablet-screen {  
-    height: calc(100vh - 6rem);  
+    height: 100vh;  
     padding: 0;  
   }  
 
@@ -128,7 +133,8 @@
     position: relative;  
     border: none;  
     max-width: 100%;  
-    width: 100%;  
+    width: 100%;
+    height: 100%;
 
     &--active {  
       &:before {  
@@ -145,20 +151,32 @@
     }  
 
     .dc-tabs {  
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
       &__active-line {  
-        background-color: var(--accent2) !important;  
-        transition: none;  
+        background-color: var(--accent3) !important;  
+        transition: all 0.3s ease;
+        height: 3px;
       }  
 
       &__active {  
-        background: linear-gradient(90deg, var(--accent), var(--accent2)) !important;
-        color: #000 !important;
+        background: var(--tab-active-bg) !important;
+        color: white !important;
+        border-bottom: 3px solid var(--accent3);
       }  
 
       &__list {  
         background: var(--general-section-1);  
-        justify-content: start;  
+        justify-content: flex-start;  
         border-bottom: 1px solid var(--border-normal);
+        flex-shrink: 0;
+        padding: 0;
+        margin: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
 
         @include mobile-or-tablet-screen {  
           overflow-x: auto;  
@@ -177,7 +195,7 @@
               @include mobile-or-tablet-screen {  
                 width: 100%;  
                 overflow-x: auto;  
-                padding: 0.8rem 1.6rem 0;  
+                padding: 0;  
               }  
             }  
           }  
@@ -185,22 +203,26 @@
 
         &--border-bottom {  
           @include mobile-or-tablet-screen {  
-            border-bottom: 0;  
+            border-bottom: 1px solid var(--border-normal);  
           }  
         }  
       }  
 
-      &__content {  
+      &__content {
+        flex: 1;
+        overflow: hidden;
+        height: calc(100vh - 60px); // Adjust based on tab height
+
         @include mobile-or-tablet-screen {  
           width: 100%;  
-          overflow-x: auto;  
+          height: calc(100vh - 60px);
 
           &--no-result {  
             @include flex-center;  
 
             flex-direction: column;  
             justify-content: flex-start;  
-            height: 100vh;  
+            height: 100%;
             margin-top: 5rem;  
 
             svg {  
@@ -224,44 +246,54 @@
         &--main {  
           &__tabs {  
             display: flex;  
-            justify-content: space-between;  
+            justify-content: space-between;
+            height: 100%;
 
             @include mobile-or-tablet-screen {  
               flex-direction: column;  
               background-color: var(--general-section-1);  
+              height: 100%;
             }  
           }  
         }  
       }  
 
       &__item {  
-        border-top-left-radius: 1rem;  
-        border-top-right-radius: 1rem;  
-        height: 4.8rem;  
-        padding: 0 2rem;  
+        border-top-left-radius: 4px;  // Reduced roundness
+        border-top-right-radius: 4px;  // Reduced roundness
+        height: 48px;  
+        padding: 0 16px;  
         width: auto;  
         color: var(--text-primary);
         transition: all 0.3s ease;
+        background: var(--tab-bg);
+        border: 1px solid var(--border-normal);
+        border-bottom: none;
+        margin-right: 2px;
+        white-space: nowrap;
+        flex-shrink: 0;
 
         @include flex-center;  
 
         &:hover {
-          background: rgba(159, 135, 255, 0.1);
+          background: var(--button-primary-hover);
+          transform: translateY(-1px);
         }
 
         svg {  
           padding-inline-end: 0;  
-          margin-inline-end: 0.8rem;  
-          fill: var(--text-primary);
+          margin-inline-end: 8px;  
+          fill: currentColor;
+          flex-shrink: 0;
 
           @include mobile-or-tablet-screen {  
-            margin-inline-end: 0.4rem;  
+            margin-inline-end: 4px;  
           }  
         }  
 
         &__icon {  
           @include mobile-or-tablet-screen {  
-            padding-top: 0.5rem;  
+            padding-top: 0;  
           }  
         }  
       }  
@@ -820,7 +852,7 @@
       }
 
       &:hover {
-        background: rgba(159, 135, 255, 0.1);
+        background: rgba(37, 99, 235, 0.1);
       }
     }  
   }  
@@ -902,5 +934,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 247, 255, 0.1);
+  background: rgba(37, 99, 235, 0.1);
+}
+
+// Custom scrollbar for better aesthetics
+.free-bots__content-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.free-bots__content-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.free-bots__content-wrapper::-webkit-scrollbar-thumb {
+  background: var(--accent2);
+  border-radius: 10px;
+}
+
+.free-bots__content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--accent3);
 }
