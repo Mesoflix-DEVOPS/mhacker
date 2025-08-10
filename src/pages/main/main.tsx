@@ -25,7 +25,7 @@ const Copytrading = lazy(() => import("../copytrading"));
 
 /** NEW ICONS WITH OUTLINE STYLE **/
 const FreeBotsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="3" width="18" height="18" rx="2" />
     <circle cx="8.5" cy="8.5" r="1.5" />
     <circle cx="15.5" cy="8.5" r="1.5" />
@@ -35,14 +35,14 @@ const FreeBotsIcon = () => (
 )
 
 const BotSettingsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="12" cy="12" r="3" />
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 3.417 1.415 2 2 0 0 1-.587 1.415l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 )
 
 const ChartsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <line x1="18" y1="20" x2="18" y2="10" />
     <line x1="12" y1="20" x2="12" y2="4" />
     <line x1="6" y1="20" x2="6" y2="14" />
@@ -50,7 +50,7 @@ const ChartsIcon = () => (
 )
 
 const DCirclesIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="12" cy="12" r="10" />
     <circle cx="12" cy="12" r="6" />
     <circle cx="12" cy="12" r="2" />
@@ -58,13 +58,13 @@ const DCirclesIcon = () => (
 )
 
 const AnalysisToolIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M21 21l-6-6m6 6l-6 6m6-16a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 )
 
 const ToolsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a1 1 0 00-.29-1.61l-4.11-1.71a1 1 0 00-1.24.49l-1.13 2.4z" />
     <path d="M12.19 8.84l-7.9 7.9a1 1 0 00-.29.59l-.53 4.11a1 1 0 001.17 1.09l4.11-.53a1 1 0 00.59-.29l7.9-7.9a1 1 0 000-1.41l-4.24-4.24a1 1 0 00-1.41 0z" />
     <path d="M6.51 17.49l-1.6-1.6a1 1 0 010-1.42l1.6-1.6a1 1 0 011.41 0l1.6 1.6a1 1 0 010 1.41l-1.6 1.6a1 1 0 01-1.41 0z" />
@@ -72,7 +72,7 @@ const ToolsIcon = () => (
 )
 
 const CopyTradingIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.5">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
     <rect x="3" y="3" width="10" height="10" rx="2" />
     <rect x="11" y="11" width="10" height="10" rx="2" />
     <path d="M7 7h2M7 9h3M15 15h2M15 17h3M13 3v8M21 11h-8" />
@@ -80,19 +80,19 @@ const CopyTradingIcon = () => (
 )
 
 const StrategyIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
   </svg>
 )
 
 const SignalsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
   </svg>
 )
 
 const TutorialsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
   </svg>
 )
@@ -181,7 +181,7 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-          "Osam_Digit_Switcher🤖🤖.xml",
+        "Osam_Digit_Switcher🤖🤖.xml",
         "Under-Destroyer💀.xml",
         "Over HitnRun.xml",
         "Osam.HnR.xml",
@@ -189,7 +189,6 @@ const AppWrapper = observer(() => {
         "Auto Bot by Osam💯.xml",
         "DEC_entry_Point.xml",
         "Under 8 pro bot💯.xml",
-        
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -256,33 +255,16 @@ const AppWrapper = observer(() => {
 
   const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
-  // Custom tab styling
-  const tabStyle = {
-    activeTab: {
-      backgroundColor: '#3B82F6', // Meaningful blue color for active tab
-      color: 'white',
-      borderBottom: '2px solid #1D4ED8'
-    },
-    inactiveTab: {
-      backgroundColor: '#F3F4F6',
-      color: '#4B5563'
-    }
-  };
-
   return (
     <React.Fragment>
       <div className="main">
-        <div className="main__container" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
+        <div className="main__container">
           <Tabs
             active_index={active_tab}
             className="main__tabs"
             onTabItemChange={onEntered}
             onTabItemClick={handleTabChange}
             top
-            style={{
-              activeTab: tabStyle.activeTab,
-              inactiveTab: tabStyle.inactiveTab
-            }}
           >
             {/* 1. Free Bots - First */}
             <div
@@ -294,97 +276,92 @@ const AppWrapper = observer(() => {
               }
               id="id-free-bots"
             >
-              <div
-                className="free-bots"
-                style={{
-                  padding: "16px",
-                  background: "linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%)",
-                  minHeight: "100vh",
-                  width: "100%",
-                  position: "relative",
-                }}
-              >
+              <div className="free-bots">
                 {/* Social Media Icons */}
                 <div style={{
                   display: "flex",
                   justifyContent: "center",
                   gap: "16px",
-                  marginBottom: "16px",
-                  padding: "8px",
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  marginBottom: "20px",
+                  padding: "12px",
+                  backgroundColor: "rgba(255,255,255,0.3)",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  position: "sticky",
+                  top: "0",
+                  zIndex: 10,
+                  backdropFilter: "blur(10px)",
                 }}>
-                  <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer">
+                  <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer"
+                    style={{ transition: "transform 0.2s ease", display: "flex" }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  >
                     <YouTubeIcon />
                   </a>
-                  <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer"
+                    style={{ transition: "transform 0.2s ease", display: "flex" }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  >
                     <InstagramIcon />
                   </a>
-                  <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer">
+                  <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer"
+                    style={{ transition: "transform 0.2s ease", display: "flex" }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  >
                     <WhatsAppIcon />
                   </a>
-                  <a href="https://www.tiktok.com/@_its_osam?_t=ZM-8yUINW3W742&_r=1" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.tiktok.com/@_its_osam?_t=ZM-8yUINW3W742&_r=1" target="_blank" rel="noopener noreferrer"
+                    style={{ transition: "transform 0.2s ease", display: "flex" }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  >
                     <TikTokIcon />
                   </a>
-                  <a href="https://t.me/+dLoQvTnT_2wzOGY0" target="_blank" rel="noopener noreferrer">
+                  <a href="https://t.me/+dLoQvTnT_2wzOGY0" target="_blank" rel="noopener noreferrer"
+                    style={{ transition: "transform 0.2s ease", display: "flex" }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  >
                     <TelegramIcon />
                   </a>
                 </div>
 
-                <div
-                  className="free-bots__content-wrapper"
-                  style={{
-                    width: "100%",
-                    maxHeight: "calc(100vh - 180px)",
-                    overflowY: "auto",
-                    padding: "0 8px",
-                  }}
-                >
+                <div className="free-bots__content-wrapper">
                   <style>
                     {`
-                      .free-bots__content-wrapper::-webkit-scrollbar {
-                        width: 8px;
-                      }
-                      .free-bots__content-wrapper::-webkit-scrollbar-track {
-                        background: #f1f1f1;
-                        border-radius: 10px;
-                      }
-                      .free-bots__content-wrapper::-webkit-scrollbar-thumb {
-                        background: #10B981;
-                        border-radius: 10px;
-                      }
-                      .free-bots__content-wrapper::-webkit-scrollbar-thumb:hover {
-                        background: #059669;
-                      }
                       @keyframes pulse {
                         0% { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-                        100% { box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); }
+                        100% { box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2); }
                       }
                       @keyframes borderAnimation {
                         0% { background-position: 0% 50%; }
                         100% { background-position: 200% 50%; }
                       }
+                      @keyframes fadeInUp {
+                        from {
+                          opacity: 0;
+                          transform: translateY(20px);
+                        }
+                        to {
+                          opacity: 1;
+                          transform: translateY(0);
+                        }
+                      }
                     `}
                   </style>
-                  <div
-                    className="free-bots__content"
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                      width: "100%",
-                    }}
-                  >
+                  <div className="free-bots__content">
                     {bots.map((bot, index) => (
                       <div
                         key={index}
                         style={{
-                          background: "white",
-                          borderRadius: "8px",
-                          padding: "10px",
+                          background: "rgba(255, 255, 255, 0.95)",
+                          borderRadius: "12px",
+                          padding: "16px",
                           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                          border: "1px solid #E5E7EB",
+                          border: "2px solid rgba(37, 99, 235, 0.1)",
                           transition: "all 0.3s ease",
                           cursor: "default",
                           width: "100%",
@@ -392,40 +369,47 @@ const AppWrapper = observer(() => {
                           alignItems: "center",
                           justifyContent: "space-between",
                           flexWrap: "wrap",
-                          gap: "10px",
+                          gap: "12px",
                           position: "relative",
                           overflow: "hidden",
-                          marginBottom: "10px",
-                          transform: "scale(0.97)",
-                          animation: "pulse 2s infinite alternate",
-                          ':hover': {
-                            transform: "scale(0.98)",
-                            boxShadow: "0 6px 16px rgba(0,0,0,0.1)"
-                          }
+                          marginBottom: "16px",
+                          animation: `fadeInUp 0.6s ease ${index * 0.1}s both`,
+                          backdropFilter: "blur(10px)",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 8px 25px rgba(37, 99, 235, 0.15)";
+                          e.currentTarget.style.borderColor = "rgba(37, 99, 235, 0.3)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
+                          e.currentTarget.style.borderColor = "rgba(37, 99, 235, 0.1)";
                         }}
                       >
-                        {/* Animated bottom border */}
+                        {/* Animated gradient border */}
                         <div
                           style={{
                             position: "absolute",
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            height: "2px",
-                            background: "linear-gradient(90deg, #3B82F6, #10B981, #3B82F6)",
+                            height: "3px",
+                            background: "linear-gradient(90deg, #2563eb, #16c784, #2563eb)",
                             backgroundSize: "200% 100%",
                             animation: "borderAnimation 3s linear infinite",
+                            borderRadius: "0 0 12px 12px",
                           }}
                         />
                         
-                        <div style={{ display: "flex", alignItems: "center", flex: "1", minWidth: "180px" }}>
+                        <div style={{ display: "flex", alignItems: "center", flex: "1", minWidth: "200px", gap: "12px" }}>
                           <div
                             style={{
-                              background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
-                              borderRadius: "6px",
-                              padding: "5px",
-                              marginRight: "8px",
+                              background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+                              borderRadius: "8px",
+                              padding: "8px",
                               flexShrink: 0,
+                              boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
                             }}
                           >
                             <FreeBotsIcon />
@@ -433,9 +417,9 @@ const AppWrapper = observer(() => {
                           <div style={{ flex: 1 }}>
                             <h3
                               style={{
-                                fontSize: "14px",
+                                fontSize: "16px",
                                 fontWeight: "600",
-                                color: "#1F2937",
+                                color: "#1f2937",
                                 margin: "0",
                                 lineHeight: "1.4",
                                 wordBreak: "break-word",
@@ -443,31 +427,41 @@ const AppWrapper = observer(() => {
                             >
                               {formatBotName(bot.title)}
                             </h3>
+                            <p style={{
+                              fontSize: "12px",
+                              color: "#6b7280",
+                              margin: "4px 0 0 0",
+                              opacity: 0.8,
+                            }}>
+                              Click to load bot
+                            </p>
                           </div>
                         </div>
                         <button
                           onClick={() => handleBotClick(bot)}
                           style={{
-                            background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
+                            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
                             color: "white",
                             border: "none",
-                            borderRadius: "6px",
-                            padding: "8px 16px",
-                            fontSize: "13px",
+                            borderRadius: "8px",
+                            padding: "10px 20px",
+                            fontSize: "14px",
                             fontWeight: "600",
                             cursor: "pointer",
-                            transition: "all 0.2s ease",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                            transition: "all 0.3s ease",
+                            boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
                             flexShrink: 0,
-                            minWidth: "70px",
+                            minWidth: "80px",
                           }}
                           onMouseOver={(e) => {
                             e.currentTarget.style.transform = "translateY(-1px)";
-                            e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.15)";
+                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.4)";
+                            e.currentTarget.style.background = "linear-gradient(135deg, #1d4ed8, #1e40af)";
                           }}
                           onMouseOut={(e) => {
                             e.currentTarget.style.transform = "translateY(0)";
-                            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+                            e.currentTarget.style.boxShadow = "0 2px 8px rgba(37, 99, 235, 0.3)";
+                            e.currentTarget.style.background = "linear-gradient(135deg, #2563eb, #1d4ed8)";
                           }}
                         >
                           Load Bot
@@ -518,13 +512,18 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
                 <iframe
                   src={dcirclesUrl}
                   width="100%"
                   height="100%"
                   title="Dcircles"
-                  style={{ border: "none", display: "block", borderRadius: 16, background: "#f0f4fa" }}
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f8fafc" 
+                  }}
                   scrolling="yes"
                 />
               </div>
@@ -540,13 +539,18 @@ const AppWrapper = observer(() => {
               }
               id="id-analysis"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
                 <iframe
                   src={analysisUrl}
                   width="100%"
                   height="100%"
                   title="Analysis"
-                  style={{ border: "none", display: "block" }}
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f8fafc" 
+                  }}
                   scrolling="yes"
                 />
               </div>
@@ -562,13 +566,18 @@ const AppWrapper = observer(() => {
               }
               id="id-tools"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
                 <iframe
                   src={toolsUrl}
                   width="100%"
                   height="100%"
                   title="Tools"
-                  style={{ border: "none", display: "block", borderRadius: 16 }}
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f8fafc" 
+                  }}
                   scrolling="yes"
                 />
               </div>
@@ -599,13 +608,18 @@ const AppWrapper = observer(() => {
               }
               id="id-strategy"
             >
-              <div style={{ width: "100%", height: 600 }}>
+              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
                 <iframe
                   src={strategyUrl}
                   width="100%"
                   height="100%"
                   title="Strategy"
-                  style={{ border: "none", display: "block", borderRadius: 16, background: "#f8f7ff" }}
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f8fafc" 
+                  }}
                   scrolling="yes"
                 />
               </div>
@@ -626,12 +640,18 @@ const AppWrapper = observer(() => {
                   "dashboard__chart-wrapper--expanded": is_drawer_open && isDesktop,
                   "dashboard__chart-wrapper--modal": is_chart_modal_visible && isDesktop,
                 })}
+                style={{ height: "100%", overflow: "hidden" }}
               >
                 <iframe
                   src="signals"
                   width="100%"
-                  height="600px"
-                  style={{ border: "none", display: "block" }}
+                  height="100%"
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f8fafc" 
+                  }}
                   scrolling="yes"
                 />
               </div>
@@ -662,37 +682,38 @@ const AppWrapper = observer(() => {
           position: "fixed",
           bottom: "20px",
           right: "20px",
-          background: "linear-gradient(135deg, #F59E0B, #EF4444)",
+          background: "linear-gradient(135deg, #f59e0b, #ef4444)",
           color: "white",
           border: "none",
-          borderRadius: "20px",
-          padding: "8px 16px",
-          fontSize: "12px",
+          borderRadius: "25px",
+          padding: "10px 18px",
+          fontSize: "13px",
           fontWeight: "600",
           cursor: "pointer",
           transition: "all 0.3s ease",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
           zIndex: 1000,
           display: "flex",
           alignItems: "center",
-          gap: "6px",
+          gap: "8px",
+          backdropFilter: "blur(10px)",
         }}
         onMouseOver={(e) => {
           e.currentTarget.style.transform = "scale(1.05)";
-          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
+          e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.3)";
         }}
         onMouseOut={(e) => {
           e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+          e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.2)";
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         Disclaimer
       </button>
 
-      {/* Risk Disclaimer Modal */}
+      {/* Enhanced Risk Disclaimer Modal */}
       {showDisclaimer && (
         <div style={{
           position: "fixed",
@@ -700,74 +721,105 @@ const AppWrapper = observer(() => {
           left: "0",
           right: "0",
           bottom: "0",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0,0,0,0.6)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           zIndex: 1001,
+          backdropFilter: "blur(5px)",
+          animation: "fadeIn 0.3s ease",
         }}>
+          <style>
+            {`
+              @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+              }
+              @keyframes slideIn {
+                from { transform: translateY(-50px) scale(0.9); }
+                to { transform: translateY(0) scale(1); }
+              }
+            `}
+          </style>
           <div style={{
             backgroundColor: "white",
-            borderRadius: "12px",
-            padding: "24px",
-            maxWidth: "600px",
+            borderRadius: "16px",
+            padding: "30px",
+            maxWidth: "650px",
             width: "90%",
-            maxHeight: "80vh",
+            maxHeight: "85vh",
             overflowY: "auto",
             position: "relative",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+            boxShadow: "0 15px 35px rgba(0,0,0,0.15)",
+            animation: "slideIn 0.4s ease",
           }}>
             <button
               onClick={() => setShowDisclaimer(false)}
               style={{
                 position: "absolute",
-                top: "16px",
-                right: "16px",
-                background: "none",
+                top: "20px",
+                right: "20px",
+                background: "rgba(239, 68, 68, 0.1)",
                 border: "none",
-                fontSize: "20px",
+                borderRadius: "50%",
+                width: "35px",
+                height: "35px",
+                fontSize: "18px",
                 cursor: "pointer",
-                color: "#6B7280",
+                color: "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
+                e.currentTarget.style.transform = "scale(1)";
               }}
             >
               ×
             </button>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px" }}>
               <div style={{
-                background: "#FEE2E2",
+                background: "linear-gradient(135deg, #fee2e2, #fecaca)",
                 borderRadius: "50%",
-                width: "40px",
-                height: "40px",
+                width: "50px",
+                height: "50px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1F2937", margin: 0 }}>
+              <h3 style={{ fontSize: "24px", fontWeight: "bold", color: "#1f2937", margin: 0 }}>
                 Deriv Trading Risk Disclaimer
               </h3>
             </div>
             
-            <div style={{ marginBottom: "16px" }}>
-              <p style={{ lineHeight: "1.6", color: "#4B5563", marginBottom: "12px" }}>
+            <div style={{ marginBottom: "20px" }}>
+              <p style={{ lineHeight: "1.7", color: "#4b5563", marginBottom: "16px", fontSize: "15px" }}>
                 Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
               </p>
               
-              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Key Risks:</h4>
-              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "8px" }}>
+              <h4 style={{ color: "#1f2937", margin: "16px 0 10px 0", fontSize: "18px", fontWeight: "600" }}>Key Risks:</h4>
+              <ul style={{ paddingLeft: "24px", lineHeight: "1.7", color: "#4b5563", marginBottom: "20px" }}>
+                <li style={{ marginBottom: "10px" }}>
                   <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.
                 </li>
-                <li style={{ marginBottom: "8px" }}>
+                <li style={{ marginBottom: "10px" }}>
                   <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.
                 </li>
-                <li style={{ marginBottom: "8px" }}>
+                <li style={{ marginBottom: "10px" }}>
                   <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.
                 </li>
-                <li style={{ marginBottom: "8px" }}>
+                <li style={{ marginBottom: "10px" }}>
                   <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.
                 </li>
                 <li>
@@ -775,15 +827,15 @@ const AppWrapper = observer(() => {
                 </li>
               </ul>
               
-              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Important Considerations:</h4>
-              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563" }}>
-                <li style={{ marginBottom: "8px" }}>
+              <h4 style={{ color: "#1f2937", margin: "16px 0 10px 0", fontSize: "18px", fontWeight: "600" }}>Important Considerations:</h4>
+              <ul style={{ paddingLeft: "24px", lineHeight: "1.7", color: "#4b5563" }}>
+                <li style={{ marginBottom: "10px" }}>
                   You could lose some or all of your invested capital.
                 </li>
-                <li style={{ marginBottom: "8px" }}>
+                <li style={{ marginBottom: "10px" }}>
                   Never trade with money you cannot afford to lose.
                 </li>
-                <li style={{ marginBottom: "8px" }}>
+                <li style={{ marginBottom: "10px" }}>
                   Past performance is not indicative of future results.
                 </li>
                 <li>
@@ -793,17 +845,18 @@ const AppWrapper = observer(() => {
             </div>
             
             <div style={{ 
-              backgroundColor: "#F3F4F6",
-              padding: "12px",
-              borderRadius: "8px",
-              marginBottom: "16px"
+              backgroundColor: "#f3f4f6",
+              padding: "16px",
+              borderRadius: "12px",
+              marginBottom: "20px",
+              border: "1px solid #e5e7eb"
             }}>
               <p style={{ 
                 fontSize: "14px",
-                color: "#6B7280",
+                color: "#6b7280",
                 fontStyle: "italic",
                 margin: 0,
-                lineHeight: "1.5"
+                lineHeight: "1.6"
               }}>
                 By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
               </p>
@@ -813,24 +866,24 @@ const AppWrapper = observer(() => {
               <button
                 onClick={() => setShowDisclaimer(false)}
                 style={{
-                  background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
+                  background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
                   color: "white",
                   border: "none",
-                  borderRadius: "8px",
-                  padding: "10px 20px",
-                  fontSize: "14px",
+                  borderRadius: "10px",
+                  padding: "12px 24px",
+                  fontSize: "15px",
                   fontWeight: "600",
                   cursor: "pointer",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 6px 16px rgba(37, 99, 235, 0.4)";
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.3)";
                 }}
               >
                 I Understand the Risks
