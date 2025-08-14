@@ -1,99 +1,214 @@
-import React, { lazy, Suspense, useEffect, useState, useCallback } from "react";
-import classNames from "classnames";
-import { observer } from "mobx-react-lite";
-import ChunkLoader from "@/components/loader/chunk-loader";
-import DesktopWrapper from "@/components/shared_ui/desktop-wrapper";
-import Dialog from "@/components/shared_ui/dialog";
-import MobileWrapper from "@/components/shared_ui/mobile-wrapper";
-import Tabs from "@/components/shared_ui/tabs/tabs";
-import TradingViewModal from "@/components/trading-view-chart/trading-view-modal";
-import { DBOT_TABS } from "@/constants/bot-contents";
-import { api_base, updateWorkspaceName } from "@/external/bot-skeleton";
-import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream";
-import { useApiBase } from "@/hooks/useApiBase";
-import { useStore } from "@/hooks/useStore";
-import { Localize, localize } from "@deriv-com/translations";
-import { useDevice } from "@deriv-com/ui";
-import RunPanel from "../../components/run-panel";
-import ChartModal from "../chart/chart-modal";
-import Dashboard from "../dashboard";
-import RunStrategy from "../dashboard/run-strategy";
+"use client"
 
-const Chart = lazy(() => import("../chart"));
-const Tutorial = lazy(() => import("../tutorials"));
-const Copytrading = lazy(() => import("../copytrading"));
+import React, { lazy, Suspense, useEffect, useState, useCallback } from "react"
+import classNames from "classnames"
+import { observer } from "mobx-react-lite"
+import ChunkLoader from "@/components/loader/chunk-loader"
+import DesktopWrapper from "@/components/shared_ui/desktop-wrapper"
+import Dialog from "@/components/shared_ui/dialog"
+import MobileWrapper from "@/components/shared_ui/mobile-wrapper"
+import Tabs from "@/components/shared_ui/tabs/tabs"
+import TradingViewModal from "@/components/trading-view-chart/trading-view-modal"
+import { DBOT_TABS } from "@/constants/bot-contents"
+import { api_base, updateWorkspaceName } from "@/external/bot-skeleton"
+import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream"
+import { useApiBase } from "@/hooks/useApiBase"
+import { useStore } from "@/hooks/useStore"
+import { Localize, localize } from "@deriv-com/translations"
+import { useDevice } from "@deriv-com/ui"
+import RunPanel from "../../components/run-panel"
+import ChartModal from "../chart/chart-modal"
+import Dashboard from "../dashboard"
+import RunStrategy from "../dashboard/run-strategy"
 
-/** NEW ICONS WITH OUTLINE STYLE **/
+const Chart = lazy(() => import("../chart"))
+const Tutorial = lazy(() => import("../tutorials"))
+const Copytrading = lazy(() => import("../copytrading"))
+
+/** BEAUTIFUL MODERN BLUE ICONS **/
 const FreeBotsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <circle cx="8.5" cy="8.5" r="1.5" />
-    <circle cx="15.5" cy="8.5" r="1.5" />
-    <line x1="8" y1="15" x2="16" y2="15" />
-    <line x1="10" y1="18" x2="14" y2="18" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#blueGrad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" stopOpacity="1" />
+        <stop offset="100%" stopColor="#1d4ed8" stopOpacity="1" />
+      </linearGradient>
+    </defs>
+    <rect x="4" y="6" width="16" height="12" rx="3" fill="url(#blueGrad1)" />
+    <line x1="12" y1="3" x2="12" y2="6" stroke="url(#blueGrad1)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="2" r="1.5" fill="url(#blueGrad1)" />
+    <circle cx="9" cy="12" r="1.5" fill="white" />
+    <circle cx="15" cy="12" r="1.5" fill="white" />
+    <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9" />
   </svg>
 )
 
 const BotSettingsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 3.417 1.415 2 2 0 0 1-.587 1.415l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#blueGrad2)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
   </svg>
 )
 
 const ChartsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <line x1="18" y1="20" x2="18" y2="10" />
-    <line x1="12" y1="20" x2="12" y2="4" />
-    <line x1="6" y1="20" x2="6" y2="14" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#blueGrad3)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#blueGrad3)" strokeWidth="2" />
+    <path
+      d="M7 14L10 10L14 15L17 9"
+      fill="none"
+      stroke="url(#blueGrad3)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="7" cy="14" r="1.5" fill="url(#blueGrad3)" />
+    <circle cx="10" cy="10" r="1.5" fill="url(#blueGrad3)" />
+    <circle cx="14" cy="15" r="1.5" fill="url(#blueGrad3)" />
+    <circle cx="17" cy="9" r="1.5" fill="url(#blueGrad3)" />
   </svg>
 )
 
 const DCirclesIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="12" r="6" />
-    <circle cx="12" cy="12" r="2" />
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <path
+      d="M12 2a10 10 0 1 1-7.07 2.93"
+      fill="none"
+      stroke="url(#blueGrad4)"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path d="M12 6a6 6 0 1 1-4.24 1.76" fill="none" stroke="url(#blueGrad4)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="2.8" fill="url(#blueGrad4)" />
+    <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9" />
   </svg>
 )
 
 const AnalysisToolIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 21l-6-6m6 6l-6 6m6-16a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad5" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#blueGrad5)" strokeWidth="2" />
+    <rect x="7" y="14" width="2" height="4" rx="1" fill="url(#blueGrad5)" />
+    <rect x="11" y="10" width="2" height="8" rx="1" fill="url(#blueGrad5)" />
+    <rect x="15" y="7" width="2" height="11" rx="1" fill="url(#blueGrad5)" />
+    <circle cx="18" cy="6" r="3" stroke="url(#blueGrad5)" strokeWidth="2" fill="white" />
+    <path d="M20 8L22 10" stroke="url(#blueGrad5)" strokeWidth="2" strokeLinecap="round" />
   </svg>
 )
 
 const ToolsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a1 1 0 00-.29-1.61l-4.11-1.71a1 1 0 00-1.24.49l-1.13 2.4z" />
-    <path d="M12.19 8.84l-7.9 7.9a1 1 0 00-.29.59l-.53 4.11a1 1 0 001.17 1.09l4.11-.53a1 1 0 00.59-.29l7.9-7.9a1 1 0 000-1.41l-4.24-4.24a1 1 0 00-1.41 0z" />
-    <path d="M6.51 17.49l-1.6-1.6a1 1 0 010-1.42l1.6-1.6a1 1 0 011.41 0l1.6 1.6a1 1 0 010 1.41l-1.6 1.6a1 1 0 01-1.41 0z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M12 2.5L13.5 4.5L16 4L17 6.5L19.5 7.5L19 10L21.5 12L19 14L19.5 16.5L17 17.5L16 20L13.5 19.5L12 21.5L10.5 19.5L8 20L7 17.5L4.5 16.5L5 14L2.5 12L5 10L4.5 7.5L7 6.5L8 4L10.5 4.5L12 2.5Z"
+      stroke="#3b82f6"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11"
+      stroke="#3b82f6"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 
 const CopyTradingIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <rect x="3" y="3" width="10" height="10" rx="2" />
-    <rect x="11" y="11" width="10" height="10" rx="2" />
-    <path d="M7 7h2M7 9h3M15 15h2M15 17h3M13 3v8M21 11h-8" />
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#blueGrad6)" strokeWidth="2" />
+    <circle cx="12" cy="9" r="2.3" fill="url(#blueGrad6)" />
+    <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#blueGrad6)" />
   </svg>
 )
 
 const StrategyIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad7" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#blueGrad7)" strokeWidth="2" />
+    <path d="M8 7H12V17H8C7.45 17 7 16.55 7 16V8C7 7.45 7.45 7 8 7Z" fill="url(#blueGrad7)" />
+    <path
+      d="M12 7H16C16.55 7 17 7.45 17 8V16C17 16.55 16.55 17 16 17H12V7Z"
+      fill="white"
+      stroke="url(#blueGrad7)"
+      strokeWidth="1.5"
+    />
+    <line x1="12" y1="7" x2="12" y2="17" stroke="url(#blueGrad7)" strokeWidth="1.5" />
+    <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#blueGrad7)" />
   </svg>
 )
 
 const SignalsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad8" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#3b82f6" />
+        <stop offset="100%" stopColor="#1d4ed8" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="4" width="18" height="14" rx="2" ry="2" fill="none" stroke="url(#blueGrad8)" strokeWidth="2" />
+    <polyline
+      points="5,14 8,10 11,12 14,7 17,9 20,6"
+      fill="none"
+      stroke="url(#blueGrad8)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad8)" />
   </svg>
 )
 
 const TutorialsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M4 5C4 4.447 4.447 4 5 4H15C16.105 4 17 4.895 17 6V20C17 20.553 16.553 21 16 21H6C4.895 21 4 20.105 4 19V5Z"
+      stroke="#3b82f6"
+      strokeWidth="2"
+      fill="none"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M17 6H19C20.105 6 21 6.895 21 8V20C21 20.553 20.553 21 20 21H17"
+      stroke="#3b82f6"
+      strokeWidth="2"
+      fill="none"
+      strokeLinejoin="round"
+    />
+    <circle cx="10" cy="12" r="3" fill="#3b82f6" />
+    <polygon points="9,10.5 12,12 9,13.5" fill="white" />
   </svg>
 )
 
@@ -144,10 +259,10 @@ const TelegramIcon = () => (
 )
 
 const AppWrapper = observer(() => {
-  const { connectionStatus } = useApiBase();
-  const { dashboard, load_modal, run_panel, summary_card } = useStore();
-  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard;
-  const { onEntered } = load_modal;
+  const { connectionStatus } = useApiBase()
+  const { dashboard, load_modal, run_panel, summary_card } = useStore()
+  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard
+  const { onEntered } = load_modal
   const {
     is_dialog_open,
     dialog_options,
@@ -156,104 +271,107 @@ const AppWrapper = observer(() => {
     onOkButtonClick,
     stopBot,
     is_drawer_open,
-  } = run_panel;
-  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string };
-  const { clear } = summary_card;
-  const { isDesktop } = useDevice();
-  const [bots, setBots] = useState([]);
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
-  const analysisUrl = "https://mesoflixldpnew.vercel.app/";
-  const dcirclesUrl = "https://analysern.netlify.app/";
-  const strategyUrl = "https://mesoflixstrategies.netlify.app/";
-  const toolsUrl = "https://alltools-ten.vercel.app/";
+  } = run_panel
+  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string }
+  const { clear } = summary_card
+  const { isDesktop } = useDevice()
+  const [bots, setBots] = useState([])
+  const [showDisclaimer, setShowDisclaimer] = useState(false)
+  const analysisUrl = "https://mesoflixldpnew.vercel.app/"
+  const dcirclesUrl = "https://analysern.netlify.app/"
+  const strategyUrl = "https://mesoflixstrategies.netlify.app/"
+  const toolsUrl = "https://alltools-ten.vercel.app/"
 
   useEffect(() => {
     if (connectionStatus !== CONNECTION_STATUS.OPENED) {
-      const is_bot_running = document.getElementById("db-animation__stop-button") !== null;
+      const is_bot_running = document.getElementById("db-animation__stop-button") !== null
       if (is_bot_running) {
-        clear();
-        stopBot();
-        api_base.setIsRunning(false);
+        clear()
+        stopBot()
+        api_base.setIsRunning(false)
       }
     }
-  }, [clear, connectionStatus, stopBot]);
+  }, [clear, connectionStatus, stopBot])
 
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-        "Osam_Digit_Switcher🤖🤖.xml",
-        "Under-Destroyer💀.xml",
-        "Over HitnRun.xml",
-        "Osam.HnR.xml",
-        "Over-Destroyer💀.xml",
-        "Auto Bot by Osam💯.xml",
-        "DEC_entry_Point.xml",
-        "Under 8 pro bot💯.xml",
-      ];
+        "DALLAS AUTOMATIC BOT 💲💱.xml",
+        "CONDITION ENTRY.xml",
+        "DIFFERS NEW CULTURE BOT (2).xml",
+        "Bandwagon Bot (With Entry point)-1.xml",
+        "OVER_UNDER_SWITCHER.xml",
+        "Updated_Expert_Speed_Bot.xml",
+        "Deleon Chart Analysis Binary D-Bot (1).xml",
+        "Deriv-killer-3.0.xml",
+        "EVEN ODD PERCANTAGE ANALYSER.xml",
+        "GHOST_OVER1-RECOVER-4.xml",
+        "Wealth Generator.xml",
+      ]
       const botPromises = botFiles.map(async (file) => {
         try {
-          const response = await fetch(file);
+          const response = await fetch(file)
           if (!response.ok) {
-            throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
+            throw new Error(`Failed to fetch ${file}: ${response.statusText}`)
           }
-          const text = await response.text();
-          const parser = new DOMParser();
-          const xml = parser.parseFromString(text, "application/xml");
+          const text = await response.text()
+          const parser = new DOMParser()
+          const xml = parser.parseFromString(text, "application/xml")
           return {
             title: file.split("/").pop(),
             image: xml.getElementsByTagName("image")[0]?.textContent || "default_image_path",
             filePath: file,
             xmlContent: text,
-          };
+          }
         } catch (error) {
-          console.error(error);
-          return null;
+          console.error(error)
+          return null
         }
-      });
-      const bots = (await Promise.all(botPromises)).filter(Boolean);
-      setBots(bots);
-    };
-    fetchBots();
-  }, []);
+      })
+      const bots = (await Promise.all(botPromises)).filter(Boolean)
+      setBots(bots)
+    }
+    fetchBots()
+  }, [])
 
   const formatBotName = (name) => {
-    return name.replace(/\.xml$/, '');
-  };
+    return name.replace(/\.xml$/, "")
+  }
 
   const handleTabChange = React.useCallback(
     (tab_index: number) => {
-      setActiveTab(tab_index);
+      setActiveTab(tab_index)
     },
     [setActiveTab],
-  );
+  )
 
   const handleBotClick = useCallback(
     async (bot: { filePath: string; xmlContent: string }) => {
-      setActiveTab(DBOT_TABS.BOT_BUILDER);
+      setActiveTab(DBOT_TABS.BOT_BUILDER)
       try {
         if (typeof load_modal.loadFileFromContent === "function") {
           try {
-            await load_modal.loadFileFromContent(bot.xmlContent);
+            await load_modal.loadFileFromContent(bot.xmlContent)
           } catch (loadError) {
-            console.error("Error in load_modal.loadFileFromContent:", loadError);
+            console.error("Error in load_modal.loadFileFromContent:", loadError)
           }
         } else {
-          console.error("loadFileFromContent is not defined on load_modal");
+          console.error("loadFileFromContent is not defined on load_modal")
         }
-        updateWorkspaceName(bot.xmlContent);
+        updateWorkspaceName(bot.xmlContent)
       } catch (error) {
-        console.error("Error loading bot file:", error);
+        console.error("Error loading bot file:", error)
       }
     },
     [setActiveTab, load_modal, updateWorkspaceName],
-  );
+  )
 
   const handleOpen = useCallback(async () => {
-    await load_modal.loadFileFromRecent();
-    setActiveTab(DBOT_TABS.BOT_BUILDER);
-  }, [load_modal, setActiveTab]);
+    await load_modal.loadFileFromRecent()
+    setActiveTab(DBOT_TABS.BOT_BUILDER)
+  }, [load_modal, setActiveTab])
 
-  const showRunPanel = [1, 2, 3, 4].includes(active_tab);
+  const showRunPanel = [1, 2, 3, 4].includes(active_tab)
 
   return (
     <React.Fragment>
@@ -278,192 +396,72 @@ const AppWrapper = observer(() => {
             >
               <div className="free-bots">
                 {/* Social Media Icons */}
-                <div style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "16px",
-                  marginBottom: "20px",
-                  padding: "12px",
-                  backgroundColor: "rgba(255,255,255,0.3)",
-                  borderRadius: "16px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  position: "sticky",
-                  top: "0",
-                  zIndex: 10,
-                  backdropFilter: "blur(10px)",
-                }}>
-                  <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer"
-                    style={{ transition: "transform 0.2s ease", display: "flex" }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                <div className="social-media-container">
+                  <a
+                    href="https://youtube.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon youtube-icon"
                   >
                     <YouTubeIcon />
                   </a>
-                  <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer"
-                    style={{ transition: "transform 0.2s ease", display: "flex" }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  <a
+                    href="https://www.instagram.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon instagram-icon"
                   >
                     <InstagramIcon />
                   </a>
-                  <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer"
-                    style={{ transition: "transform 0.2s ease", display: "flex" }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  <a
+                    href="https://chat.whatsapp.com/FefH8rz7046JcC1nB45Hdf?mode=ac_t"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon whatsapp-icon"
                   >
                     <WhatsAppIcon />
                   </a>
-                  <a href="https://www.tiktok.com/@_its_osam?_t=ZM-8yUINW3W742&_r=1" target="_blank" rel="noopener noreferrer"
-                    style={{ transition: "transform 0.2s ease", display: "flex" }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  <a
+                    href="https://www.tiktok.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon tiktok-icon"
                   >
                     <TikTokIcon />
                   </a>
-                  <a href="https://t.me/+dLoQvTnT_2wzOGY0" target="_blank" rel="noopener noreferrer"
-                    style={{ transition: "transform 0.2s ease", display: "flex" }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-                    onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+                  <a
+                    href="https://t.me/+dLoQvTnT_2wzOGY0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon telegram-icon"
                   >
                     <TelegramIcon />
                   </a>
                 </div>
 
                 <div className="free-bots__content-wrapper">
-                  <style>
-                    {`
-                      @keyframes pulse {
-                        0% { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-                        100% { box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2); }
-                      }
-                      @keyframes borderAnimation {
-                        0% { background-position: 0% 50%; }
-                        100% { background-position: 200% 50%; }
-                      }
-                      @keyframes fadeInUp {
-                        from {
-                          opacity: 0;
-                          transform: translateY(20px);
-                        }
-                        to {
-                          opacity: 1;
-                          transform: translateY(0);
-                        }
-                      }
-                    `}
-                  </style>
                   <div className="free-bots__content">
                     {bots.map((bot, index) => (
                       <div
                         key={index}
+                        className="free-bot-item"
                         style={{
-                          background: "rgba(255, 255, 255, 0.95)",
-                          borderRadius: "12px",
-                          padding: "16px",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                          border: "2px solid rgba(37, 99, 235, 0.1)",
-                          transition: "all 0.3s ease",
-                          cursor: "default",
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          flexWrap: "wrap",
-                          gap: "12px",
-                          position: "relative",
-                          overflow: "hidden",
-                          marginBottom: "16px",
-                          animation: `fadeInUp 0.6s ease ${index * 0.1}s both`,
-                          backdropFilter: "blur(10px)",
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.transform = "translateY(-2px)";
-                          e.currentTarget.style.boxShadow = "0 8px 25px rgba(37, 99, 235, 0.15)";
-                          e.currentTarget.style.borderColor = "rgba(37, 99, 235, 0.3)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
-                          e.currentTarget.style.borderColor = "rgba(37, 99, 235, 0.1)";
+                          animationDelay: `${index * 0.1}s`,
                         }}
                       >
                         {/* Animated gradient border */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            height: "3px",
-                            background: "linear-gradient(90deg, #2563eb, #16c784, #2563eb)",
-                            backgroundSize: "200% 100%",
-                            animation: "borderAnimation 3s linear infinite",
-                            borderRadius: "0 0 12px 12px",
-                          }}
-                        />
-                        
-                        <div style={{ display: "flex", alignItems: "center", flex: "1", minWidth: "200px", gap: "12px" }}>
-                          <div
-                            style={{
-                              background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-                              borderRadius: "8px",
-                              padding: "8px",
-                              flexShrink: 0,
-                              boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
-                            }}
-                          >
+                        <div className="gradient-border" />
+
+                        <div className="bot-info">
+                          <div className="bot-icon-container">
                             <FreeBotsIcon />
                           </div>
-                          <div style={{ flex: 1 }}>
-                            <h3
-                              style={{
-                                fontSize: "16px",
-                                fontWeight: "600",
-                                color: "#1f2937",
-                                margin: "0",
-                                lineHeight: "1.4",
-                                wordBreak: "break-word",
-                              }}
-                            >
-                              {formatBotName(bot.title)}
-                            </h3>
-                            <p style={{
-                              fontSize: "12px",
-                              color: "#6b7280",
-                              margin: "4px 0 0 0",
-                              opacity: 0.8,
-                            }}>
-                              Click to load bot
-                            </p>
+                          <div className="bot-details">
+                            <h3 className="bot-title">{formatBotName(bot.title)}</h3>
+                            <p className="bot-status">Ready to deploy • Click to load</p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleBotClick(bot)}
-                          style={{
-                            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "8px",
-                            padding: "10px 20px",
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease",
-                            boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)",
-                            flexShrink: 0,
-                            minWidth: "80px",
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.transform = "translateY(-1px)";
-                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.4)";
-                            e.currentTarget.style.background = "linear-gradient(135deg, #1d4ed8, #1e40af)";
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.transform = "translateY(0)";
-                            e.currentTarget.style.boxShadow = "0 2px 8px rgba(37, 99, 235, 0.3)";
-                            e.currentTarget.style.background = "linear-gradient(135deg, #2563eb, #1d4ed8)";
-                          }}
-                        >
+                        <button onClick={() => handleBotClick(bot)} className="load-bot-button">
                           Load Bot
                         </button>
                       </div>
@@ -518,11 +516,11 @@ const AppWrapper = observer(() => {
                   width="100%"
                   height="100%"
                   title="Dcircles"
-                  style={{ 
-                    border: "none", 
-                    display: "block", 
+                  style={{
+                    border: "none",
+                    display: "block",
                     minHeight: "calc(100vh - 60px)",
-                    background: "#f8fafc" 
+                    background: "#eff6ff",
                   }}
                   scrolling="yes"
                 />
@@ -545,11 +543,11 @@ const AppWrapper = observer(() => {
                   width="100%"
                   height="100%"
                   title="Analysis"
-                  style={{ 
-                    border: "none", 
-                    display: "block", 
+                  style={{
+                    border: "none",
+                    display: "block",
                     minHeight: "calc(100vh - 60px)",
-                    background: "#f8fafc" 
+                    background: "#dbeafe",
                   }}
                   scrolling="yes"
                 />
@@ -572,11 +570,11 @@ const AppWrapper = observer(() => {
                   width="100%"
                   height="100%"
                   title="Tools"
-                  style={{ 
-                    border: "none", 
-                    display: "block", 
+                  style={{
+                    border: "none",
+                    display: "block",
                     minHeight: "calc(100vh - 60px)",
-                    background: "#f8fafc" 
+                    background: "#eff6ff",
                   }}
                   scrolling="yes"
                 />
@@ -614,11 +612,11 @@ const AppWrapper = observer(() => {
                   width="100%"
                   height="100%"
                   title="Strategy"
-                  style={{ 
-                    border: "none", 
-                    display: "block", 
+                  style={{
+                    border: "none",
+                    display: "block",
                     minHeight: "calc(100vh - 60px)",
-                    background: "#f8fafc" 
+                    background: "#dbeafe",
                   }}
                   scrolling="yes"
                 />
@@ -646,11 +644,11 @@ const AppWrapper = observer(() => {
                   src="signals"
                   width="100%"
                   height="100%"
-                  style={{ 
-                    border: "none", 
-                    display: "block", 
+                  style={{
+                    border: "none",
+                    display: "block",
                     minHeight: "calc(100vh - 60px)",
-                    background: "#f8fafc" 
+                    background: "#eff6ff",
                   }}
                   scrolling="yes"
                 />
@@ -674,218 +672,83 @@ const AppWrapper = observer(() => {
           </Tabs>
         </div>
       </div>
-      
-      {/* Floating Disclaimer Button */}
-      <button
-        onClick={() => setShowDisclaimer(true)}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          background: "linear-gradient(135deg, #f59e0b, #ef4444)",
-          color: "white",
-          border: "none",
-          borderRadius: "25px",
-          padding: "10px 18px",
-          fontSize: "13px",
-          fontWeight: "600",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-          zIndex: 1000,
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          backdropFilter: "blur(10px)",
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
-          e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.3)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.2)";
-        }}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+
+      {/* Smaller Risk Disclaimer Button - Moved Up */}
+      <button onClick={() => setShowDisclaimer(true)} className="risk-disclaimer-button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        Disclaimer
+        Risk
       </button>
 
       {/* Enhanced Risk Disclaimer Modal */}
       {showDisclaimer && (
-        <div style={{
-          position: "fixed",
-          top: "0",
-          left: "0",
-          right: "0",
-          bottom: "0",
-          backgroundColor: "rgba(0,0,0,0.6)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1001,
-          backdropFilter: "blur(5px)",
-          animation: "fadeIn 0.3s ease",
-        }}>
-          <style>
-            {`
-              @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-              }
-              @keyframes slideIn {
-                from { transform: translateY(-50px) scale(0.9); }
-                to { transform: translateY(0) scale(1); }
-              }
-            `}
-          </style>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "16px",
-            padding: "30px",
-            maxWidth: "650px",
-            width: "90%",
-            maxHeight: "85vh",
-            overflowY: "auto",
-            position: "relative",
-            boxShadow: "0 15px 35px rgba(0,0,0,0.15)",
-            animation: "slideIn 0.4s ease",
-          }}>
-            <button
-              onClick={() => setShowDisclaimer(false)}
-              style={{
-                position: "absolute",
-                top: "20px",
-                right: "20px",
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "none",
-                borderRadius: "50%",
-                width: "35px",
-                height: "35px",
-                fontSize: "18px",
-                cursor: "pointer",
-                color: "#ef4444",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.2s ease",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
-                e.currentTarget.style.transform = "scale(1.1)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
-                e.currentTarget.style.transform = "scale(1)";
-              }}
-            >
+        <div className="disclaimer-overlay">
+          <div className="disclaimer-modal">
+            <button onClick={() => setShowDisclaimer(false)} className="disclaimer-close-button">
               ×
             </button>
-            
-            <div style={{ display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px" }}>
-              <div style={{
-                background: "linear-gradient(135deg, #fee2e2, #fecaca)",
-                borderRadius: "50%",
-                width: "50px",
-                height: "50px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
+
+            <div className="disclaimer-header">
+              <div className="disclaimer-icon">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: "24px", fontWeight: "bold", color: "#1f2937", margin: 0 }}>
-                Deriv Trading Risk Disclaimer
-              </h3>
+              <h3 className="disclaimer-title">Trading Risk Disclaimer</h3>
             </div>
-            
-            <div style={{ marginBottom: "20px" }}>
-              <p style={{ lineHeight: "1.7", color: "#4b5563", marginBottom: "16px", fontSize: "15px" }}>
-                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
+
+            <div className="disclaimer-content">
+              <p className="disclaimer-intro">
+                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not
+                suitable for all investors. Before deciding to trade, carefully consider your financial situation and
+                experience level.
               </p>
-              
-              <h4 style={{ color: "#1f2937", margin: "16px 0 10px 0", fontSize: "18px", fontWeight: "600" }}>Key Risks:</h4>
-              <ul style={{ paddingLeft: "24px", lineHeight: "1.7", color: "#4b5563", marginBottom: "20px" }}>
-                <li style={{ marginBottom: "10px" }}>
-                  <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                  <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                  <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                  <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.
+
+              <h4 className="disclaimer-subtitle">Key Risks:</h4>
+              <ul className="disclaimer-list">
+                <li>
+                  <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but
+                  also magnify potential losses.
                 </li>
                 <li>
-                  <strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may affect your rights as a trader.
+                  <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected
+                  directions.
+                </li>
+                <li>
+                  <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close
+                  positions.
+                </li>
+                <li>
+                  <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical
+                  problems may prevent order execution.
+                </li>
+                <li>
+                  <strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may
+                  affect your rights as a trader.
                 </li>
               </ul>
-              
-              <h4 style={{ color: "#1f2937", margin: "16px 0 10px 0", fontSize: "18px", fontWeight: "600" }}>Important Considerations:</h4>
-              <ul style={{ paddingLeft: "24px", lineHeight: "1.7", color: "#4b5563" }}>
-                <li style={{ marginBottom: "10px" }}>
-                  You could lose some or all of your invested capital.
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                  Never trade with money you cannot afford to lose.
-                </li>
-                <li style={{ marginBottom: "10px" }}>
-                  Past performance is not indicative of future results.
-                </li>
+
+              <h4 className="disclaimer-subtitle">Important Considerations:</h4>
+              <ul className="disclaimer-list">
+                <li>You could lose some or all of your invested capital.</li>
+                <li>Never trade with money you cannot afford to lose.</li>
+                <li>Past performance is not indicative of future results.</li>
                 <li>
                   Seek independent financial advice if you have any doubts about your understanding of these risks.
                 </li>
               </ul>
             </div>
-            
-            <div style={{ 
-              backgroundColor: "#f3f4f6",
-              padding: "16px",
-              borderRadius: "12px",
-              marginBottom: "20px",
-              border: "1px solid #e5e7eb"
-            }}>
-              <p style={{ 
-                fontSize: "14px",
-                color: "#6b7280",
-                fontStyle: "italic",
-                margin: 0,
-                lineHeight: "1.6"
-              }}>
-                By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
+
+            <div className="disclaimer-notice">
+              <p className="disclaimer-notice-text">
+                By continuing to use this platform, you acknowledge that you have read, understood, and accept these
+                risks associated with trading on Deriv.
               </p>
             </div>
-            
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button
-                onClick={() => setShowDisclaimer(false)}
-                style={{
-                  background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "10px",
-                  padding: "12px 24px",
-                  fontSize: "15px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 6px 16px rgba(37, 99, 235, 0.4)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.3)";
-                }}
-              >
+
+            <div className="disclaimer-footer">
+              <button onClick={() => setShowDisclaimer(false)} className="disclaimer-accept-button">
                 I Understand the Risks
               </button>
             </div>
@@ -917,7 +780,7 @@ const AppWrapper = observer(() => {
         {message}
       </Dialog>
     </React.Fragment>
-  );
-});
+  )
+})
 
-export default AppWrapper;
+export default AppWrapper
