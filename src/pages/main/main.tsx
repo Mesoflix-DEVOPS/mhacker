@@ -296,17 +296,14 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-        "DALLAS AUTOMATIC BOT 💲💱.xml",
-        "CONDITION ENTRY.xml",
-        "DIFFERS NEW CULTURE BOT (2).xml",
-        "Bandwagon Bot (With Entry point)-1.xml",
-        "OVER_UNDER_SWITCHER.xml",
-        "Updated_Expert_Speed_Bot.xml",
-        "Deleon Chart Analysis Binary D-Bot (1).xml",
-        "Deriv-killer-3.0.xml",
-        "EVEN ODD PERCANTAGE ANALYSER.xml",
-        "GHOST_OVER1-RECOVER-4.xml",
-        "Wealth Generator.xml",
+          "Osam_Digit_Switcher🤖🤖.xml",
+        "Under-Destroyer💀.xml",
+        "Over HitnRun.xml",
+        "Osam.HnR.xml",
+        "Over-Destroyer💀.xml",
+        "Auto Bot by Osam💯.xml",
+        "DEC_entry_Point.xml",
+        "Under 8 pro bot💯.xml",
       ]
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -332,7 +329,18 @@ const AppWrapper = observer(() => {
       setBots(bots)
     }
     fetchBots()
-  }, [])
+  }, [
+        "Osam_Digit_Switcher🤖🤖.xml",
+        "Under-Destroyer💀.xml",
+        "Over HitnRun.xml",
+        "Osam.HnR.xml",
+        "Over-Destroyer💀.xml",
+        "Auto Bot by Osam💯.xml",
+        "DEC_entry_Point.xml",
+        "Under 8 pro bot💯.xml",
+
+    
+  ])
 
   const formatBotName = (name) => {
     return name.replace(/\.xml$/, "")
