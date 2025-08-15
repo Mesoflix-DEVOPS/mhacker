@@ -278,6 +278,7 @@
     justify-content: center; // Center horizontally
     text-align: center; // Center text
     flex-shrink: 0; // Prevent button from shrinking in flexbox layout
+    margin-left: 12px; // Add space between bot info and button
 
     &:hover {
       background: linear-gradient(135deg, var(--accent4), #1e3a8a);
@@ -677,78 +678,62 @@
         border-bottom: none;
         margin-right: 2px; // Reduced margin from 4px to 2px
         white-space: nowrap;
-        flex-shrink: 0; // Prevent shrinking for horizontal scroll
-        min-width: fit-content; // Allow natural width for horizontal scroll
+        flex-shrink: 0;
+        min-width: fit-content;
         font-weight: 600 !important;
         position: relative;
         overflow: hidden;
         
-        span {
-          color: #000000 !important; // Changed from #f8fafc (bright white) to black for better visibility
-          font-weight: 800 !important; // Increased from 600 to 800 for maximum visibility
-          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important; // White shadow for contrast on dark backgrounds
+        span, .localize, * {
+          color: #000000 !important;
+          font-weight: 800 !important;
+          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
           opacity: 1 !important;
-          font-size: 11px; // Reduced from 13px to 11px for smaller tabs
+          font-size: 11px;
         }
 
         svg {
-          fill: #000000 !important; // Changed from #f8fafc (bright white) to black
+          fill: #000000 !important;
           color: #000000 !important;
           opacity: 1 !important;
-          filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)); // White shadow for contrast
+          filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
         }
-
-        // Enhanced gradient overlay for better contrast
-        &:before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-          pointer-events: none;
-          border-radius: inherit;
-        }
-
-        @include flex-center;  
 
         &:hover {
-          background: var(--tab-hover-bg) !important; // Beautiful blue hover
+          background: var(--tab-hover-bg) !important;
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); // Blue shadow
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
           border-color: rgba(37, 99, 235, 0.6);
           
-          // Ensure hover text is also very visible
-          span {
-            color: #000000 !important; // Keep black on hover instead of white
+          span, .localize, * {
+            color: #000000 !important;
             text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9) !important;
             font-weight: 700 !important;
           }
           
           svg {
-            fill: #000000 !important; // Keep black on hover instead of white
+            fill: #000000 !important;
             color: #000000 !important;
             filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.9));
           }
         }
 
         @include mobile-or-tablet-screen {  
-          height: 32px; // Reduced mobile height from default to 32px
-          padding: 3px 6px !important; // Reduced mobile padding
+          height: 32px;
+          padding: 3px 6px !important;
           
-          span {
-            color: #000000 !important; // Black for mobile instead of bright white
-            font-weight: 800 !important; // Maximum font weight
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9) !important; // White shadow for mobile contrast
-            font-size: 10px !important; // Smaller font for mobile
+          span, .localize, * {
+            color: #000000 !important;
+            font-weight: 800 !important;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9) !important;
+            font-size: 10px !important;
           }
 
           svg {  
-            margin-inline-end: 4px; // Reduced margin from 6px to 4px
-            fill: #000000 !important; // Black for mobile instead of bright white
+            margin-inline-end: 4px;
+            fill: #000000 !important;
             color: #000000 !important;
-            filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.9)); // White shadow for mobile contrast
+            filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.9));
           }  
         }  
       }  
