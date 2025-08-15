@@ -393,12 +393,12 @@ const AppWrapper = observer(() => {
             {/* 1. Free Bots - First */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <FreeBotsIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Free Bots" />
                   </span>
-                </>
+                </div>
               }
               id="id-free-bots"
             >
@@ -482,12 +482,12 @@ const AppWrapper = observer(() => {
             {/* 2. Bot Settings */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <BotSettingsIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Bot Settings" />
                   </span>
-                </>
+                </div>
               }
               id="id-bot-settings"
             >
@@ -498,12 +498,12 @@ const AppWrapper = observer(() => {
             {/* 3. Charts */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <ChartsIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Charts" />
                   </span>
-                </>
+                </div>
               }
               id="id-charts"
             >
@@ -515,12 +515,12 @@ const AppWrapper = observer(() => {
             {/* 4. Dcircles */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <DCirclesIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Dcircles" />
                   </span>
-                </>
+                </div>
               }
               id="id-dcircles"
             >
@@ -544,12 +544,12 @@ const AppWrapper = observer(() => {
             {/* 5. Analysis */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <AnalysisToolIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Analysis" />
                   </span>
-                </>
+                </div>
               }
               id="id-analysis"
             >
@@ -573,12 +573,12 @@ const AppWrapper = observer(() => {
             {/* 6. Tools */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <ToolsIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Tools" />
                   </span>
-                </>
+                </div>
               }
               id="id-tools"
             >
@@ -602,12 +602,12 @@ const AppWrapper = observer(() => {
             {/* 7. Copytrading */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <CopyTradingIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Copytrading" />
                   </span>
-                </>
+                </div>
               }
               id="id-copytrading"
             >
@@ -619,12 +619,12 @@ const AppWrapper = observer(() => {
             {/* 8. Strategies */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <StrategyIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Strategy" />
                   </span>
-                </>
+                </div>
               }
               id="id-strategy"
             >
@@ -648,12 +648,12 @@ const AppWrapper = observer(() => {
             {/* 9. Signals */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <SignalsIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Signals" />
                   </span>
-                </>
+                </div>
               }
               id="id-signals"
             >
@@ -682,12 +682,12 @@ const AppWrapper = observer(() => {
             {/* 10. Tutorials - Last */}
             <div
               label={
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <TutorialsIcon />
-                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
                     <Localize i18n_default_text="Tutorials" />
                   </span>
-                </>
+                </div>
               }
               id="id-tutorials"
             >
