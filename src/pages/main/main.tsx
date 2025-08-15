@@ -406,7 +406,7 @@ const AppWrapper = observer(() => {
                 {/* Social Media Icons */}
                 <div className="social-media-container">
                   <a
-                    href="https://youtube.com/"
+                    href="https://youtube.com/@osamtradinghub-cl1fs?si=JSF3lDV1TBzjUTTb"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="social-icon youtube-icon"
@@ -414,7 +414,7 @@ const AppWrapper = observer(() => {
                     <YouTubeIcon />
                   </a>
                   <a
-                    href="https://www.instagram.com/"
+                    href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="social-icon instagram-icon"
@@ -422,7 +422,7 @@ const AppWrapper = observer(() => {
                     <InstagramIcon />
                   </a>
                   <a
-                    href="https://chat.whatsapp.com/FefH8rz7046JcC1nB45Hdf?mode=ac_t"
+                    href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="social-icon whatsapp-icon"
@@ -430,7 +430,7 @@ const AppWrapper = observer(() => {
                     <WhatsAppIcon />
                   </a>
                   <a
-                    href="https://www.tiktok.com/"
+                    href="https://www.tiktok.com/@_its_osam?_t=ZM-8yu0PcOKRHR&_r=1"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="social-icon tiktok-icon"
