@@ -67,48 +67,48 @@
   }
 }
 
-// FREE BOTS SECTION - IMPROVED SCROLLING AND VISIBILITY
+// FREE BOTS SECTION - REDUCED SIZE AND BETTER SCROLLING
 .free-bots {
   padding: 0;
   background: var(--free-bots-bg);
   border-radius: 0;
   border: none;
   box-shadow: none;
-  height: 100%;
+  height: calc(100vh - 60px); // Fixed height calculation
   width: 100%;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
 
-  // Social Media Container - Reduced size
+  // Social Media Container - Further reduced size
   .social-media-container {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    padding: 10px;
+    gap: 8px; // Reduced gap
+    padding: 8px; // Reduced padding
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
-    border-radius: 16px;
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.15);
-    margin: 0 12px 12px 12px; // Reduced margin
-    backdrop-filter: blur(12px);
+    border-radius: 12px; // Reduced border radius
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15); // Reduced shadow
+    margin: 8px 12px 12px 12px; // Reduced margins
+    backdrop-filter: blur(8px); // Reduced blur
     border: 1px solid rgba(59, 130, 246, 0.2);
-    flex-shrink: 0; // Prevent shrinking
-    
+    flex-shrink: 0;
+
     .social-icon {
       transition: all 0.3s ease;
       display: flex;
-      padding: 6px;
-      border-radius: 10px;
+      padding: 4px; // Reduced padding
+      border-radius: 8px; // Reduced border radius
       background: rgba(255, 255, 255, 0.8);
 
       svg {
-        width: 20px;
-        height: 20px;
+        width: 18px; // Reduced size
+        height: 18px; // Reduced size
       }
 
       &:hover {
-        transform: scale(1.15) translateY(-2px);
+        transform: scale(1.1) translateY(-1px); // Reduced transform
         background: rgba(255, 255, 255, 1);
       }
 
@@ -135,39 +135,33 @@
   }
 }
 
-// IMPROVED CONTENT WRAPPER WITH BETTER SCROLLING AND MOBILE PADDING
+// FIXED CONTENT WRAPPER WITH PROPER SCROLLING - Reduced padding
 .free-bots__content-wrapper {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 12px 60px 12px; // Increased bottom padding for mobile
+  padding: 0 12px 20px 12px; // Reduced bottom padding
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(59, 130, 246, 0.1);
 
-  // Mobile-specific improvements
-  @include mobile-or-tablet-screen {
-    padding: 0 8px 80px 8px; // Extra bottom padding for mobile
-    height: calc(100vh - 160px); // Ensure proper height calculation
-  }
-
   // Enhanced scrollbar styling
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 4px; // Reduced scrollbar width
   }
 
   &::-webkit-scrollbar-track {
     background: rgba(59, 130, 246, 0.1);
-    border-radius: 10px;
+    border-radius: 8px; // Reduced border radius
   }
 
   &::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, var(--accent), var(--accent4));
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    border-radius: 8px; // Reduced border radius
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3); // Reduced shadow
 
     &:hover {
       background: linear-gradient(135deg, var(--accent4), #1e3a8a);
-      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4); // Reduced shadow
     }
   }
 }
@@ -177,67 +171,69 @@
   flex-direction: column;
   gap: 12px; // Reduced gap
   width: 100%;
-  padding-bottom: 0; // Removed extra padding
+  padding-bottom: 12px; // Reduced padding
 }
 
-// FREE BOT ITEM STYLING - OPTIMIZED SIZE
+// FREE BOT ITEM STYLING - REDUCED SIZE
 .free-bot-item {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.95));
-  border-radius: 10px; // Reduced border radius
-  padding: 12px; // Reduced padding
-  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.12);
-  border: 2px solid rgba(59, 130, 246, 0.15);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  cursor: default;
+  border: 1px solid rgba(59, 130, 246, 0.15); // Reduced border thickness
+  border-radius: 12px; // Reduced border radius
+  padding: 16px; // Reduced padding
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px; // Reduced gap
+  max-width: none;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12); // Reduced shadow
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(8px); // Reduced blur
   position: relative;
   overflow: hidden;
-  animation: fadeInScale 0.8s ease both;
-  backdrop-filter: blur(10px);
-  min-height: 70px; // Reduced minimum height
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    border-radius: 10px;
+  }
 
   &:hover {
-    transform: translateY(-2px) scale(1.01); // Reduced scale
-    box-shadow: 0 12px 36px rgba(59, 130, 246, 0.25);
-    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px) scale(1.01); // Reduced transform
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2); // Reduced shadow
+    border-color: rgba(59, 130, 246, 0.3);
     background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(219, 234, 254, 0.98));
   }
 
   .gradient-border {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
-    height: 2px; // Reduced height
-    background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8, #3b82f6);
-    background-size: 300% 100%;
-    animation: gradientShift 4s ease infinite;
-    border-radius: 0 0 10px 10px;
+    bottom: 0;
+    background: linear-gradient(45deg, var(--accent), var(--accent4), var(--accent));
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+    border-radius: 12px; // Reduced border radius
+    z-index: -1;
+    opacity: 0.1;
   }
 
   .bot-info {
     display: flex;
     align-items: center;
-    flex: 1;
-    min-width: 160px; // Reduced minimum width
-    gap: 10px;
+    gap: 12px; // Reduced gap
+    margin-bottom: 12px; // Reduced margin
 
     .bot-icon-container {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      border-radius: 8px; // Reduced border radius
-      padding: 8px; // Reduced padding
       flex-shrink: 0;
-      box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
-      color: white;
+      width: 36px; // Reduced size
+      height: 36px; // Reduced size
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent4));
+      border-radius: 8px; // Reduced border radius
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); // Reduced shadow
 
       svg {
-        width: 18px; // Reduced icon size
-        height: 18px;
+        width: 20px; // Reduced size
+        height: 20px; // Reduced size
       }
     }
 
@@ -245,42 +241,43 @@
       flex: 1;
 
       .bot-title {
-        font-size: 14px; // Reduced font size
+        font-size: 16px; // Reduced font size
         font-weight: 700;
         color: #1e3a8a;
-        margin: 0;
+        margin-bottom: 4px; // Reduced margin
         line-height: 1.3;
-        word-break: break-word;
       }
 
       .bot-status {
-        font-size: 11px; // Reduced font size
+        font-size: 12px; // Reduced font size
         color: #1e40af;
-        margin: 2px 0 0 0;
         opacity: 0.8;
-        font-weight: 500;
+        line-height: 1.2;
       }
     }
   }
 
   .load-bot-button {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    width: 100%;
+    padding: 8px 16px; // Reduced padding
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
     color: white;
     border: none;
     border-radius: 8px; // Reduced border radius
-    padding: 8px 16px; // Reduced padding
-    font-size: 12px; // Reduced font size
     font-weight: 600;
+    font-size: 13px; // Reduced font size
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
-    flex-shrink: 0;
-    min-width: 80px; // Reduced minimum width
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); // Reduced shadow
 
     &:hover {
-      transform: translateY(-1px) scale(1.02);
-      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
-      background: linear-gradient(135deg, #2563eb, #1e40af);
+      background: linear-gradient(135deg, var(--accent4), #1e3a8a);
+      transform: translateY(-1px); // Reduced transform
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); // Reduced shadow
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 }
@@ -567,17 +564,17 @@
       &__active-line {  
         background: linear-gradient(90deg, var(--accent), var(--accent4)) !important;  
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        height: 3px; // Reduced height
+        height: 3px; // Reduced from 4px to 3px
         border-radius: 0;
-        bottom: -1px;
+        bottom: -1px; // Adjusted position
       }  
 
       &__active {  
         background: var(--tab-active-bg) !important;
         color: white !important;
-        border: 2px solid var(--accent);
-        border-bottom: 3px solid var(--accent); // Reduced border
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        border: 1px solid var(--accent); // Reduced border thickness
+        border-bottom: 3px solid var(--accent); // Reduced from 4px to 3px
+        box-shadow: 0 2px 12px rgba(59, 130, 246, 0.25); // Reduced shadow
         transform: translateY(-1px); // Reduced transform
         
         // Better text visibility for active tabs
@@ -586,63 +583,33 @@
           fill: white !important;
           opacity: 1 !important;
           font-weight: 700;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); // Reduced text shadow
         }
       }  
 
       &__list {  
         background: linear-gradient(135deg, var(--general-section-1), #334155);  
         justify-content: flex-start;  
-        border-bottom: 2px solid rgba(59, 130, 246, 0.2);
-        flex-shrink: 0;
-        padding: 6px; // Reduced padding
-        margin: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        height: 50px; // Fixed reduced height
-
-        @include mobile-or-tablet-screen {  
-          overflow-x: auto;  
-          overflow-y: hidden;  
-          -ms-overflow-style: none;  
-          scrollbar-width: none;  
-          height: 45px; // Even smaller for mobile
-
-          &::-webkit-scrollbar {  
-            display: none;  
-          }  
-        }  
-
-        &--header {  
-          &--main {  
-            &__tabs {  
-              @include mobile-or-tablet-screen {  
-                width: 100%;  
-                overflow-x: auto;  
-                padding: 0;  
-              }  
-            }  
-          }  
-        }  
-
-        &--border-bottom {  
-          @include mobile-or-tablet-screen {  
-            border-bottom: 2px solid rgba(59, 130, 246, 0.2);  
-          }  
-        }  
+        min-height: 48px; // Reduced from default
+        padding: 4px 8px; // Reduced padding
+        gap: 2px; // Reduced gap between tabs
+        
+        @media (max-width: 768px) {
+          min-height: 44px;
+          padding: 2px 4px;
+          gap: 1px;
+        }
       }  
 
       &__content {
         flex: 1;
         overflow: hidden;
-        height: calc(100vh - 56px); // Adjusted for reduced tab height
+        height: calc(100vh - 70px); // Adjusted for new tab height
         background: var(--card-bg);
 
         @include mobile-or-tablet-screen {  
           width: 100%;  
-          height: calc(100vh - 51px); // Adjusted for mobile
+          height: calc(100vh - 70px);
 
           &--no-result {  
             @include flex-center;  
@@ -686,39 +653,38 @@
       }  
 
       &__item {  
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        height: 38px;  // Reduced height significantly
-        padding: 0 14px;  // Reduced padding
+        border-top-left-radius: 0;  // Removed rounded corners
+        border-top-right-radius: 0;  // Removed rounded corners
+        height: 54px;  // Increased height
+        padding: 8px 12px !important; // Reduced padding
         width: auto;  
-        color: #f8fafc !important; // Much brighter inactive text
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: var(--tab-bg);
-        border: 1px solid rgba(75, 85, 99, 0.3); // Thinner border
+        color: var(--text-primary) !important; // Force white text visibility
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1); // New background color
+        border: 1px solid rgba(255, 255, 255, 0.2); // New border color
         border-bottom: none;
-        margin-right: 3px; // Reduced margin
+        margin-right: 4px;
         white-space: nowrap;
         flex-shrink: 0;
-        font-weight: 600; // Reduced font weight for inactive
+        font-weight: 600 !important; // Increased font weight for better visibility
         position: relative;
         overflow: hidden;
         
-        // IMPROVED INACTIVE TEXT VISIBILITY - Much brighter
+        // IMPROVED TEXT VISIBILITY - Much brighter text
         span {
-          color: #f1f5f9 !important; // Very bright gray for inactive tabs
-          font-weight: 600 !important; 
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+          color: rgba(255, 255, 255, 0.9) !important; // Increased opacity
+          font-weight: 600 !important; // Increased font weight
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); // Added text shadow
           opacity: 1 !important;
-          font-size: 13px !important; 
-          letter-spacing: 0.3px;
+          font-size: 13px; // Slightly smaller font
         }
 
-        // Improved inactive SVG visibility
+        // Improved SVG visibility
         svg {
-          fill: #f1f5f9 !important; // Very bright gray for inactive SVG
-          color: #f1f5f9 !important;
+          fill: rgba(255, 255, 255, 0.9) !important; // Increased opacity
+          color: rgba(255, 255, 255, 0.9) !important;
           opacity: 1 !important;
-          filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); // Added text shadow
         }
 
         // Enhanced gradient overlay for better contrast
@@ -729,7 +695,7 @@
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
           pointer-events: none;
           border-radius: inherit;
         }
@@ -737,43 +703,38 @@
         @include flex-center;  
 
         &:hover {
-          background: var(--tab-hover-bg) !important;
-          transform: translateY(-2px) scale(1.01); // Reduced transform
-          box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+          background: var(--tab-hover-bg) !important; // Beautiful blue hover
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); // Blue shadow
           border-color: rgba(37, 99, 235, 0.6);
           
           // Ensure hover text is also very visible
           span {
             color: #ffffff !important;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
             font-weight: 700 !important;
           }
           
           svg {
             fill: #ffffff !important;
             color: #ffffff !important;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
           }
         }
 
         @include mobile-or-tablet-screen {  
-          height: 33px; // Even smaller for mobile
-          padding: 0 10px;
-
           // Enhanced mobile visibility
           span {
-            color: #f8fafc !important; // Very bright for mobile
-            font-weight: 600 !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
-            font-size: 12px !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+            font-size: 13px !important;
           }
 
           svg {  
             margin-inline-end: 6px;  
-            fill: #f8fafc !important;
-            color: #f8fafc !important;
-            width: 16px;
-            height: 16px;
+            fill: #ffffff !important;
+            color: #ffffff !important;
           }  
         }  
 
@@ -800,6 +761,17 @@
         &__run-button {  
           background: linear-gradient(135deg, var(--accent), var(--accent4)) !important;
           box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+          transition: all 0.3s ease;
+          
+          &:hover {
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+          }
+        }  
+
+        &__stop-button {  
+          background: linear-gradient(135deg, var(--brand-red-coral), #dc2626) !important;
+          box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
           transition: all 0.3s ease;
           
           &:hover {
@@ -1498,9 +1470,4 @@
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     transform: translateY(-1px);
   }
-}px 24px rgba(59, 130, 246, 0.4);
-            transform: translateY(-2px);
-          }
-        }  
-
-      
+}
