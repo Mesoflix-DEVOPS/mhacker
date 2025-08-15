@@ -74,7 +74,7 @@
   border-radius: 0;
   border: none;
   box-shadow: none;
-  height: calc(100vh - 60px); // Fixed height calculation
+  height: calc(100vh - 50px); // Reduced from 60px to 50px for smaller tab height
   width: 100%;
   overflow: hidden;
   position: relative;
@@ -135,14 +135,15 @@
   }
 }
 
-// FIXED CONTENT WRAPPER WITH PROPER SCROLLING - Reduced padding
+// FIXED CONTENT WRAPPER WITH PROPER SCROLLING - Enhanced for better visibility
 .free-bots__content-wrapper {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 12px 20px 12px; // Reduced bottom padding
+  padding: 0 12px 80px 12px; // Increased bottom padding from 20px to 80px to ensure last bot is visible
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(59, 130, 246, 0.1);
+  max-height: calc(100vh - 120px); // Added max-height for better mobile scrolling
 
   // Enhanced scrollbar styling
   &::-webkit-scrollbar {
@@ -174,29 +175,30 @@
   padding-bottom: 12px; // Reduced padding
 }
 
-// FREE BOT ITEM STYLING - REDUCED SIZE
+// FREE BOT ITEM STYLING - Enhanced visibility
 .free-bot-item {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.95));
-  border: 1px solid rgba(59, 130, 246, 0.15); // Reduced border thickness
-  border-radius: 12px; // Reduced border radius
-  padding: 16px; // Reduced padding
+  border: 3px solid rgba(59, 130, 246, 0.25); // Increased border from 1px to 3px for better visibility
+  border-radius: 12px;
+  padding: 16px;
   width: 100%;
   max-width: none;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12); // Reduced shadow
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.18); // Enhanced shadow for better visibility
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  backdrop-filter: blur(8px); // Reduced blur
+  backdrop-filter: blur(8px);
   position: relative;
   overflow: hidden;
 
   @media (max-width: 768px) {
     padding: 12px;
     border-radius: 10px;
+    border: 2px solid rgba(59, 130, 246, 0.3); // Enhanced mobile border
   }
 
   &:hover {
-    transform: translateY(-2px) scale(1.01); // Reduced transform
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2); // Reduced shadow
-    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.25); // Enhanced hover shadow
+    border-color: rgba(59, 130, 246, 0.4);
     background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(219, 234, 254, 0.98));
   }
 
@@ -259,21 +261,25 @@
 
   .load-bot-button {
     width: 100%;
-    padding: 8px 16px; // Reduced padding
+    padding: 8px 16px; // Reduced padding for smaller button
     background: linear-gradient(135deg, var(--accent), var(--accent4));
     color: white;
     border: none;
-    border-radius: 8px; // Reduced border radius
+    border-radius: 8px;
     font-weight: 600;
-    font-size: 13px; // Reduced font size
+    font-size: 12px; // Reduced font size from 13px to 12px
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); // Reduced shadow
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    display: flex; // Added flexbox for perfect centering
+    align-items: center; // Center vertically
+    justify-content: center; // Center horizontally
+    text-align: center; // Center text
 
     &:hover {
       background: linear-gradient(135deg, var(--accent4), #1e3a8a);
-      transform: translateY(-1px); // Reduced transform
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); // Reduced shadow
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     }
 
     &:active {
@@ -590,26 +596,29 @@
       &__list {  
         background: linear-gradient(135deg, var(--general-section-1), #334155);  
         justify-content: flex-start;  
-        min-height: 48px; // Reduced from default
-        padding: 4px 8px; // Reduced padding
-        gap: 2px; // Reduced gap between tabs
+        min-height: 36px; // Reduced from 48px to 36px for smaller tab height
+        padding: 2px 6px; // Reduced padding from 4px 8px to 2px 6px
+        gap: 1px; // Reduced gap from 2px to 1px
+        overflow-x: auto; // Added horizontal scrolling
+        overflow-y: hidden; // Hide vertical overflow
+        white-space: nowrap; // Prevent wrapping
         
         @media (max-width: 768px) {
-          min-height: 44px;
-          padding: 2px 4px;
-          gap: 1px;
+          min-height: 32px; // Reduced mobile height from 44px to 32px
+          padding: 1px 3px; // Further reduced mobile padding
+          gap: 0px; // No gap on mobile
         }
       }  
 
       &__content {
         flex: 1;
         overflow: hidden;
-        height: calc(100vh - 70px); // Adjusted for new tab height
+        height: calc(100vh - 50px); // Reduced from 70px to 50px for smaller tab height
         background: var(--card-bg);
 
         @include mobile-or-tablet-screen {  
           width: 100%;  
-          height: calc(100vh - 70px);
+          height: calc(100vh - 50px); // Reduced mobile height
 
           &--no-result {  
             @include flex-center;  
@@ -653,38 +662,37 @@
       }  
 
       &__item {  
-        border-top-left-radius: 0;  // Removed rounded corners
-        border-top-right-radius: 0;  // Removed rounded corners
-        height: 54px;  // Increased height
-        padding: 8px 12px !important; // Reduced padding
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        height: 36px; // Reduced from 54px to 36px for much smaller tab height
+        padding: 4px 8px !important; // Reduced padding from 8px 12px to 4px 8px
         width: auto;  
-        color: var(--text-primary) !important; // Force white text visibility
+        color: var(--text-primary) !important;
         transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.1); // New background color
-        border: 1px solid rgba(255, 255, 255, 0.2); // New border color
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-bottom: none;
-        margin-right: 4px;
+        margin-right: 2px; // Reduced margin from 4px to 2px
         white-space: nowrap;
-        flex-shrink: 0;
-        font-weight: 600 !important; // Increased font weight for better visibility
+        flex-shrink: 0; // Prevent shrinking for horizontal scroll
+        min-width: fit-content; // Allow natural width for horizontal scroll
+        font-weight: 600 !important;
         position: relative;
         overflow: hidden;
         
-        // IMPROVED TEXT VISIBILITY - Much brighter text
         span {
-          color: rgba(255, 255, 255, 0.9) !important; // Increased opacity
-          font-weight: 600 !important; // Increased font weight
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); // Added text shadow
+          color: #f8fafc !important; // Much brighter white from rgba(255, 255, 255, 0.9)
+          font-weight: 800 !important; // Increased from 600 to 800 for maximum visibility
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important; // Stronger shadow for better contrast
           opacity: 1 !important;
-          font-size: 13px; // Slightly smaller font
+          font-size: 11px; // Reduced from 13px to 11px for smaller tabs
         }
 
-        // Improved SVG visibility
         svg {
-          fill: rgba(255, 255, 255, 0.9) !important; // Increased opacity
-          color: rgba(255, 255, 255, 0.9) !important;
+          fill: #f8fafc !important; // Much brighter white
+          color: #f8fafc !important;
           opacity: 1 !important;
-          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); // Added text shadow
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8)); // Stronger shadow
         }
 
         // Enhanced gradient overlay for better contrast
@@ -723,24 +731,21 @@
         }
 
         @include mobile-or-tablet-screen {  
-          // Enhanced mobile visibility
+          height: 32px; // Reduced mobile height from default to 32px
+          padding: 3px 6px !important; // Reduced mobile padding
+          
           span {
-            color: #ffffff !important;
-            font-weight: 700 !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
-            font-size: 13px !important;
+            color: #f8fafc !important; // Brightest white for mobile
+            font-weight: 800 !important; // Maximum font weight
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9) !important; // Strongest shadow for mobile
+            font-size: 10px !important; // Smaller font for mobile
           }
 
           svg {  
-            margin-inline-end: 6px;  
-            fill: #ffffff !important;
-            color: #ffffff !important;
-          }  
-        }  
-
-        &__icon {  
-          @include mobile-or-tablet-screen {  
-            padding-top: 0;  
+            margin-inline-end: 4px; // Reduced margin from 6px to 4px
+            fill: #f8fafc !important;
+            color: #f8fafc !important;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)); // Strongest shadow for mobile
           }  
         }  
       }  
@@ -779,13 +784,6 @@
             transform: translateY(-2px);
           }
         }  
-      }  
-
-      &__container {  
-        background: var(--general-main-1);  
-        border: 2px solid rgba(59, 130, 246, 0.2);
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       }  
     }  
   }  
