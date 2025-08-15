@@ -392,12 +392,14 @@ const AppWrapper = observer(() => {
           >
             {/* 1. Free Bots - First */}
             <div
-              label={(
+              label={
                 <>
                   <FreeBotsIcon />
-                  <Localize i18n_default_text="Free Bots" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Free Bots" />
+                  </span>
                 </>
-              )}
+              }
               id="id-free-bots"
             >
               <div className="free-bots">
@@ -479,12 +481,14 @@ const AppWrapper = observer(() => {
 
             {/* 2. Bot Settings */}
             <div
-              label={(
+              label={
                 <>
                   <BotSettingsIcon />
-                  <Localize i18n_default_text="Bot Settings" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Bot Settings" />
+                  </span>
                 </>
-              )}
+              }
               id="id-bot-settings"
             >
               <Dashboard handleTabChange={handleTabChange} />
@@ -493,12 +497,14 @@ const AppWrapper = observer(() => {
 
             {/* 3. Charts */}
             <div
-              label={(
+              label={
                 <>
                   <ChartsIcon />
-                  <Localize i18n_default_text="Charts" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Charts" />
+                  </span>
                 </>
-              )}
+              }
               id="id-charts"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
@@ -508,12 +514,14 @@ const AppWrapper = observer(() => {
 
             {/* 4. Dcircles */}
             <div
-              label={(
+              label={
                 <>
                   <DCirclesIcon />
-                  <Localize i18n_default_text="Dcircles" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Dcircles" />
+                  </span>
                 </>
-              )}
+              }
               id="id-dcircles"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -535,12 +543,14 @@ const AppWrapper = observer(() => {
 
             {/* 5. Analysis */}
             <div
-              label={(
+              label={
                 <>
                   <AnalysisToolIcon />
-                  <Localize i18n_default_text="Analysis" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Analysis" />
+                  </span>
                 </>
-              )}
+              }
               id="id-analysis"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -562,12 +572,14 @@ const AppWrapper = observer(() => {
 
             {/* 6. Tools */}
             <div
-              label={(
+              label={
                 <>
                   <ToolsIcon />
-                  <Localize i18n_default_text="Tools" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Tools" />
+                  </span>
                 </>
-              )}
+              }
               id="id-tools"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -589,12 +601,14 @@ const AppWrapper = observer(() => {
 
             {/* 7. Copytrading */}
             <div
-              label={(
+              label={
                 <>
                   <CopyTradingIcon />
-                  <Localize i18n_default_text="Copytrading" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Copytrading" />
+                  </span>
                 </>
-              )}
+              }
               id="id-copytrading"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
@@ -604,12 +618,14 @@ const AppWrapper = observer(() => {
 
             {/* 8. Strategies */}
             <div
-              label={(
+              label={
                 <>
                   <StrategyIcon />
-                  <Localize i18n_default_text="Strategy" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Strategy" />
+                  </span>
                 </>
-              )}
+              }
               id="id-strategy"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -631,12 +647,14 @@ const AppWrapper = observer(() => {
 
             {/* 9. Signals */}
             <div
-              label={(
+              label={
                 <>
                   <SignalsIcon />
-                  <Localize i18n_default_text="Signals" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Signals" />
+                  </span>
                 </>
-              )}
+              }
               id="id-signals"
             >
               <div
@@ -663,12 +681,14 @@ const AppWrapper = observer(() => {
 
             {/* 10. Tutorials - Last */}
             <div
-              label={(
+              label={
                 <>
                   <TutorialsIcon />
-                  <Localize i18n_default_text="Tutorials" />
+                  <span style={{ color: "#000000 !important", fontWeight: "800" }}>
+                    <Localize i18n_default_text="Tutorials" />
+                  </span>
                 </>
-              )}
+              }
               id="id-tutorials"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
@@ -678,14 +698,6 @@ const AppWrapper = observer(() => {
           </Tabs>
         </div>
       </div>
-
-      {/* Smaller Risk Disclaimer Button - Moved Up */}
-      <button onClick={() => setShowDisclaimer(true)} className="risk-disclaimer-button">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        Risk
-      </button>
 
       {/* Enhanced Risk Disclaimer Modal */}
       {showDisclaimer && (
@@ -785,6 +797,14 @@ const AppWrapper = observer(() => {
       >
         {message}
       </Dialog>
+
+      {/* Smaller Risk Disclaimer Button - Moved Down */}
+      <button onClick={() => setShowDisclaimer(true)} className="risk-disclaimer-button" style={{ bottom: "20px" }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        Risk
+      </button>
     </React.Fragment>
   )
 })
