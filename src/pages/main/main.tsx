@@ -296,7 +296,7 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-          "Osam_Digit_Switcher🤖🤖.xml",
+        "Osam_Digit_Switcher🤖🤖.xml",
         "Under-Destroyer💀.xml",
         "Over HitnRun.xml",
         "Osam.HnR.xml",
@@ -330,16 +330,14 @@ const AppWrapper = observer(() => {
     }
     fetchBots()
   }, [
-        "Osam_Digit_Switcher🤖🤖.xml",
-        "Under-Destroyer💀.xml",
-        "Over HitnRun.xml",
-        "Osam.HnR.xml",
-        "Over-Destroyer💀.xml",
-        "Auto Bot by Osam💯.xml",
-        "DEC_entry_Point.xml",
-        "Under 8 pro bot💯.xml",
-
-    
+    "Osam_Digit_Switcher🤖🤖.xml",
+    "Under-Destroyer💀.xml",
+    "Over HitnRun.xml",
+    "Osam.HnR.xml",
+    "Over-Destroyer💀.xml",
+    "Auto Bot by Osam💯.xml",
+    "DEC_entry_Point.xml",
+    "Under 8 pro bot💯.xml",
   ])
 
   const formatBotName = (name) => {
