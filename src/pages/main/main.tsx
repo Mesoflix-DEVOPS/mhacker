@@ -51,7 +51,7 @@ const BotSettingsIcon = () => (
         <stop offset="100%" stopColor="#1d4ed8" />
       </linearGradient>
     </defs>
-    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
+    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
   </svg>
 )
 
@@ -392,12 +392,12 @@ const AppWrapper = observer(() => {
           >
             {/* 1. Free Bots - First */}
             <div
-              label={
+              label={(
                 <>
                   <FreeBotsIcon />
                   <Localize i18n_default_text="Free Bots" />
                 </>
-              }
+              )}
               id="id-free-bots"
             >
               <div className="free-bots">
@@ -479,12 +479,12 @@ const AppWrapper = observer(() => {
 
             {/* 2. Bot Settings */}
             <div
-              label={
+              label={(
                 <>
                   <BotSettingsIcon />
                   <Localize i18n_default_text="Bot Settings" />
                 </>
-              }
+              )}
               id="id-bot-settings"
             >
               <Dashboard handleTabChange={handleTabChange} />
@@ -493,12 +493,12 @@ const AppWrapper = observer(() => {
 
             {/* 3. Charts */}
             <div
-              label={
+              label={(
                 <>
                   <ChartsIcon />
                   <Localize i18n_default_text="Charts" />
                 </>
-              }
+              )}
               id="id-charts"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
@@ -508,12 +508,12 @@ const AppWrapper = observer(() => {
 
             {/* 4. Dcircles */}
             <div
-              label={
+              label={(
                 <>
                   <DCirclesIcon />
                   <Localize i18n_default_text="Dcircles" />
                 </>
-              }
+              )}
               id="id-dcircles"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -535,12 +535,12 @@ const AppWrapper = observer(() => {
 
             {/* 5. Analysis */}
             <div
-              label={
+              label={(
                 <>
                   <AnalysisToolIcon />
                   <Localize i18n_default_text="Analysis" />
                 </>
-              }
+              )}
               id="id-analysis"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -562,12 +562,12 @@ const AppWrapper = observer(() => {
 
             {/* 6. Tools */}
             <div
-              label={
+              label={(
                 <>
                   <ToolsIcon />
                   <Localize i18n_default_text="Tools" />
                 </>
-              }
+              )}
               id="id-tools"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -589,12 +589,12 @@ const AppWrapper = observer(() => {
 
             {/* 7. Copytrading */}
             <div
-              label={
+              label={(
                 <>
                   <CopyTradingIcon />
                   <Localize i18n_default_text="Copytrading" />
                 </>
-              }
+              )}
               id="id-copytrading"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
@@ -604,12 +604,12 @@ const AppWrapper = observer(() => {
 
             {/* 8. Strategies */}
             <div
-              label={
+              label={(
                 <>
                   <StrategyIcon />
                   <Localize i18n_default_text="Strategy" />
                 </>
-              }
+              )}
               id="id-strategy"
             >
               <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -631,12 +631,12 @@ const AppWrapper = observer(() => {
 
             {/* 9. Signals */}
             <div
-              label={
+              label={(
                 <>
                   <SignalsIcon />
                   <Localize i18n_default_text="Signals" />
                 </>
-              }
+              )}
               id="id-signals"
             >
               <div
@@ -663,12 +663,12 @@ const AppWrapper = observer(() => {
 
             {/* 10. Tutorials - Last */}
             <div
-              label={
+              label={(
                 <>
                   <TutorialsIcon />
                   <Localize i18n_default_text="Tutorials" />
                 </>
-              }
+              )}
               id="id-tutorials"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
