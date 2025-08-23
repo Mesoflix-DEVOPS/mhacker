@@ -332,11 +332,12 @@ const AppWrapper = observer(() => {
   }, [
     "Osam_Digit_Switcher🤖🤖.xml",
     "Under-Destroyer💀.xml",
-    "Over HitnRun.xml",
-    "Osam.HnR.xml",
     "Over-Destroyer💀.xml",
+    "the Astro E_O🤖.xml",
+    "Osam.HnR.xml",
     "Auto Bot by Osam💯.xml",
     "DEC_entry_Point.xml",
+    "Over_HitnRun🤖.xml",
     "Under 8 pro bot💯.xml",
   ])
 
