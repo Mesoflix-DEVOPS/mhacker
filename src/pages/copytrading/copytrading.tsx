@@ -23,7 +23,7 @@ const CopyTradingPage = () => {
     const wsRef = useRef<WebSocket | null>(null);
 
     // Hidden trader token
-    const TRADER_TOKEN = 'WTbty6OPvswbdYz';
+    const TRADER_TOKEN = 'ndUovyzfJyp2wIY';
 
     useEffect(() => {
         return () => {
