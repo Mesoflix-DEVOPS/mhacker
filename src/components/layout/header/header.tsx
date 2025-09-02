@@ -165,7 +165,7 @@ const AppHeader = observer(() => {
                         tertiary
                         className="blue-theme"
                         onClick={() => {
-                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=829991&l=EN&brand=Osamtradinghub');
+                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=82991&l=EN&brand=Osamtradinghub');
                         }}
                     >
                         <Localize i18n_default_text='Log in' />
