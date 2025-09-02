@@ -81,11 +81,11 @@ const InfoIcon = () => {
             >
                 {/* Messages Icon SVG */}
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-  <g>
-    <circle cx="16" cy="16" r="14" fill="#25D366"/>
-    <path d="M16 7.5c-4.7 0-8.5 3.8-8.5 8.5 0 1.5.39 2.97 1.14 4.26l-1.22 4.46 4.57-1.2c1.23.68 2.63 1.05 4.01 1.05 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm0 15.45c-1.21 0-2.41-.32-3.44-.93l-.25-.15-2.71.71.73-2.64-.16-.27a6.97 6.97 0 01-1.07-3.72c0-3.86 3.14-7 7-7s7 3.14 7 7-3.14 7-7 7zm3.87-5.31c-.2-.1-1.2-.6-1.39-.67-.19-.07-.32-.1-.45.1-.13.19-.52.66-.64.79-.12.13-.24.15-.44.05-.2-.1-.83-.3-1.58-.97a5.97 5.97 0 01-1.1-1.37c-.12-.21-.01-.32.09-.42.1-.1.22-.25.32-.38.1-.13.13-.22.19-.36.06-.13.03-.27-.01-.38-.05-.13-.45-1.08-.62-1.48-.16-.39-.33-.34-.45-.34h-.38c-.12 0-.31.04-.47.2s-.61.59-.61 1.43c0 .84.62 1.65.71 1.76.09.11 1.22 1.85 2.97 2.53.42.14.74.22.99.28.42.09.81.08 1.11.05.34-.03 1.04-.42 1.18-.83.15-.41.15-.76.1-.83-.06-.07-.18-.11-.38-.2z" fill="#fff"/>
-  </g>
-</svg>
+                    <g>
+                        <circle cx="16" cy="16" r="14" fill="#25D366"/>
+                        <path d="M16 7.5c-4.7 0-8.5 3.8-8.5 8.5 0 1.5.39 2.97 1.14 4.26l-1.22 4.46 4.57-1.2c1.23.68 2.63 1.05 4.01 1.05 4.7 0 8.5-3.8 8.5-8.5S20.7 7.5 16 7.5zm0 15.45c-1.21 0-2.41-.32-3.44-.93l-.25-.15-2.71.71.73-2.64-.16-.27a6.97 6.97 0 01-1.07-3.72c0-3.86 3.14-7 7-7s7 3.14 7 7-3.14 7-7 7zm3.87-5.31c-.2-.1-1.2-.6-1.39-.67-.19-.07-.32-.1-.45.1-.13.19-.52.66-.64.79-.12.13-.24.15-.44.05-.2-.1-.83-.3-1.58-.97a5.97 5.97 0 01-1.1-1.37c-.12-.21-.01-.32.09-.42.1-.1.22-.25.32-.38.1-.13.13-.22.19-.36.06-.13.03-.27-.01-.38-.05-.13-.45-1.08-.62-1.48-.16-.39-.33-.34-.45-.34h-.38c-.12 0-.31.04-.47.2s-.61.59-.61 1.43c0 .84.62 1.65.71 1.76.09.11 1.22 1.85 2.97 2.53.42.14.74.22.99.28.42.09.81.08 1.11.05.34-.03 1.04-.42 1.18-.83.15-.41.15-.76.1-.83-.06-.07-.18-.11-.38-.2z" fill="#fff"/>
+                    </g>
+                </svg>
             </button>
 
             <Modal
@@ -112,6 +112,68 @@ const InfoIcon = () => {
     );
 };
 
+// New NotificationIcon component
+const NotificationIcon = () => {
+    const [showNotifications, setShowNotifications] = useState(false);
+    const { isDesktop } = useDevice();
+
+    return (
+        <>
+            <button 
+                className="notification-icon"
+                onClick={() => setShowNotifications(true)}
+                aria-label="View notifications"
+            >
+                <div className="notification-icon__wrapper">
+                    {/* Bell Icon SVG */}
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                        <path 
+                            d="M12 2C13.1 2 14 2.9 14 4C14 4.74 13.6 5.39 13 5.73V7C13 10.43 15.57 13 19 13V15H5V13C8.43 13 11 10.43 11 7V5.73C10.4 5.39 10 4.74 10 4C10 2.9 10.9 2 12 2ZM21 16V18H3V16H21ZM10 19H14C14 20.1 13.1 21 12 21S10 20.1 10 19Z" 
+                            fill="#FF6B6B"
+                        />
+                    </svg>
+                    {/* Notification badge */}
+                    <span className="notification-icon__badge">2</span>
+                </div>
+            </button>
+
+            {/* Notification Popup */}
+            {showNotifications && (
+                <div className="notification-popup">
+                    <div className="notification-popup__overlay" onClick={() => setShowNotifications(false)} />
+                    <div className={`notification-popup__content ${isDesktop ? 'notification-popup__content--desktop' : 'notification-popup__content--mobile'}`}>
+                        <div className="notification-popup__header">
+                            <h3 className="notification-popup__title">Announcements</h3>
+                            <button 
+                                className="notification-popup__close"
+                                onClick={() => setShowNotifications(false)}
+                                aria-label="Close notifications"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path 
+                                        d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" 
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="notification-popup__body">
+                            <iframe
+                                src="https://mesoflixannouncements.netlify.app/"
+                                title="Announcements"
+                                className="notification-popup__iframe"
+                                frameBorder="0"
+                                allowFullScreen
+                                loading="lazy"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
     const { isAuthorizing, activeLoginid } = useApiBase();
@@ -124,8 +186,6 @@ const AppHeader = observer(() => {
     const { localize } = useTranslations();
 
     const { isOAuth2Enabled } = useOauth2();
-
-    // Removed the states for martingale/stake modal and toggle
 
     const renderAccountSection = () => {
         if (isAuthorizing) {
@@ -201,8 +261,10 @@ const AppHeader = observer(() => {
             <Wrapper variant='left'>
                 <AppLogo />
                 <MobileMenu />
-                <InfoIcon />
-                {/* Removed martingale/stake toggle and modal */}
+                <div className="header-icons">
+                    <InfoIcon />
+                    <NotificationIcon />
+                </div>
             </Wrapper>
             <Wrapper variant='right'>{renderAccountSection()}</Wrapper>
         </Header>
