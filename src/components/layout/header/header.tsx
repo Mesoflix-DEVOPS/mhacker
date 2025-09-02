@@ -19,9 +19,9 @@ import MobileMenu from './mobile-menu';
 import PlatformSwitcher from './platform-switcher';
 import './header.scss';
 import React, { useState } from 'react';
-import Modal from '@/components/shared_ui/modal'; // Import the modal component
+import Modal from '@/components/shared_ui/modal';
 
-// OSTH SVG Icon Component
+
 const OsthIcon = () => (
     <svg width="40" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="120" height="32" rx="8" fill="#4A90E2"/>
@@ -40,7 +40,7 @@ const OsthIcon = () => (
     </svg>
 );
 
-// New Notification Icon Component
+
 const NotificationIcon = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const { isDesktop } = useDevice();
