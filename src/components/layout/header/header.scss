@@ -1,505 +1,143 @@
 @use 'components/shared/styles/constants' as *;
 @use 'components/shared/styles/mixins' as *;
 
+// Blue theme for header background and icons
 .app-header {
-    &__account-settings {
-        padding-inline-end: 1.2rem;
-        border-inline-end: 0.1rem solid var(--general-section-1);
+    background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+    box-shadow: 0 4px 24px rgba(38, 99, 235, 0.08);
+
+    &--desktop, &--mobile {
+        min-height: 68px;
+        display: flex;
+        align-items: center;
+        padding: 0 2rem;
     }
 
-    &__account-settings,
-    .notifications__wrapper,
-    &__menu {
+    &__account-settings {
+        margin-right: 1.2rem;
+        padding-right: 1.2rem;
+        border-right: 1px solid #dbeafe;
         svg > path,
         svg > g > path {
-            fill: var(--text-prominent);
+            fill: #1e3a8a;
         }
     }
 }
 
-.app-header__toggle {
-    margin-left: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: var(--button-toggle-secondary);
-    border: none;
-    border-radius: 4px;
-    color: var(--text-general);
-    cursor: pointer;
-    font-size: 1rem;
-
-    &:hover {
-        background-color: var(--button-toggle-alternate);
-    }
-
-    &[aria-pressed="true"] {
-        background-color: var(--button-active);
-        color: var(--text-inverse);
-    }
-}
-
-.account-switcher {
-    &__item {
-        .deriv-account-switcher-item {
-            padding: 0.6rem 1.6rem;
-
-            &__detail {
-                .deriv-account-switcher-item__currency {
-                    margin-bottom: 2px;
-                    font-size: 1.4rem;
-                }
-            }
-
-            &__icon {
-                margin-right: unset;
-                margin-inline-end: 10px;
-            }
-        }
-
-        &--disabled {
-            opacity: 0.32;
-        }
-    }
-
-    &__separator:after {
-        background-color: var(--general-section-2);
-        content: '';
-        height: 4px;
-        position: absolute;
-        width: 100%;
-        z-index: 1;
-    }
-
-    &-footer {
-        background: var(--general-main-1);
-
-        &__actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 1rem;
-            background-color: var(--general-main-1);
-
-            &--hide-manage-button {
-                justify-content: flex-end;
-            }
-
-            .manage-button {
-                background: none;
-                border: 1px solid var(--button-secondary-default);
-                margin-inline-end: 0.7rem;
-                height: auto;
-                padding: 0.4rem 1.2rem;
-                white-space: break-spaces;
-
-                &:hover {
-                    background-color: unset !important;
-                }
-
-                span {
-                    color: var(--text-prominent);
-                    font-size: var(--text-size-xs);
-                    cursor: pointer;
-                    font-weight: 700;
-                }
-            }
-        }
-    }
-}
-
-.derivs-secondary-tabs {
+.header-icons-container {
     display: flex;
-    justify-content: center;
-    width: 100%;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: var(--general-main-1);
+    align-items: center;
+    gap: 1rem;
+    margin-left: 2rem;
 
-    .derivs-text__size--md {
-        font-size: 14px;
-        line-height: 18px;
+    @include mobile-or-tablet-screen {
+        margin-left: 1rem;
+        gap: 0.5rem;
     }
 }
 
-.deriv-account-switcher {
-    &-item {
-        &__balance {
-            button {
-                border-width: 1px;
-                height: 2.4rem;
-                min-width: 4.8rem;
+// OSTH logo
+.osth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: radial-gradient(circle at 37% 30%, #60a5fa 0%, #2563eb 100%);
+    border-radius: 50%;
+    box-shadow: 0 2px 12px rgba(38, 99, 235, 0.18);
 
-                span {
-                    color: var(--text-prominent) !important;
-                }
-            }
-        }
-    }
-
-    &__button {
-        margin-inline-end: 0.8rem;
-
-        @include mobile-or-tablet-screen {
-            margin-inline-end: 0;
-        }
-
-        .deriv-context-menu {
-            box-shadow: 0 0 2px 0 var(--du-shadow-box, #00000014);
-        }
-
-        .deriv-account-switcher__balance + svg > path {
-            fill: var(--text-general);
-        }
-
-        &:hover {
-            background-color: unset;
-        }
-    }
-
-    &__currency {
-        margin-bottom: 2px;
-    }
-
-    &__icon {
-        margin-right: 7px;
-    }
-
-    &__balance {
-        padding: 0 1rem 0.1rem 0;
-    }
-
-    &__list {
-        &.account-switcher-panel {
-            padding: 0.4rem 0.8rem 0;
-
-            .account-switcher-panel__no-eu-accounts {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-
-                .add-button {
-                    background: none;
-
-                    span {
-                        color: #000;
-                        font-size: 12px;
-                        border: solid 2px var(--text-disabled-1);
-                        padding: 0.1rem 1.6rem;
-                        border-radius: 0.5em;
-                        cursor: pointer;
-                    }
-                }
-
-                .deriv-account-switcher-item {
-                    background: none;
-                }
-            }
-        }
-
-        .deriv-accordion {
-            &__content {
-                background: unset;
-            }
-
-            &__text {
-                margin-top: 0;
-            }
-
-            &__icon {
-                margin-left: unset;
-                margin-inline-start: auto;
-            }
-        }
-    }
-
-    &__title {
-        height: 4rem;
-        margin: 0 auto;
-        padding: 1.2rem 1.6rem;
-    }
-
-    &__container--mobile {
-        min-height: auto;
-    }
-
-    &__container {
-        max-height: 80vh;
-        overflow: auto;
-        background: var(--general-main-1);
-        background-color: var(--general-main-2);
-        border-radius: 4px;
-        box-shadow: 0 8px 16px 0 var(--shadow-menu) !important;
-        position: absolute;
-        transition:
-            transform 0.3s ease,
-            opacity 0.25s linear;
-        width: 320px;
-        top: 55px;
-        right: unset;
-        inset-inline-end: 0;
-    }
-
-    &__logout {
-        align-items: center;
-        display: flex;
-        grid-column: 2 / 3;
-        justify-content: flex-end;
-        justify-self: end;
-        padding: 1.6em 1.3em;
-
-        &-text {
-            margin-inline-end: 1rem;
-            font-size: var(--text-size-xs);
-        }
-
-        &--loader {
-            display: flex;
-            justify-content: flex-end;
-            padding: 16px;
-        }
-    }
-
-    &__tradershub-link {
-        padding: 1.2rem 2.5rem 0.6rem 0.8rem;
-        background: var(--general-main-1);
-    }
-
-    &__footer {
-        padding: 0;
+    svg {
         display: block;
     }
 }
 
-.languages-modal {
-    background: var(--general-section-1);
-
-    .deriv-modal__header {
-        border-bottom: 2px solid var(--general-section-5);
-    }
-
-    .deriv-modal__close-icon {
-        path {
-            fill: var(--text-prominent);
-        }
-    }
-
-    .deriv-text {
-        color: var(--text-prominent) !important;
-    }
-}
-
-.auth-actions {
-    display: flex;
-    padding-block: 8px;
-
-    button {
-        font-weight: 400;
-        margin-inline-end: 1.6rem;
-    }
-}
-
-.deposit-button,
-.manage-funds-button {
-    margin-inline-end: 1.6rem;
-}
-
-.deriv-accordion--underline {
-    border-bottom: none;
-}
-
-.modal-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    background-color: var(--general-main-2);
-    border-radius: 8px;
-
-    label {
-        display: flex;
-        flex-direction: column;
-        font-size: 1rem;
-        color: var(--text-prominent);
-
-        input {
-            margin-top: 0.5rem;
-            padding: 0.75rem;
-            border: 1px solid var(--border-normal);
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--button-primary);
-            box-shadow: 0 0 4px var(--button-primary);
-        }
-    }
-
-    .proceed-button {
-        padding: 0.75rem 1.5rem;
-        background-color: var(--button-primary);
-        color: var(--text-inverse);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: bold;
-        text-align: center;
-
-        &:hover {
-            background-color: var(--button-primary-hover);
-        }
-
-        &:disabled {
-            background-color: var(--button-disabled);
-            cursor: not-allowed;
-        }
-    }
-}
-
-// Header Icons Container
-.header-icons-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: 1rem;
-
-    @include mobile-or-tablet-screen {
-        margin-left: 0.5rem;
-        gap: 0.25rem;
-    }
-}
-
-// Info Icon (existing styles)
-.info-icon-container {
-    position: relative;
-    margin: 0 8px;
-}
-
-.info-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-    
-    &:hover {
-        transform: scale(1.1);
-    }
-
-    svg {
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-}
-
-// Notification Icon Styles
+// Notification icon
 .notification-icon {
     position: relative;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
-    
+    transition: box-shadow 0.2s, transform 0.2s;
+
     &:hover {
-        transform: scale(1.1);
+        box-shadow: 0 2px 12px #2563eb33;
+        transform: scale(1.08);
     }
 
     svg {
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        filter: drop-shadow(0 2px 6px rgba(38, 99, 235, 0.16));
     }
 }
 
 .notification-badge {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    background: #FF0000;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: bold;
+    top: 0;
+    right: 0;
+    background: #3b82f6;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
     min-width: 18px;
     height: 18px;
     border-radius: 50%;
+    border: 2px solid #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--general-main-1);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    animation: pulse 2s infinite;
+    box-shadow: 0 2px 8px #2563eb40;
+    animation: pulse 1.8s infinite;
+}
 
-    @keyframes pulse {
-        0%, 100% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.1);
-        }
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        background: #3b82f6;
+    }
+    50% {
+        transform: scale(1.15);
+        background: #2563eb;
     }
 }
 
-// Notification Popup Styles
+// Notification popup
 .notification-popup-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
+    inset: 0;
+    background: rgba(38, 99, 235, 0.18);
+    z-index: 9900;
     display: flex;
     align-items: center;
     justify-content: center;
     animation: fadeIn 0.3s ease;
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 }
 
 .notification-popup {
-    background: var(--general-main-1);
-    border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    animation: slideIn 0.3s ease;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(38, 99, 235, 0.18);
     max-height: 90vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
 
     @keyframes slideIn {
-        from {
-            transform: scale(0.9) translateY(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
+        from { transform: scale(0.95) translateY(-20px); opacity: 0; }
+        to { transform: scale(1) translateY(0); opacity: 1; }
     }
 
-    &--desktop {
-        width: 800px;
-        height: 600px;
-    }
-
-    &--mobile {
-        width: 95vw;
-        height: 85vh;
-        margin: 0 10px;
-    }
+    &--desktop { width: 700px; height: 520px; }
+    &--mobile { width: 96vw; height: 75vh; margin: 0 8px; }
 }
 
 .notification-popup__header {
@@ -507,16 +145,16 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    border-bottom: 1px solid var(--general-section-2);
-    background: var(--general-main-2);
+    border-bottom: 1px solid #e0e7ff;
+    background: #eff6ff;
     flex-shrink: 0;
 }
 
 .notification-popup__title {
     margin: 0;
     font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-prominent);
+    font-weight: 700;
+    color: #2563eb;
 }
 
 .notification-popup__close {
@@ -528,14 +166,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-general);
-    transition: all 0.2s ease;
+    color: #1e3a8a;
+    transition: background 0.2s, transform 0.2s;
     width: 40px;
     height: 40px;
 
     &:hover {
-        background: var(--general-section-1);
-        color: var(--text-prominent);
+        background: #dbeafe;
+        color: #2563eb;
         transform: rotate(90deg);
     }
 
@@ -557,10 +195,39 @@
     width: 100%;
     height: 100%;
     border: none;
-    background: var(--general-main-1);
+    background: #f8fafc;
     flex: 1;
 
     @include mobile-or-tablet-screen {
         min-height: 400px;
+    }
+}
+
+// Auth actions and deposit/manage funds buttons
+.auth-actions {
+    display: flex;
+    gap: 1.2rem;
+    padding-block: 8px;
+
+    button {
+        font-weight: 500;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(38, 99, 235, 0.08);
+    }
+}
+
+.deposit-button,
+.manage-funds-button {
+    margin-right: 1.2rem;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 1px 6px #2563eb20;
+    transition: background 0.2s;
+
+    &:hover {
+        background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+        color: #fff;
     }
 }
