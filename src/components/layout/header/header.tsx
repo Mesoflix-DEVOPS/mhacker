@@ -17,26 +17,21 @@ import MobileMenu from './mobile-menu';
 import './header.scss';
 import React, { useState } from 'react';
 
-// Modern OSTH logo icon
+// Clear, bold OSTH logo
 const OsthLogo = () => (
     <div className="osth-logo">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <defs>
-                <linearGradient id="osth-gradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#2563eb"/>
-                    <stop offset="1" stopColor="#60a5fa"/>
-                </linearGradient>
-            </defs>
-            <circle cx="24" cy="24" r="22" fill="url(#osth-gradient)" stroke="#ffffff" strokeWidth="2"/>
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="26" fill="#2563eb" stroke="#fff" strokeWidth="3"/>
             <text
-                x="24"
-                y="28"
+                x="28"
+                y="34"
                 textAnchor="middle"
-                fontFamily="Arial Black, Arial, sans-serif"
+                fontFamily="'Segoe UI', Arial, sans-serif"
                 fontWeight="bold"
-                fontSize="18"
+                fontSize="22"
                 fill="#fff"
                 letterSpacing="4"
+                style={{textShadow: "1px 2px 4px #11356f"}}
             >
                 OSTH
             </text>
@@ -44,7 +39,7 @@ const OsthLogo = () => (
     </div>
 );
 
-// Animated Notification Bell Icon
+// Notification Bell Icon - Orangey theme
 const NotificationIcon = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const { isDesktop } = useDevice();
@@ -58,20 +53,17 @@ const NotificationIcon = () => {
             >
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                     <g>
-                        <ellipse cx="16" cy="28" rx="6" ry="3" fill="#2563eb" opacity="0.25"/>
+                        <ellipse cx="16" cy="27" rx="6" ry="3" fill="#fb923c" opacity="0.25"/>
                         <path
                             d="M23 22V14c0-4.418-3.582-8-8-8s-8 3.582-8 8v8l-1.667 1.667A1 1 0 0 0 6 25h20a1 1 0 0 0 .667-1.667L23 22Z"
-                            fill="url(#osth-gradient)"
-                            stroke="#2563eb"
-                            strokeWidth="1.5"
+                            fill="#fb923c"
+                            stroke="#ea580c"
+                            strokeWidth="1.6"
                         />
                         <path
                             d="M16 29c2.7 0 4-1.3 4-2H12c0 .7 1.3 2 4 2Z"
-                            fill="#2563eb"
+                            fill="#ea580c"
                         />
-                        <circle cx="24" cy="10" r="3" fill="#2563eb" stroke="#fff" strokeWidth="1.5">
-                            <animate attributeName="r" values="3;4;3" dur="1s" repeatCount="indefinite"/>
-                        </circle>
                     </g>
                 </svg>
                 <span className="notification-badge">2</span>
@@ -147,7 +139,7 @@ const AppHeader = observer(() => {
                     {isDesktop &&
                         (has_wallet ? (
                             <Button
-                                className='manage-funds-button'
+                                className='manage-funds-button blue-theme'
                                 has_effect
                                 text={localize('Manage funds')}
                                 onClick={() => window.location.assign(standalone_routes.wallets_transfer)}
@@ -159,7 +151,7 @@ const AppHeader = observer(() => {
                                 onClick={() => {
                                     window.location.assign(standalone_routes.cashier_deposit);
                                 }}
-                                className='deposit-button'
+                                className='deposit-button blue-theme'
                             >
                                 {localize('Deposit')}
                             </Button>
@@ -171,6 +163,7 @@ const AppHeader = observer(() => {
                 <div className='auth-actions'>
                     <Button
                         tertiary
+                        className="blue-theme"
                         onClick={() => {
                             window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=84866&l=EN&brand=AUTOTOOL');
                         }}
@@ -179,6 +172,7 @@ const AppHeader = observer(() => {
                     </Button>
                     <Button
                         primary
+                        className="blue-theme"
                         onClick={() => {
                             window.open(standalone_routes.signup);
                         }}
