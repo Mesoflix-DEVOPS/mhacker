@@ -371,13 +371,13 @@
     }
 }
 
-// OSTH Logo Styles
-.osth-logo-container {
+// Info Icon (existing styles)
+.info-icon-container {
     position: relative;
     margin: 0 8px;
 }
 
-.osth-logo {
+.info-icon {
     background: none;
     border: none;
     cursor: pointer;
@@ -385,49 +385,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
     
     &:hover {
         transform: scale(1.1);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
 
-    &:active {
-        transform: scale(0.95);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    svg {
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
-
-    .osth-text {
-        font-weight: bold;
-        font-size: 14px;
-        color: white;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    }
-}
-
-// Animation for logo pulse effect
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    50% {
-        transform: scale(1.05);
-        box-shadow: 0 6px 12px rgba(58, 123, 213, 0.3);
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-}
-
-.osth-logo--animated {
-    animation: pulse 2s infinite;
 }
 
 // Notification Icon Styles
@@ -455,7 +421,7 @@
     position: absolute;
     top: -2px;
     right: -2px;
-    background: #FF6B35;
+    background: #FF0000;
     color: white;
     font-size: 0.75rem;
     font-weight: bold;
@@ -468,6 +434,15 @@
     border: 2px solid var(--general-main-1);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     animation: pulse 2s infinite;
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
 }
 
 // Notification Popup Styles
