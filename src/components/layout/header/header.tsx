@@ -20,22 +20,62 @@ import React, { useState } from 'react';
 // Small, visible OSTH logo
 const OsthLogo = () => (
     <div className="osth-logo">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="16" r="14" fill="#2563eb" stroke="#fff" strokeWidth="2"/>
-            <text
-                x="16"
-                y="21"
-                textAnchor="middle"
-                fontFamily="'Segoe UI', Arial, sans-serif"
-                fontWeight="bold"
-                fontSize="11"
-                fill="#fff"
-                letterSpacing="2"
-                style={{textShadow: "1px 1px 2px #11356f"}}
-            >
-                OSTH
-            </text>
-        </svg>
+        
+<
+svg
+ 
+width
+=
+"
+32
+"
+ 
+height
+=
+"
+32
+"
+ 
+viewBox
+=
+"
+0 0 24 24
+"
+ 
+fill
+=
+"
+none
+"
+ 
+xmlns
+=
+"
+http://www.w3.org/2000/svg
+"
+>
+
+                    
+<
+path
+ 
+fill
+=
+"
+#4A90E2
+"
+ 
+d
+=
+"
+M12 2C6.48 2 2 6.48 2 12c0 4.36 2.79 8.06 6.65 9.39.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.71.59-3.28-1.28-3.28-1.28-.45-1.13-1.11-1.43-1.11-1.43-.91-.61.07-.6.07-.6 1 .07 1.52 1.01 1.52 1.01.9 1.51 2.36 1.07 2.94.82.09-.65.35-1.07.63-1.31-2.17-.25-4.46-1.07-4.46-4.77 0-1.05.38-1.91 1-2.59-.1-.26-.44-1.3.1-2.7 0 0 .83-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8a9.56 9.56 0 0 1 2.5.34c1.92-1.29 2.75-1.02 2.75-1.02.54 1.4.2 2.44.1 2.7.62.68 1 1.54 1 2.59 0 3.71-2.3 4.52-4.48 4.76.36.31.68.91.68 1.84 0 1.33-.01 2.4-.01 2.73 0 .27.18.59.69.49A10 10 0 0 0 22 12c0-5.52-4.48-10-10-10z
+"
+/>
+
+                
+</
+svg
+>
     </div>
 );
 
