@@ -7,40 +7,36 @@ import { useOauth2 } from '@/hooks/auth/useOauth2';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useStore } from '@/hooks/useStore';
 import { StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
-import { requestOidcAuthentication } from '@deriv-com/auth-client';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { Tooltip } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
 import AccountsInfoLoader from './account-info-loader';
 import AccountSwitcher from './account-switcher';
-import MenuItems from './menu-items';
 import MobileMenu from './mobile-menu';
-import PlatformSwitcher from './platform-switcher';
 import './header.scss';
 import React, { useState } from 'react';
-import Modal from '@/components/shared_ui/modal';
 
-
+// OSTH SVG Icon Component
 const OsthIcon = () => (
-    <svg width="40" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="60" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="120" height="32" rx="8" fill="#4A90E2"/>
         <text
-            x="50%"
-            y="50%"
-            dominantBaseline="middle"
-            textAnchor="middle"
+            x="60"
+            y="21"
             fontFamily="Arial, Helvetica, sans-serif"
             fontWeight="bold"
             fontSize="20"
             fill="#fff"
+            textAnchor="middle"
+            dominantBaseline="middle"
         >
             OSTH
         </text>
     </svg>
 );
 
-
+// Notification Icon Component
 const NotificationIcon = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const { isDesktop } = useDevice();
@@ -54,7 +50,7 @@ const NotificationIcon = () => {
             >
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path 
-                        d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 [...]
+                        d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.63 5.36 6 7.92 6 11v5l-1.7 1.7c-.14.14-.3.34-.3.6v.25c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-.25c0-.26-.16-.46-.3-.6L18 16zm-2 0H8v-5c0-2.49 1.51-4.5 4-4.5s4 2.01 4 4.5v5z"
                         fill="#FF6B35"
                     />
                 </svg>
@@ -80,7 +76,7 @@ const NotificationIcon = () => {
                             >
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                     <path 
-                                        d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" 
+                                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
                                         fill="currentColor"
                                     />
                                 </svg>
@@ -112,7 +108,6 @@ const AppHeader = observer(() => {
     const has_wallet = Object.keys(accounts ?? {}).some(id => accounts?.[id].account_category === 'wallet');
 
     const { localize } = useTranslations();
-
     const { isOAuth2Enabled } = useOauth2();
 
     const renderAccountSection = () => {
