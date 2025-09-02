@@ -17,26 +17,34 @@ import MobileMenu from './mobile-menu';
 import './header.scss';
 import React, { useState } from 'react';
 
-// OSTH SVG Icon Component
-const OsthIcon = () => (
-    <svg width="60" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="120" height="32" rx="8" fill="#4A90E2"/>
-        <text
-            x="60"
-            y="21"
-            fontFamily="Arial, Helvetica, sans-serif"
-            fontWeight="bold"
-            fontSize="20"
-            fill="#fff"
-            textAnchor="middle"
-            dominantBaseline="middle"
-        >
-            OSTH
-        </text>
-    </svg>
+// Modern OSTH logo icon
+const OsthLogo = () => (
+    <div className="osth-logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <defs>
+                <linearGradient id="osth-gradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#2563eb"/>
+                    <stop offset="1" stopColor="#60a5fa"/>
+                </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="22" fill="url(#osth-gradient)" stroke="#ffffff" strokeWidth="2"/>
+            <text
+                x="24"
+                y="28"
+                textAnchor="middle"
+                fontFamily="Arial Black, Arial, sans-serif"
+                fontWeight="bold"
+                fontSize="18"
+                fill="#fff"
+                letterSpacing="4"
+            >
+                OSTH
+            </text>
+        </svg>
+    </div>
 );
 
-// Notification Icon Component
+// Animated Notification Bell Icon
 const NotificationIcon = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const { isDesktop } = useDevice();
@@ -48,16 +56,26 @@ const NotificationIcon = () => {
                 onClick={() => setShowNotifications(true)}
                 aria-label="View notifications"
             >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path 
-                        d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.63 5.36 6 7.92 6 11v5l-1.7 1.7c-.14.14-.3.34-.3.6v.25c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-.25c0-.26-.16-.46-.3-.6L18 16zm-2 0H8v-5c0-2.49 1.51-4.5 4-4.5s4 2.01 4 4.5v5z"
-                        fill="#FF6B35"
-                    />
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <g>
+                        <ellipse cx="16" cy="28" rx="6" ry="3" fill="#2563eb" opacity="0.25"/>
+                        <path
+                            d="M23 22V14c0-4.418-3.582-8-8-8s-8 3.582-8 8v8l-1.667 1.667A1 1 0 0 0 6 25h20a1 1 0 0 0 .667-1.667L23 22Z"
+                            fill="url(#osth-gradient)"
+                            stroke="#2563eb"
+                            strokeWidth="1.5"
+                        />
+                        <path
+                            d="M16 29c2.7 0 4-1.3 4-2H12c0 .7 1.3 2 4 2Z"
+                            fill="#2563eb"
+                        />
+                        <circle cx="24" cy="10" r="3" fill="#2563eb" stroke="#fff" strokeWidth="1.5">
+                            <animate attributeName="r" values="3;4;3" dur="1s" repeatCount="indefinite"/>
+                        </circle>
+                    </g>
                 </svg>
                 <span className="notification-badge">2</span>
             </button>
-
-            {/* Notification Popup */}
             {showNotifications && (
                 <div className="notification-popup-overlay" onClick={() => setShowNotifications(false)}>
                     <div 
@@ -106,9 +124,7 @@ const AppHeader = observer(() => {
     const { data: activeAccount } = useActiveAccount({ allBalanceData: client?.all_accounts_balance });
     const { accounts } = client ?? {};
     const has_wallet = Object.keys(accounts ?? {}).some(id => accounts?.[id].account_category === 'wallet');
-
     const { localize } = useTranslations();
-    const { isOAuth2Enabled } = useOauth2();
 
     const renderAccountSection = () => {
         if (isAuthorizing) {
@@ -185,7 +201,7 @@ const AppHeader = observer(() => {
                 <AppLogo />
                 <MobileMenu />
                 <div className="header-icons-container">
-                    <OsthIcon />
+                    <OsthLogo />
                     <NotificationIcon />
                 </div>
             </Wrapper>
