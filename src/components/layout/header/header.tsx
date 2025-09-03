@@ -20,58 +20,25 @@ import React, { useState } from 'react';
 // Beautiful OSAM Trading Hub Logo (Blue theme, stylized like DH)
 const OsamLogo = () => (
     <div className="osam-logo" title="OSAM Trading Hub">
-      <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
-  <title>OSAM Forex Logo</title>
-  <desc>Trading logo with candlesticks and OSAM text inside a circular badge.</desc>
+     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="26" viewBox="0 0 160 160">
   <defs>
-   
     <linearGradient id="fxg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#00d084"/>
       <stop offset="50%" stop-color="#1e90ff"/>
       <stop offset="100%" stop-color="#1769aa"/>
     </linearGradient>
-   
-    <filter id="fxShadow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-      <feOffset dx="0" dy="5" result="off"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.25"/>
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
   </defs>
-
-
-  <circle cx="80" cy="80" r="70" fill="url(#fxg)" filter="url(#fxShadow)"/>
+  <circle cx="80" cy="80" r="70" fill="url(#fxg)"/>
   <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="4" stroke-opacity="0.9"/>
-
- 
- 
   <line x1="55" y1="50" x2="55" y2="105" stroke="#00d084" stroke-width="3"/>
   <rect x="49" y="70" width="12" height="25" rx="2" fill="#00d084"/>
-
- 
   <line x1="80" y1="45" x2="80" y2="100" stroke="#ff4d4f" stroke-width="3"/>
   <rect x="74" y="65" width="12" height="25" rx="2" fill="#ff4d4f"/>
-
-
   <line x1="105" y1="55" x2="105" y2="110" stroke="#00d084" stroke-width="3"/>
   <rect x="99" y="75" width="12" height="25" rx="2" fill="#00d084"/>
-
-  
-  <text x="80" y="135" text-anchor="middle"
-        font-family="Poppins, Segoe UI, sans-serif"
-        font-weight="700"
-        font-size="22"
-        fill="white"
-        opacity="0.95">OSAM</text>
-
-  
-  <ellipse cx="80" cy="48" rx="42" ry="8" fill="#FFFFFF" opacity="0.15"/>
+  <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="22" fill="white" opacity="0.95">OSAM</text>
 </svg>
+
 
         <span className="osam-logo__text">OSAM</span>
     </div>
