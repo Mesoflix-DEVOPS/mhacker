@@ -7,7 +7,6 @@ import { useOauth2 } from '@/hooks/auth/useOauth2';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useStore } from '@/hooks/useStore';
 import { StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
-import { requestOidcAuthentication } from '@deriv-com/auth-client';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { Tooltip } from '@deriv-com/ui';
@@ -20,6 +19,83 @@ import PlatformSwitcher from './platform-switcher';
 import './header.scss';
 import React, { useState } from 'react';
 
+// OSAM Trading Hub Blue Logo
+const OsamTradingHubLogo = () => {
+    const [isAnimating, setIsAnimating] = useState(false);
+    const handleLogoClick = () => {
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 800);
+    };
+
+    return (
+        <div 
+            className={`osam-tradinghub-logo ${isAnimating ? 'osam-tradinghub-logo--animating' : ''}`}
+            onClick={handleLogoClick}
+            title="OSAM Trading Hub"
+        >
+            <svg width="42" height="42" viewBox="0 0 52 52" fill="none">
+                <defs>
+                    <linearGradient id="osamMainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#5eb8ff" />
+                        <stop offset="25%" stopColor="#1769aa" />
+                        <stop offset="80%" stopColor="#1e90ff" />
+                        <stop offset="100%" stopColor="#114a7d" />
+                    </linearGradient>
+                    <linearGradient id="osamAccentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#fff" />
+                        <stop offset="60%" stopColor="#e6f5ff" />
+                        <stop offset="100%" stopColor="#b3dbff" />
+                    </linearGradient>
+                    <filter id="osamDropShadow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="2" dy="5" result="offset"/>
+                        <feFlood floodColor="#1769aa" floodOpacity="0.18"/>
+                        <feComposite in2="offset" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    <filter id="osamGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                {/* Outer blue shadow */}
+                <circle cx="26" cy="26" r="23.5" fill="#5eb8ff" opacity="0.16" filter="blur(2.5px)" />
+                {/* Main blue circle */}
+                <circle cx="26" cy="26" r="22" fill="url(#osamMainGradient)" filter="url(#osamDropShadow)" />
+                {/* Inner white accent ring */}
+                <circle cx="26" cy="26" r="20" fill="none" stroke="url(#osamAccentGradient)" strokeWidth="2" opacity="0.6" />
+                {/* Stylized O */}
+                <g filter="url(#osamGlow)">
+                    <ellipse cx="18" cy="26" rx="7" ry="12" fill="url(#osamAccentGradient)" opacity="0.98" />
+                    <ellipse cx="18" cy="26" rx="3.6" ry="7.2" fill="url(#osamMainGradient)" opacity="0.98" />
+                </g>
+                {/* Stylized S */}
+                <g filter="url(#osamGlow)">
+                    <path d="M25 17c2-4 10-2 9 3.5-1 6-8 3.5-8 7.5s7 5 9 1" stroke="url(#osamMainGradient)" strokeWidth="2.2" fill="none" opacity="0.95"/>
+                </g>
+                {/* Stylized A (triangle) */}
+                <polygon points="32,36 37,16 42,36" fill="url(#osamAccentGradient)" stroke="#1769aa" strokeWidth="1.1" filter="url(#osamGlow)" />
+                {/* Stylized M (two lines) */}
+                <g filter="url(#osamGlow)">
+                    <polyline points="44,36 46,22 48,36" fill="none" stroke="#1769aa" strokeWidth="2"/>
+                    <polyline points="46,22 47,28 48,22" fill="none" stroke="#1e90ff" strokeWidth="1.2"/>
+                </g>
+                {/* Accent dots and shine */}
+                <circle cx="12" cy="16" r="2.2" fill="#1e90ff" opacity="0.85"/>
+                <circle cx="40" cy="12" r="1.5" fill="#5eb8ff" opacity="0.7"/>
+                <ellipse cx="26" cy="17" rx="10" ry="2.6" fill="#fff" opacity="0.15" />
+            </svg>
+            <span className="osam-tradinghub-logo__text">OSAM Trading Hub</span>
+        </div>
+    );
+};
+
 // Notification Bell SVG Component
 const NotificationBellIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -29,25 +105,6 @@ const NotificationBellIcon = () => (
         />
     </svg>
 );
-
-// PromoClub Logo Component (unchanged)
-const PromoClubLogo = () => {
-    const [isAnimating, setIsAnimating] = useState(false);
-
-    const handleLogoClick = () => {
-        setIsAnimating(true);
-        setTimeout(() => setIsAnimating(false), 800);
-    };
-
-    return (
-        <div 
-            className={`promoclub-logo ${isAnimating ? 'promoclub-logo--animating' : ''}`}
-            onClick={handleLogoClick}
-        >
-
-        </div>
-    );
-};
 
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
@@ -59,7 +116,6 @@ const AppHeader = observer(() => {
     const has_wallet = Object.keys(accounts ?? {}).some(id => accounts?.[id].account_category === 'wallet');
 
     const { localize } = useTranslations();
-
     const { isOAuth2Enabled } = useOauth2();
 
     // Notification popup state
@@ -177,10 +233,16 @@ const AppHeader = observer(() => {
             })}
         >
             <Wrapper variant='left'>
-                <AppLogo />
-                <MobileMenu />
-                <PromoClubLogo />
-                {renderNotificationBell()}
+                <div className="left-section">
+                    {/* OSAM Trading Hub Logo */}
+                    <OsamTradingHubLogo />
+                    {/* AppLogo only on mobile/tablet */}
+                    {!isDesktop && <AppLogo />}
+                    {/* Menu open functionality */}
+                    <MobileMenu />
+                    {/* Notification Bell */}
+                    {renderNotificationBell()}
+                </div>
             </Wrapper>
             <Wrapper variant='right'>{renderAccountSection()}</Wrapper>
         </Header>
