@@ -20,65 +20,59 @@ import React, { useState } from 'react';
 // Beautiful OSAM Trading Hub Logo (Blue theme, stylized like DH)
 const OsamLogo = () => (
     <div className="osam-logo" title="OSAM Trading Hub">
-        <svg
-            className="osam-logo__svg"
-            width="42"
-            height="42"
-            viewBox="0 0 52 52"
-            fill="none"
-        >
-            <defs>
-                <linearGradient id="osamMainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#5eb8ff" />
-                    <stop offset="40%" stopColor="#1769aa" />
-                    <stop offset="80%" stopColor="#1e90ff" />
-                    <stop offset="100%" stopColor="#114a7d" />
-                </linearGradient>
-                <linearGradient id="osamAccentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#fff" />
-                    <stop offset="60%" stopColor="#e6f5ff" />
-                    <stop offset="100%" stopColor="#b3dbff" />
-                </linearGradient>
-                <filter id="osamDropShadow" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                    <feOffset dx="2" dy="5" result="offset"/>
-                    <feFlood floodColor="#1769aa" floodOpacity="0.18"/>
-                    <feComposite in2="offset" operator="in"/>
-                    <feMerge>
-                        <feMergeNode/>
-                        <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                </filter>
-                <filter id="osamGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-                    <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                </filter>
-            </defs>
-            {/* Outer blue shadow */}
-            <circle cx="26" cy="26" r="23.5" fill="#5eb8ff" opacity="0.14" filter="blur(2.2px)" />
-            {/* Main blue background circle */}
-            <circle cx="26" cy="26" r="22" fill="url(#osamMainGradient)" filter="url(#osamDropShadow)" />
-            {/* Inner accent ring */}
-            <circle cx="26" cy="26" r="20" fill="none" stroke="url(#osamAccentGradient)" strokeWidth="2" opacity="0.5" />
-            {/* O (stylized) */}
-            <ellipse cx="14" cy="26" rx="6" ry="10" fill="url(#osamAccentGradient)" opacity="0.95" filter="url(#osamGlow)" />
-            <ellipse cx="14" cy="26" rx="3" ry="6" fill="url(#osamMainGradient)" opacity="0.98" />
-            {/* S (curved path) */}
-            <path d="M21 17c2-4 10-2 9 3.5-1 6-8 3.5-8 7.5s7 5 9 1" stroke="url(#osamMainGradient)" strokeWidth="2.2" fill="none" opacity="0.95" filter="url(#osamGlow)" />
-            {/* A (triangle) */}
-            <polygon points="32,36 37,16 42,36" fill="url(#osamAccentGradient)" stroke="#1769aa" strokeWidth="1.1" filter="url(#osamGlow)" />
-            {/* M (two lines) */}
-            <polyline points="44,36 46,22 48,36" fill="none" stroke="#1769aa" strokeWidth="2" filter="url(#osamGlow)" />
-            <polyline points="46,22 47,28 48,22" fill="none" stroke="#1e90ff" strokeWidth="1.2" filter="url(#osamGlow)" />
-            {/* Shine accent */}
-            <ellipse cx="26" cy="17" rx="10" ry="2.2" fill="#fff" opacity="0.13" />
-            {/* Decorative dots */}
-            <circle cx="10" cy="16" r="1.6" fill="#1e90ff" opacity="0.82"/>
-            <circle cx="41" cy="12" r="1.1" fill="#5eb8ff" opacity="0.65"/>
-        </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title>OSAM Forex Logo</title>
+  <desc>Trading logo with candlesticks and OSAM text inside a circular badge.</desc>
+  <defs>
+    <!-- Main gradient -->
+    <linearGradient id="fxg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00d084"/>
+      <stop offset="50%" stop-color="#1e90ff"/>
+      <stop offset="100%" stop-color="#1769aa"/>
+    </linearGradient>
+    <!-- Glow -->
+    <filter id="fxShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="5" result="off"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.25"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Circular badge -->
+  <circle cx="80" cy="80" r="70" fill="url(#fxg)" filter="url(#fxShadow)"/>
+  <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="4" stroke-opacity="0.9"/>
+
+  <!-- Candlesticks -->
+  <!-- Bullish -->
+  <line x1="55" y1="50" x2="55" y2="105" stroke="#00d084" stroke-width="3"/>
+  <rect x="49" y="70" width="12" height="25" rx="2" fill="#00d084"/>
+
+  <!-- Bearish -->
+  <line x1="80" y1="45" x2="80" y2="100" stroke="#ff4d4f" stroke-width="3"/>
+  <rect x="74" y="65" width="12" height="25" rx="2" fill="#ff4d4f"/>
+
+  <!-- Bullish -->
+  <line x1="105" y1="55" x2="105" y2="110" stroke="#00d084" stroke-width="3"/>
+  <rect x="99" y="75" width="12" height="25" rx="2" fill="#00d084"/>
+
+  <!-- Name inside -->
+  <text x="80" y="135" text-anchor="middle"
+        font-family="Poppins, Segoe UI, sans-serif"
+        font-weight="700"
+        font-size="22"
+        fill="white"
+        opacity="0.95">OSAM</text>
+
+  <!-- Shine accent -->
+  <ellipse cx="80" cy="48" rx="42" ry="8" fill="#FFFFFF" opacity="0.15"/>
+</svg>
+
         <span className="osam-logo__text">OSAM</span>
     </div>
 );
