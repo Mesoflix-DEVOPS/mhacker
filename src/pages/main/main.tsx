@@ -21,10 +21,14 @@ import ChartModal from "../chart/chart-modal"
 import Dashboard from "../dashboard"
 import RunStrategy from "../dashboard/run-strategy"
 
-const Chart = lazy(() => import("../chart"))
-const Tutorial = lazy(() => import("../tutorials"))
-const Copytrading = lazy(() => import("../copytrading"))
-const Analysis = lazy(() => import("../analysis")) // NEW
+// ... All icon components as in your code above (not repeated for brevity; copy all icon components unchanged) ...
+const Chart = lazy(() => import("../chart"));
+const Tutorial = lazy(() => import("../tutorials"));
+const Copytrading = lazy(() => import("../copytrading"));
+const Dcircles = lazy(() => import("../analysis"));
+
+
+
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
@@ -226,7 +230,6 @@ const TelegramIcon = () => (
     />
   </svg>
 )
-
 const AppWrapper = observer(() => {
   const { connectionStatus } = useApiBase()
   const { dashboard, load_modal, run_panel, summary_card } = useStore()
@@ -311,7 +314,7 @@ const AppWrapper = observer(() => {
     "Under 8 pro bot💯.xml",
   ])
 
-  const formatBotName = (name) => {
+  const formatBotName = (name: string) => {
     return name.replace(/\.xml$/, "")
   }
 
@@ -350,10 +353,73 @@ const AppWrapper = observer(() => {
 
   const showRunPanel = [1, 2, 3, 4].includes(active_tab)
 
+  // --- STYLE OVERRIDES ---
+  // You can move this into your CSS file for production!
+  React.useEffect(() => {
+    const styleId = "appwrapper-custom-fullscreen"
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement("style")
+      style.id = styleId
+      style.innerHTML = `
+        .main, .main__container {
+          width: 100vw !important;
+          height: 100vh !important;
+          min-height: 100vh !important;
+          min-width: 100vw !important;
+          max-width: 100vw !important;
+          max-height: 100vh !important;
+        }
+        .main__tabs {
+          height: 100vh !important;
+        }
+        .main__tabs > div[role="tabpanel"] {
+          width: 100vw !important;
+          height: 100vh !important;
+          min-height: 100vh !important;
+          overflow: hidden !important;
+        }
+        /* DCIRCLES Tab: make content scrollable and full height */
+        #id-dcircles {
+          width: 100vw !important;
+          height: 100vh !important;
+          min-height: 100vh !important;
+          max-height: 100vh !important;
+          display: flex;
+          flex-direction: column;
+          padding: 0 !important;
+          margin: 0 !important;
+          background: #fff;
+        }
+        #id-dcircles > .scrollable-dcircles-content {
+          flex: 1 1 0;
+          min-height: 0;
+          min-width: 0;
+          width: 100vw;
+          height: 100%;
+          overflow-y: auto !important;
+          overflow-x: hidden;
+          box-sizing: border-box;
+          background: #fff;
+          padding: 0;
+        }
+        /* Remove padding/margins from tab panels for all tabs */
+        .main__tabs > div[role="tabpanel"] {
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+      `
+      document.head.appendChild(style)
+    }
+    return () => {
+      const style = document.getElementById(styleId)
+      if (style) style.remove()
+    }
+  }, [])
+
   return (
     <React.Fragment>
-      <div className="main" style={{ width: "100vw", height: "100vh", minHeight: "100vh", minWidth: "100vw", overflow: "hidden" }}>
-        <div className="main__container" style={{ width: "100%", height: "100%", minHeight: "100vh", minWidth: "100vw", overflow: "hidden" }}>
+      <div className="main">
+        <div className="main__container">
           <Tabs
             active_index={active_tab}
             className="main__tabs"
@@ -373,7 +439,7 @@ const AppWrapper = observer(() => {
               }
               id="id-free-bots"
             >
-              <div className="free-bots">
+              <div className="free-bots" style={{ width: "100%", height: "100%" }}>
                 {/* Social Media Icons */}
                 <div className="social-media-container">
                   <a
@@ -480,7 +546,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles - now loads from analysis folder */}
+            {/* 4. Dcircles - SCROLLABLE & FULL HEIGHT */}
             <div
               label={
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -492,22 +558,7 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  minHeight: "calc(100vh - 60px)",
-                  minWidth: "100vw",
-                  boxSizing: "border-box",
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                  background: "#f9fafb",
-                  padding: "0",
-                  margin: "0",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
+              <div className="scrollable-dcircles-content">
                 <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
                   <Analysis />
                 </Suspense>
@@ -526,7 +577,7 @@ const AppWrapper = observer(() => {
               }
               id="id-analysis"
             >
-              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+              <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
                 <iframe
                   src={analysisUrl}
                   width="100%"
@@ -555,7 +606,7 @@ const AppWrapper = observer(() => {
               }
               id="id-tools"
             >
-              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+              <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
                 <iframe
                   src={toolsUrl}
                   width="100%"
@@ -601,7 +652,7 @@ const AppWrapper = observer(() => {
               }
               id="id-strategy"
             >
-              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+              <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
                 <iframe
                   src={strategyUrl}
                   width="100%"
@@ -635,7 +686,7 @@ const AppWrapper = observer(() => {
                   "dashboard__chart-wrapper--expanded": is_drawer_open && isDesktop,
                   "dashboard__chart-wrapper--modal": is_chart_modal_visible && isDesktop,
                 })}
-                style={{ height: "100%", overflow: "hidden" }}
+                style={{ height: "100%", width: "100%", overflow: "hidden" }}
               >
                 <iframe
                   src="signals"
@@ -775,7 +826,3 @@ const AppWrapper = observer(() => {
 })
 
 export default AppWrapper
-
-// --------- SVG ICONS ---------
-// All SVG icon components from your original code should be pasted above this AppWrapper component.
-// --------------------------------
