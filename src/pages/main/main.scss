@@ -9,8 +9,8 @@
   --accent2: #2563eb;         // Deeper Blue for secondary actions
   --accent3: #1d4ed8;         // Rich Blue for active states
   --accent4: #1e40af;         // Deep Blue for hover states
-  --text-primary: #000000;    // Pure white for better visibility
-  --text-secondary: #000000;  // Light gray for better contrast
+  --text-primary: black;    // Pure white for better visibility
+  --text-secondary: black;  // Light gray for better contrast
   --border-normal: rgba(30, 41, 59, 0.4);
   --general-main-1: #0f172a;
   --general-section-1: #1e293b;
@@ -579,7 +579,7 @@
 
       &__active {  
         background: var(--tab-active-bg) !important;
-        color: white !important;
+        color: black !important;
         border: 1px solid var(--accent); // Reduced border thickness
         border-bottom: 3px solid var(--accent); // Reduced from 4px to 3px
         box-shadow: 0 2px 12px rgba(59, 130, 246, 0.25); // Reduced shadow
@@ -588,7 +588,7 @@
         // Better text visibility for active tabs
         span, svg {
           color: black !important;
-          fill: black !important;
+          fill: white !important;
           opacity: 1 !important;
           font-weight: 700;
           text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); // Reduced text shadow
