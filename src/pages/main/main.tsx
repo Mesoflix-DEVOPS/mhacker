@@ -262,12 +262,15 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-        "DigitSwitcherPro.xml",
-        "Over-Destroyer💀.xml",
-        "DERIHUB Even Odd Master.xml",
-        "MASTER PLUG BOT V1.xml",
-        "DeriHub_Under_Trader.xml",
-        "MASTER PLUG BOT V2(1) (7).xml",
+    "Osam_Digit_Switcher🤖🤖.xml",
+    "Under-Destroyer💀.xml",
+    "Over-Destroyer💀.xml",
+    "the Astro E_O🤖.xml",
+    "Osam.HnR.xml",
+    "Auto Bot by Osam💯.xml",
+    "DEC_entry_Point.xml",
+    "Over_HitnRun🤖.xml",
+    "Under 8 pro bot💯.xml",
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
