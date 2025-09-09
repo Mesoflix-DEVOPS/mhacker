@@ -587,8 +587,8 @@
         
         // Better text visibility for active tabs
         span, svg {
-          color: white !important;
-          fill: white !important;
+          color: black !important;
+          fill: black !important;
           opacity: 1 !important;
           font-weight: 700;
           text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); // Reduced text shadow
