@@ -262,15 +262,12 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-    "Osam_Digit_Switcher🤖🤖.xml",
-    "Under-Destroyer💀.xml",
-    "Over-Destroyer💀.xml",
-    "the Astro E_O🤖.xml",
-    "Osam.HnR.xml",
-    "Auto Bot by Osam💯.xml",
-    "DEC_entry_Point.xml",
-    "Over_HitnRun🤖.xml",
-    "Under 8 pro bot💯.xml",
+        "DigitSwitcherPro.xml",
+        "Over-Destroyer💀.xml",
+        "DERIHUB Even Odd Master.xml",
+        "MASTER PLUG BOT V1.xml",
+        "DeriHub_Under_Trader.xml",
+        "MASTER PLUG BOT V2(1) (7).xml",
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -357,46 +354,14 @@ const AppWrapper = observer(() => {
               id="id-free-bots"
             >
               <div className="free-bots">
-               {/* Social Media Icons */}
+                {/* Social Media Icons */}
                 <div className="social-media-container">
-                  <a
-                    href="https://youtube.com/@osamtradinghub-cl1fs?si=JSF3lDV1TBzjUTTb"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon youtube-icon"
-                  >
-                    <YouTubeIcon />
-                  </a>
-                  <a
-                    href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon instagram-icon"
-                  >
-                    <InstagramIcon />
-                  </a>
-                  <a
-                    href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon whatsapp-icon"
-                  >
-                    <WhatsAppIcon />
-                  </a>
-                  <a
-                    href="https://www.tiktok.com/@_its_osam?_t=ZM-8yu0PcOKRHR&_r=1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon tiktok-icon"
-                  >
-                    <TikTokIcon />
-                  </a>
-                  <a
-                    href="https://t.me/+dLoQvTnT_2wzOGY0"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon telegram-icon"
-                  >
+                  <a href="https://youtube.com/@danielmwangi3263?si=mXljcLwrAfDJmP2L" target="_blank" rel="noopener noreferrer" className="social-icon youtube-icon"><YouTubeIcon /></a>
+                  <a href="https://www.instagram.com/daniel_the_ceo_01?igsh=cmRnZHh6MHRibThy" target="_blank" rel="noopener noreferrer" className="social-icon instagram-icon"><InstagramIcon /></a>
+                  <a href="https://whatsapp.com/channel/0029Vb71CLFLtOj6rhqG1A3E" target="_blank" rel="noopener noreferrer" className="social-icon whatsapp-icon"><WhatsAppIcon /></a>
+                  <a href="https://www.tiktok.com/@danieltheceo01?_t=ZM-8z0BoHRxMve&_r=1" target="_blank" rel="noopener noreferrer" className="social-icon tiktok-icon"><TikTokIcon /></a>
+                  <a href="https://t.me/derihub" target="_blank" rel="noopener noreferrer" className="social-icon telegram-icon"><TelegramIcon /></a>
+                </div>
                 <div className="free-bots__content-wrapper">
                   <div className="free-bots__content">
                     {bots.map((bot, index) => (
