@@ -74,42 +74,41 @@
   border-radius: 0;
   border: none;
   box-shadow: none;
-  height: 100%;
+  height: calc(100vh - 50px); // Reduced from 60px to 50px for smaller tab height
   width: 100%;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
 
-  // Social Media Container - Reduced size
+  // Social Media Container - Further reduced size
   .social-media-container {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    padding: 12px;
+    gap: 8px; // Reduced gap
+    padding: 8px; // Reduced padding
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
-    border-radius: 16px;
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.15);
-    margin-bottom: 16px;
-    margin: 0 12px 16px 12px;
-    backdrop-filter: blur(12px);
+    border-radius: 12px; // Reduced border radius
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15); // Reduced shadow
+    margin: 8px 12px 12px 12px; // Reduced margins
+    backdrop-filter: blur(8px); // Reduced blur
     border: 1px solid rgba(59, 130, 246, 0.2);
-    flex-shrink: 0; // Prevent shrinking
-    
+    flex-shrink: 0;
+
     .social-icon {
       transition: all 0.3s ease;
       display: flex;
-      padding: 6px;
-      border-radius: 10px;
+      padding: 4px; // Reduced padding
+      border-radius: 8px; // Reduced border radius
       background: rgba(255, 255, 255, 0.8);
 
       svg {
-        width: 20px;
-        height: 20px;
+        width: 18px; // Reduced size
+        height: 18px; // Reduced size
       }
 
       &:hover {
-        transform: scale(1.15) translateY(-2px);
+        transform: scale(1.1) translateY(-1px); // Reduced transform
         background: rgba(255, 255, 255, 1);
       }
 
@@ -136,33 +135,34 @@
   }
 }
 
-// FIXED CONTENT WRAPPER WITH PROPER SCROLLING - Reduced padding
+// FIXED CONTENT WRAPPER WITH PROPER SCROLLING - Enhanced for better visibility
 .free-bots__content-wrapper {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 12px 40px 12px; // Reduced padding
+  padding: 0 12px 80px 12px; // Increased bottom padding from 20px to 80px to ensure last bot is visible
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(59, 130, 246, 0.1);
+  max-height: calc(100vh - 120px); // Added max-height for better mobile scrolling
 
   // Enhanced scrollbar styling
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 4px; // Reduced scrollbar width
   }
 
   &::-webkit-scrollbar-track {
     background: rgba(59, 130, 246, 0.1);
-    border-radius: 10px;
+    border-radius: 8px; // Reduced border radius
   }
 
   &::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, var(--accent), var(--accent4));
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    border-radius: 8px; // Reduced border radius
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3); // Reduced shadow
 
     &:hover {
       background: linear-gradient(135deg, var(--accent4), #1e3a8a);
-      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4); // Reduced shadow
     }
   }
 }
@@ -170,69 +170,76 @@
 .free-bots__content {
   display: flex;
   flex-direction: column;
-  gap: 16px; // Reduced gap
+  gap: 12px; // Reduced gap
   width: 100%;
-  padding-bottom: 16px; // Reduced padding
+  padding-bottom: 12px; // Reduced padding
 }
 
-// FREE BOT ITEM STYLING - REDUCED SIZE
+// FREE BOT ITEM STYLING - Enhanced visibility
 .free-bot-item {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(239, 246, 255, 0.95));
-  border-radius: 12px; // Smaller border radius
-  padding: 16px; // Reduced padding
-  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.12);
-  border: 2px solid rgba(59, 130, 246, 0.15);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  cursor: default;
+  border: 3px solid rgba(59, 130, 246, 0.25);
+  border-radius: 12px;
+  padding: 12px; // Reduced padding from 16px to 12px for smaller height
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px; // Reduced gap
+  max-width: none;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.18);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(8px);
   position: relative;
   overflow: hidden;
-  animation: fadeInScale 0.8s ease both;
-  backdrop-filter: blur(10px);
-  min-height: 80px; // Reduced minimum height
+  display: flex; // Added flex display for side-by-side layout
+  align-items: center; // Center align items vertically
+  gap: 12px; // Added gap between bot info and button
+
+  @media (max-width: 768px) {
+    padding: 10px; // Reduced mobile padding from 12px to 10px
+    border-radius: 10px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+  }
 
   &:hover {
-    transform: translateY(-3px) scale(1.015); // Reduced scale
-    box-shadow: 0 12px 36px rgba(59, 130, 246, 0.25);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.25);
     border-color: rgba(59, 130, 246, 0.4);
     background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(219, 234, 254, 0.98));
   }
 
   .gradient-border {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
-    height: 3px; // Reduced height
-    background: linear-gradient(90deg, #3b82f6, #2563eb, #1d4ed8, #3b82f6);
-    background-size: 300% 100%;
-    animation: gradientShift 4s ease infinite;
-    border-radius: 0 0 12px 12px;
+    bottom: 0;
+    background: linear-gradient(45deg, var(--accent), var(--accent4), var(--accent));
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0.1;
   }
 
   .bot-info {
     display: flex;
     align-items: center;
-    flex: 1;
-    min-width: 180px; // Reduced minimum width
     gap: 12px;
+    margin-bottom: 0; // Removed margin for side-by-side layout
+    flex: 1; // Allow bot info to take available space
 
     .bot-icon-container {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      border-radius: 10px; // Reduced border radius
-      padding: 10px; // Reduced padding
       flex-shrink: 0;
-      box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
-      color: white;
+      width: 32px; // Reduced size from 36px to 32px
+      height: 32px; // Reduced size from 36px to 32px
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent4));
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 
       svg {
-        width: 20px; // Reduced icon size
-        height: 20px;
+        width: 18px; // Reduced size from 20px to 18px
+        height: 18px; // Reduced size from 20px to 18px
       }
     }
 
@@ -240,42 +247,45 @@
       flex: 1;
 
       .bot-title {
-        font-size: 16px; // Reduced font size
+        font-size: 15px; // Reduced font size from 16px to 15px
         font-weight: 700;
         color: #1e3a8a;
-        margin: 0;
-        line-height: 1.3;
-        word-break: break-word;
+        margin-bottom: 2px; // Reduced margin from 4px to 2px
+        line-height: 1.2;
       }
 
       .bot-status {
-        font-size: 12px; // Reduced font size
-        color: #1e40af;
-        margin: 4px 0 0 0;
+        font-size: 12px; // Reduced font size from 13px to 12px
+        color: #3b82f6;
         opacity: 0.8;
-        font-weight: 500;
+        line-height: 1.2;
       }
     }
   }
 
   .load-bot-button {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
     color: white;
     border: none;
-    border-radius: 10px; // Reduced border radius
-    padding: 10px 20px; // Reduced padding
-    font-size: 13px; // Reduced font size
+    border-radius: 8px;
+    padding: 8px 16px; // Reduced padding from 10px 20px to 8px 16px
+    font-size: 13px; // Reduced font size from 14px to 13px
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
-    flex-shrink: 0;
-    min-width: 90px; // Reduced minimum width
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    white-space: nowrap;
+    flex-shrink: 0; // Prevent button from shrinking
+    width: auto; // Changed from 100% to auto for side-by-side layout
 
     &:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
-      background: linear-gradient(135deg, #2563eb, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      background: linear-gradient(135deg, var(--accent4), #1e3a8a);
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 }
@@ -283,8 +293,8 @@
 // RISK DISCLAIMER BUTTON - MOVED TO LEFT SIDE
 .risk-disclaimer-button {
   position: fixed;
-  bottom: 80px; // Kept same height
-  left: 20px; // Changed from right to left
+  bottom: 20px; // Changed from 80px to 20px to move to the very bottom
+  right: 20px; // Kept on right side
   background: linear-gradient(135deg, #f59e0b, #dc2626);
   color: white;
   border: none;
@@ -562,18 +572,18 @@
       &__active-line {  
         background: linear-gradient(90deg, var(--accent), var(--accent4)) !important;  
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        height: 4px;
-        border-radius: 0; // Removed rounded corners
-        bottom: -2px; // Position at bottom
+        height: 3px; // Reduced from 4px to 3px
+        border-radius: 0;
+        bottom: -1px; // Adjusted position
       }  
 
       &__active {  
         background: var(--tab-active-bg) !important;
         color: white !important;
-        border: 2px solid var(--accent);
-        border-bottom: 4px solid var(--accent);
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
-        transform: translateY(-2px);
+        border: 1px solid var(--accent); // Reduced border thickness
+        border-bottom: 3px solid var(--accent); // Reduced from 4px to 3px
+        box-shadow: 0 2px 12px rgba(59, 130, 246, 0.25); // Reduced shadow
+        transform: translateY(-1px); // Reduced transform
         
         // Better text visibility for active tabs
         span, svg {
@@ -581,61 +591,36 @@
           fill: white !important;
           opacity: 1 !important;
           font-weight: 700;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); // Reduced text shadow
         }
       }  
 
       &__list {  
         background: linear-gradient(135deg, var(--general-section-1), #334155);  
         justify-content: flex-start;  
-        border-bottom: 2px solid rgba(59, 130, 246, 0.2);
-        flex-shrink: 0;
-        padding: 8px;
-        margin: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-
-        @include mobile-or-tablet-screen {  
-          overflow-x: auto;  
-          overflow-y: hidden;  
-          -ms-overflow-style: none;  
-          scrollbar-width: none;  
-
-          &::-webkit-scrollbar {  
-            display: none;  
-          }  
-        }  
-
-        &--header {  
-          &--main {  
-            &__tabs {  
-              @include mobile-or-tablet-screen {  
-                width: 100%;  
-                overflow-x: auto;  
-                padding: 0;  
-              }  
-            }  
-          }  
-        }  
-
-        &--border-bottom {  
-          @include mobile-or-tablet-screen {  
-            border-bottom: 2px solid rgba(59, 130, 246, 0.2);  
-          }  
-        }  
+        min-height: 44px; // Increased from 36px to 44px for better tab visibility
+        padding: 2px 6px;  
+        gap: 1px;  
+        overflow-x: auto; // Added horizontal scrolling
+        overflow-y: hidden; // Hide vertical overflow
+        white-space: nowrap; // Prevent wrapping
+        
+        @media (max-width: 768px) {
+          min-height: 40px; // Increased mobile height from 32px to 40px
+          padding: 2px 4px;  
+          gap: 1px;  
+        }
       }  
 
       &__content {
         flex: 1;
         overflow: hidden;
-        height: calc(100vh - 70px); // Adjusted for new tab height
+        height: calc(100vh - 54px); // Adjusted from 50px to 54px for new tab height
         background: var(--card-bg);
 
         @include mobile-or-tablet-screen {  
           width: 100%;  
-          height: calc(100vh - 70px);
+          height: calc(100vh - 50px); // Reduced mobile height
 
           &--no-result {  
             @include flex-center;  
@@ -679,97 +664,50 @@
       }  
 
       &__item {  
-        border-top-left-radius: 0;  // Removed rounded corners
-        border-top-right-radius: 0;  // Removed rounded corners
-        height: 54px;  // Increased height
-        padding: 0 20px;  // Increased padding
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        height: 40px; // Increased from 36px to 40px for better visibility
+        padding: 6px 10px !important; // Increased padding from 4px 8px to 6px 10px
         width: auto;  
-        color: var(--text-primary) !important; // Force white text visibility
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: var(--tab-bg);
-        border: 2px solid rgba(75, 85, 99, 0.3); // More neutral border
+        color: var(--text-primary) !important;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-bottom: none;
-        margin-right: 4px;
+        margin-right: 2px;
         white-space: nowrap;
-        flex-shrink: 0;
-        font-weight: 700; // Increased font weight for better visibility
-        position: relative;
-        overflow: hidden;
-        
-        // IMPROVED TEXT VISIBILITY - Much brighter text
-        span {
-          color: #ffffff !important; // Pure white for maximum visibility
-          font-weight: 700 !important; // Bold text
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important; // Strong text shadow
-          opacity: 1 !important;
-          font-size: 14px !important; // Ensure good size
-          letter-spacing: 0.5px; // Better letter spacing
-        }
+        display: flex; // Added flex display for proper alignment
+        align-items: center; // Center align content
+        justify-content: center; // Center justify content
 
-        // Improved SVG visibility
-        svg {
-          fill: #ffffff !important; // Pure white SVG
-          color: #ffffff !important;
-          opacity: 1 !important;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); // Shadow for SVG
+        span, .localize, * {
+          color: #000000 !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+          line-height: 1.2;
         }
-
-        // Enhanced gradient overlay for better contrast
-        &:before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-          pointer-events: none;
-          border-radius: inherit;
-        }
-
-        @include flex-center;  
 
         &:hover {
-          background: var(--tab-hover-bg) !important; // Beautiful blue hover
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); // Blue shadow
-          border-color: rgba(37, 99, 235, 0.6);
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-1px);
           
-          // Ensure hover text is also very visible
-          span {
-            color: #ffffff !important;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8) !important;
-            font-weight: 700 !important;
-          }
-          
-          svg {
-            fill: #ffffff !important;
-            color: #ffffff !important;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+          span, .localize, * {
+            color: #000000 !important;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
           }
         }
 
-        @include mobile-or-tablet-screen {  
-          // Enhanced mobile visibility
-          span {
-            color: #ffffff !important;
+        &--active {
+          background: rgba(255, 255, 255, 0.9);
+          border-color: rgba(59, 130, 246, 0.3);
+          
+          span, .localize, * {
+            color: #000000 !important;
             font-weight: 700 !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
-            font-size: 13px !important;
+            text-shadow: none;
           }
-
-          svg {  
-            margin-inline-end: 6px;  
-            fill: #ffffff !important;
-            color: #ffffff !important;
-          }  
-        }  
-
-        &__icon {  
-          @include mobile-or-tablet-screen {  
-            padding-top: 0;  
-          }  
-        }  
+        }
       }  
     }  
   }  
@@ -806,13 +744,6 @@
             transform: translateY(-2px);
           }
         }  
-      }  
-
-      &__container {  
-        background: var(--general-main-1);  
-        border: 2px solid rgba(59, 130, 246, 0.2);
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       }  
     }  
   }  
