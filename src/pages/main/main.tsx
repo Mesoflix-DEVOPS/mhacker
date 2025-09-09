@@ -1,34 +1,28 @@
-"use client"
+import React, { lazy, Suspense, useEffect, useState, useCallback } from "react";
+import classNames from "classnames";
+import { observer } from "mobx-react-lite";
+import ChunkLoader from "@/components/loader/chunk-loader";
+import DesktopWrapper from "@/components/shared_ui/desktop-wrapper";
+import Dialog from "@/components/shared_ui/dialog";
+import MobileWrapper from "@/components/shared_ui/mobile-wrapper";
+import Tabs from "@/components/shared_ui/tabs/tabs";
+import TradingViewModal from "@/components/trading-view-chart/trading-view-modal";
+import { DBOT_TABS } from "@/constants/bot-contents";
+import { api_base, updateWorkspaceName } from "@/external/bot-skeleton";
+import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream";
+import { useApiBase } from "@/hooks/useApiBase";
+import { useStore } from "@/hooks/useStore";
+import { Localize, localize } from "@deriv-com/translations";
+import { useDevice } from "@deriv-com/ui";
+import RunPanel from "../../components/run-panel";
+import ChartModal from "../chart/chart-modal";
+import Dashboard from "../dashboard";
+import RunStrategy from "../dashboard/run-strategy";
 
-import React, { lazy, Suspense, useEffect, useState, useCallback } from "react"
-import classNames from "classnames"
-import { observer } from "mobx-react-lite"
-import ChunkLoader from "@/components/loader/chunk-loader"
-import DesktopWrapper from "@/components/shared_ui/desktop-wrapper"
-import Dialog from "@/components/shared_ui/dialog"
-import MobileWrapper from "@/components/shared_ui/mobile-wrapper"
-import Tabs from "@/components/shared_ui/tabs/tabs"
-import TradingViewModal from "@/components/trading-view-chart/trading-view-modal"
-import { DBOT_TABS } from "@/constants/bot-contents"
-import { api_base, updateWorkspaceName } from "@/external/bot-skeleton"
-import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream"
-import { useApiBase } from "@/hooks/useApiBase"
-import { useStore } from "@/hooks/useStore"
-import { Localize, localize } from "@deriv-com/translations"
-import { useDevice } from "@deriv-com/ui"
-import RunPanel from "../../components/run-panel"
-import ChartModal from "../chart/chart-modal"
-import Dashboard from "../dashboard"
-import RunStrategy from "../dashboard/run-strategy"
-
-// ... All icon components as in your code above (not repeated for brevity; copy all icon components unchanged) ...
 const Chart = lazy(() => import("../chart"));
 const Tutorial = lazy(() => import("../tutorials"));
 const Copytrading = lazy(() => import("../copytrading"));
 const Dcircles = lazy(() => import("../analysis"));
-
-
-
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
@@ -230,11 +224,12 @@ const TelegramIcon = () => (
     />
   </svg>
 )
+
 const AppWrapper = observer(() => {
-  const { connectionStatus } = useApiBase()
-  const { dashboard, load_modal, run_panel, summary_card } = useStore()
-  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard
-  const { onEntered } = load_modal
+  const { connectionStatus } = useApiBase();
+  const { dashboard, load_modal, run_panel, summary_card } = useStore();
+  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard;
+  const { onEntered } = load_modal;
   const {
     is_dialog_open,
     dialog_options,
@@ -243,66 +238,30 @@ const AppWrapper = observer(() => {
     onOkButtonClick,
     stopBot,
     is_drawer_open,
-  } = run_panel
-  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string }
-  const { clear } = summary_card
-  const { isDesktop } = useDevice()
-  const [bots, setBots] = useState([])
-  const [showDisclaimer, setShowDisclaimer] = useState(false)
-  const analysisUrl = "https://mesoflixldpnew.vercel.app/"
-  const strategyUrl = "https://mesoflixstrategies.netlify.app/"
-  const toolsUrl = "https://alltools-ten.vercel.app/"
+  } = run_panel;
+  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string };
+  const { clear } = summary_card;
+  const { isDesktop, isMobile } = useDevice();
+  const [bots, setBots] = useState([]);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const analysisUrl = "https://mesoflixldpnew.vercel.app/";
+  const strategyUrl = "https://mesoflixstrategies.netlify.app/";
+  const toolsUrl = "https://alltools-ten.vercel.app/";
 
   useEffect(() => {
     if (connectionStatus !== CONNECTION_STATUS.OPENED) {
-      const is_bot_running = document.getElementById("db-animation__stop-button") !== null
+      const is_bot_running = document.getElementById("db-animation__stop-button") !== null;
       if (is_bot_running) {
-        clear()
-        stopBot()
-        api_base.setIsRunning(false)
+        clear();
+        stopBot();
+        api_base.setIsRunning(false);
       }
     }
-  }, [clear, connectionStatus, stopBot])
+  }, [clear, connectionStatus, stopBot]);
 
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-        "Osam_Digit_Switcher🤖🤖.xml",
-        "Under-Destroyer💀.xml",
-        "Over-Destroyer💀.xml",
-        "the Astro E_O🤖.xml",
-        "Mega_Mind V1👻.xml",
-        "Osam.HnR.xml",
-        "Auto Bot by Osam💯.xml",
-        "DEC_entry_Point.xml",
-        "Over_HitnRun🤖.xml",
-        "Under_HitnRun.xml",
-      ]
-      const botPromises = botFiles.map(async (file) => {
-        try {
-          const response = await fetch(file)
-          if (!response.ok) {
-            throw new Error(`Failed to fetch ${file}: ${response.statusText}`)
-          }
-          const text = await response.text()
-          const parser = new DOMParser()
-          const xml = parser.parseFromString(text, "application/xml")
-          return {
-            title: file.split("/").pop(),
-            image: xml.getElementsByTagName("image")[0]?.textContent || "default_image_path",
-            filePath: file,
-            xmlContent: text,
-          }
-        } catch (error) {
-          console.error(error)
-          return null
-        }
-      })
-      const bots = (await Promise.all(botPromises)).filter(Boolean)
-      setBots(bots)
-    }
-    fetchBots()
-  }, [
     "Osam_Digit_Switcher🤖🤖.xml",
     "Under-Destroyer💀.xml",
     "Over-Destroyer💀.xml",
@@ -312,109 +271,74 @@ const AppWrapper = observer(() => {
     "DEC_entry_Point.xml",
     "Over_HitnRun🤖.xml",
     "Under 8 pro bot💯.xml",
-  ])
+      ];
+      const botPromises = botFiles.map(async (file) => {
+        try {
+          const response = await fetch(file);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
+          }
+          const text = await response.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, "application/xml");
+          return {
+            title: file.split("/").pop(),
+            image: xml.getElementsByTagName("image")[0]?.textContent || "default_image_path",
+            filePath: file,
+            xmlContent: text,
+          };
+        } catch (error) {
+          console.error(error);
+          return null;
+        }
+      });
+      const bots = (await Promise.all(botPromises)).filter(Boolean);
+      setBots(bots);
+    };
+    fetchBots();
+  }, []);
 
-  const formatBotName = (name: string) => {
-    return name.replace(/\.xml$/, "")
-  }
+  const formatBotName = (name: string) => name.replace(/\.xml$/, '');
 
-  const handleTabChange = React.useCallback(
-    (tab_index: number) => {
-      setActiveTab(tab_index)
-    },
-    [setActiveTab],
-  )
+  const handleTabChange = useCallback(
+    (tab_index: number) => setActiveTab(tab_index),
+    [setActiveTab]
+  );
 
   const handleBotClick = useCallback(
     async (bot: { filePath: string; xmlContent: string }) => {
-      setActiveTab(DBOT_TABS.BOT_BUILDER)
+      setActiveTab(DBOT_TABS.BOT_BUILDER);
       try {
         if (typeof load_modal.loadFileFromContent === "function") {
-          try {
-            await load_modal.loadFileFromContent(bot.xmlContent)
-          } catch (loadError) {
-            console.error("Error in load_modal.loadFileFromContent:", loadError)
-          }
+          await load_modal.loadFileFromContent(bot.xmlContent);
         } else {
-          console.error("loadFileFromContent is not defined on load_modal")
+          console.error("loadFileFromContent is not defined on load_modal");
         }
-        updateWorkspaceName(bot.xmlContent)
+        updateWorkspaceName(bot.xmlContent);
       } catch (error) {
-        console.error("Error loading bot file:", error)
+        console.error("Error loading bot file:", error);
       }
     },
-    [setActiveTab, load_modal, updateWorkspaceName],
-  )
+    [setActiveTab, load_modal, updateWorkspaceName]
+  );
 
   const handleOpen = useCallback(async () => {
-    await load_modal.loadFileFromRecent()
-    setActiveTab(DBOT_TABS.BOT_BUILDER)
-  }, [load_modal, setActiveTab])
+    await load_modal.loadFileFromRecent();
+    setActiveTab(DBOT_TABS.BOT_BUILDER);
+  }, [load_modal, setActiveTab]);
 
-  const showRunPanel = [1, 2, 3, 4].includes(active_tab)
+  const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
-  // --- STYLE OVERRIDES ---
-  // You can move this into your CSS file for production!
-  React.useEffect(() => {
-    const styleId = "appwrapper-custom-fullscreen"
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement("style")
-      style.id = styleId
-      style.innerHTML = `
-        .main, .main__container {
-          width: 100vw !important;
-          height: 100vh !important;
-          min-height: 100vh !important;
-          min-width: 100vw !important;
-          max-width: 100vw !important;
-          max-height: 100vh !important;
-        }
-        .main__tabs {
-          height: 100vh !important;
-        }
-        .main__tabs > div[role="tabpanel"] {
-          width: 100vw !important;
-          height: 100vh !important;
-          min-height: 100vh !important;
-          overflow: hidden !important;
-        }
-        /* DCIRCLES Tab: make content scrollable and full height */
-        #id-dcircles {
-          width: 100vw !important;
-          height: 100vh !important;
-          min-height: 100vh !important;
-          max-height: 100vh !important;
-          display: flex;
-          flex-direction: column;
-          padding: 0 !important;
-          margin: 0 !important;
-          background: #fff;
-        }
-        #id-dcircles > .scrollable-dcircles-content {
-          flex: 1 1 0;
-          min-height: 0;
-          min-width: 0;
-          width: 100vw;
-          height: 100%;
-          overflow-y: auto !important;
-          overflow-x: hidden;
-          box-sizing: border-box;
-          background: #fff;
-          padding: 0;
-        }
-        /* Remove padding/margins from tab panels for all tabs */
-        .main__tabs > div[role="tabpanel"] {
-          padding: 0 !important;
-          margin: 0 !important;
-        }
-      `
-      document.head.appendChild(style)
-    }
-    return () => {
-      const style = document.getElementById(styleId)
-      if (style) style.remove()
-    }
-  }, [])
+  // Responsive style for full height/width and scroll for tab panels
+  const fullPanelStyle: React.CSSProperties = {
+    width: "100%",
+    height: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
+    minHeight: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
+    maxHeight: "100vh",
+    overflowY: "auto",
+    overflowX: "hidden",
+    background: "#f0fdf4"
+  };
 
   return (
     <React.Fragment>
@@ -427,20 +351,13 @@ const AppWrapper = observer(() => {
             onTabItemClick={handleTabChange}
             top
           >
-            {/* 1. Free Bots - First */}
+            {/* 1. Free Bots */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <FreeBotsIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Free Bots" />
-                  </span>
-                </div>
-              }
+              label={<><FreeBotsIcon /><Localize i18n_default_text="Free Bots" /></>}
               id="id-free-bots"
             >
-              <div className="free-bots" style={{ width: "100%", height: "100%" }}>
-                {/* Social Media Icons */}
+              <div className="free-bots">
+               {/* Social Media Icons */}
                 <div className="social-media-container">
                   <a
                     href="https://youtube.com/@osamtradinghub-cl1fs?si=JSF3lDV1TBzjUTTb"
@@ -480,32 +397,19 @@ const AppWrapper = observer(() => {
                     rel="noopener noreferrer"
                     className="social-icon telegram-icon"
                   >
-                    <TelegramIcon />
-                  </a>
-                </div>
                 <div className="free-bots__content-wrapper">
                   <div className="free-bots__content">
                     {bots.map((bot, index) => (
-                      <div
-                        key={index}
-                        className="free-bot-item"
-                        style={{
-                          animationDelay: `${index * 0.1}s`,
-                        }}
-                      >
+                      <div key={index} className="free-bot-item" style={{ animationDelay: `${index * 0.1}s` }}>
                         <div className="gradient-border" />
                         <div className="bot-info">
-                          <div className="bot-icon-container">
-                            <FreeBotsIcon />
-                          </div>
+                          <div className="bot-icon-container"><FreeBotsIcon /></div>
                           <div className="bot-details">
                             <h3 className="bot-title">{formatBotName(bot.title)}</h3>
                             <p className="bot-status">Ready to deploy • Click to load</p>
                           </div>
                         </div>
-                        <button onClick={() => handleBotClick(bot)} className="load-bot-button">
-                          Load Bot
-                        </button>
+                        <button onClick={() => handleBotClick(bot)} className="load-bot-button">Load Bot</button>
                       </div>
                     ))}
                   </div>
@@ -515,14 +419,7 @@ const AppWrapper = observer(() => {
 
             {/* 2. Bot Settings */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <BotSettingsIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Bot Settings" />
-                  </span>
-                </div>
-              }
+              label={<><BotSettingsIcon /><Localize i18n_default_text="Bot Settings" /></>}
               id="id-bot-settings"
             >
               <Dashboard handleTabChange={handleTabChange} />
@@ -531,14 +428,7 @@ const AppWrapper = observer(() => {
 
             {/* 3. Charts */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <ChartsIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Charts" />
-                  </span>
-                </div>
-              }
+              label={<><ChartsIcon /><Localize i18n_default_text="Charts" /></>}
               id="id-charts"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
@@ -546,38 +436,24 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles - SCROLLABLE & FULL HEIGHT */}
+            {/* 4. Dcircles */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <DCirclesIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Dcircles" />
-                  </span>
-                </div>
-              }
+              label={<><DCirclesIcon /><Localize i18n_default_text="Dcircles" /></>}
               id="id-dcircles"
             >
-              <div className="scrollable-dcircles-content">
-                <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
-                  <Analysis />
-                </Suspense>
-              </div>
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
+                <div style={fullPanelStyle}>
+                  <Dcircles />
+                </div>
+              </Suspense>
             </div>
 
             {/* 5. Analysis */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <AnalysisToolIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Analysis" />
-                  </span>
-                </div>
-              }
+              label={<><AnalysisToolIcon /><Localize i18n_default_text="Analysis" /></>}
               id="id-analysis"
             >
-              <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+              <div style={fullPanelStyle}>
                 <iframe
                   src={analysisUrl}
                   width="100%"
@@ -586,8 +462,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    minHeight: "calc(100vh - 60px)",
-                    background: "#dbeafe",
+                    background: "#f0f9ff"
                   }}
                   scrolling="yes"
                 />
@@ -596,17 +471,10 @@ const AppWrapper = observer(() => {
 
             {/* 6. Tools */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <ToolsIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Tools" />
-                  </span>
-                </div>
-              }
+              label={<><ToolsIcon /><Localize i18n_default_text="Tools" /></>}
               id="id-tools"
             >
-              <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+              <div style={fullPanelStyle}>
                 <iframe
                   src={toolsUrl}
                   width="100%"
@@ -615,8 +483,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    minHeight: "calc(100vh - 60px)",
-                    background: "#eff6ff",
+                    background: "#f0fdf4"
                   }}
                   scrolling="yes"
                 />
@@ -625,14 +492,7 @@ const AppWrapper = observer(() => {
 
             {/* 7. Copytrading */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <CopyTradingIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Copytrading" />
-                  </span>
-                </div>
-              }
+              label={<><CopyTradingIcon /><Localize i18n_default_text="Copytrading" /></>}
               id="id-copytrading"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
@@ -642,17 +502,10 @@ const AppWrapper = observer(() => {
 
             {/* 8. Strategies */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <StrategyIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Strategy" />
-                  </span>
-                </div>
-              }
+              label={<><StrategyIcon /><Localize i18n_default_text="Strategy" /></>}
               id="id-strategy"
             >
-              <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
+              <div style={fullPanelStyle}>
                 <iframe
                   src={strategyUrl}
                   width="100%"
@@ -661,8 +514,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    minHeight: "calc(100vh - 60px)",
-                    background: "#dbeafe",
+                    background: "#f0f9ff"
                   }}
                   scrolling="yes"
                 />
@@ -671,14 +523,7 @@ const AppWrapper = observer(() => {
 
             {/* 9. Signals */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <SignalsIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Signals" />
-                  </span>
-                </div>
-              }
+              label={<><SignalsIcon /><Localize i18n_default_text="Signals" /></>}
               id="id-signals"
             >
               <div
@@ -686,7 +531,7 @@ const AppWrapper = observer(() => {
                   "dashboard__chart-wrapper--expanded": is_drawer_open && isDesktop,
                   "dashboard__chart-wrapper--modal": is_chart_modal_visible && isDesktop,
                 })}
-                style={{ height: "100%", width: "100%", overflow: "hidden" }}
+                style={fullPanelStyle}
               >
                 <iframe
                   src="signals"
@@ -695,24 +540,16 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    minHeight: "calc(100vh - 60px)",
-                    background: "#eff6ff",
+                    background: "#f0fdf4"
                   }}
                   scrolling="yes"
                 />
               </div>
             </div>
 
-            {/* 10. Tutorials - Last */}
+            {/* 10. Tutorials */}
             <div
-              label={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <TutorialsIcon />
-                  <span style={{ color: "#000000", fontWeight: "600", fontSize: "14px" }}>
-                    <Localize i18n_default_text="Tutorials" />
-                  </span>
-                </div>
-              }
+              label={<><TutorialsIcon /><Localize i18n_default_text="Tutorials" /></>}
               id="id-tutorials"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
@@ -722,69 +559,139 @@ const AppWrapper = observer(() => {
           </Tabs>
         </div>
       </div>
+      
+      {/* Risk Disclaimer Button */}
+      <button
+        onClick={() => setShowDisclaimer(true)}
+        className="risk-disclaimer-button"
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          background: "linear-gradient(135deg, #F59E0B, #EF4444)",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          padding: "8px 16px",
+          fontSize: "12px",
+          fontWeight: "600",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+        onMouseOver={e => {
+          e.currentTarget.style.transform = "scale(1.05)";
+          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
+        }}
+        onMouseOut={e => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        Disclaimer
+      </button>
 
-      {/* Enhanced Risk Disclaimer Modal */}
+      {/* Risk Disclaimer Modal */}
       {showDisclaimer && (
-        <div className="disclaimer-overlay">
-          <div className="disclaimer-modal">
-            <button onClick={() => setShowDisclaimer(false)} className="disclaimer-close-button">
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1001,
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "24px",
+            maxWidth: "600px",
+            width: "90%",
+            maxHeight: "80vh",
+            overflowY: "auto",
+            position: "relative",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+          }}>
+            <button
+              onClick={() => setShowDisclaimer(false)}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                background: "none",
+                border: "none",
+                fontSize: "20px",
+                cursor: "pointer",
+                color: "#6B7280",
+              }}
+            >
               ×
             </button>
-            <div className="disclaimer-header">
-              <div className="disclaimer-icon">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+              <div style={{
+                background: "#FEE2E2",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="disclaimer-title">Trading Risk Disclaimer</h3>
+              <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1F2937", margin: 0 }}>Deriv Trading Risk Disclaimer</h3>
             </div>
-            <div className="disclaimer-content">
-              <p className="disclaimer-intro">
-                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not
-                suitable for all investors. Before deciding to trade, carefully consider your financial situation and
-                experience level.
+            <div style={{ marginBottom: "16px" }}>
+              <p style={{ lineHeight: "1.6", color: "#4B5563", marginBottom: "12px" }}>
+                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
               </p>
-              <h4 className="disclaimer-subtitle">Key Risks:</h4>
-              <ul className="disclaimer-list">
-                <li>
-                  <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but
-                  also magnify potential losses.
-                </li>
-                <li>
-                  <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected
-                  directions.
-                </li>
-                <li>
-                  <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close
-                  positions.
-                </li>
-                <li>
-                  <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical
-                  problems may prevent order execution.
-                </li>
-                <li>
-                  <strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may
-                  affect your rights as a trader.
-                </li>
+              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Key Risks:</h4>
+              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563", marginBottom: "16px" }}>
+                <li style={{ marginBottom: "8px" }}><strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.</li>
+                <li style={{ marginBottom: "8px" }}><strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.</li>
+                <li style={{ marginBottom: "8px" }}><strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.</li>
+                <li style={{ marginBottom: "8px" }}><strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.</li>
+                <li><strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may affect your rights as a trader.</li>
               </ul>
-              <h4 className="disclaimer-subtitle">Important Considerations:</h4>
-              <ul className="disclaimer-list">
-                <li>You could lose some or all of your invested capital.</li>
-                <li>Never trade with money you cannot afford to lose.</li>
-                <li>Past performance is not indicative of future results.</li>
-                <li>
-                  Seek independent financial advice if you have any doubts about your understanding of these risks.
-                </li>
+              <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Important Considerations:</h4>
+              <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563" }}>
+                <li style={{ marginBottom: "8px" }}>You could lose some or all of your invested capital.</li>
+                <li style={{ marginBottom: "8px" }}>Never trade with money you cannot afford to lose.</li>
+                <li style={{ marginBottom: "8px" }}>Past performance is not indicative of future results.</li>
+                <li>Seek independent financial advice if you have any doubts about your understanding of these risks.</li>
               </ul>
             </div>
-            <div className="disclaimer-notice">
-              <p className="disclaimer-notice-text">
-                By continuing to use this platform, you acknowledge that you have read, understood, and accept these
-                risks associated with trading on Deriv.
+            <div style={{ backgroundColor: "#F3F4F6", padding: "12px", borderRadius: "8px", marginBottom: "16px" }}>
+              <p style={{ fontSize: "14px", color: "#6B7280", fontStyle: "italic", margin: 0, lineHeight: "1.5" }}>
+                By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
               </p>
             </div>
-            <div className="disclaimer-footer">
-              <button onClick={() => setShowDisclaimer(false)} className="disclaimer-accept-button">
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowDisclaimer(false)}
+                style={{
+                  background: "linear-gradient(135deg, #3B82F6, #1E40AF)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "10px 20px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
                 I Understand the Risks
               </button>
             </div>
@@ -815,14 +722,8 @@ const AppWrapper = observer(() => {
       >
         {message}
       </Dialog>
-      <button onClick={() => setShowDisclaimer(true)} className="risk-disclaimer-button" style={{ bottom: "20px" }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        Risk
-      </button>
     </React.Fragment>
-  )
-})
+  );
+});
 
-export default AppWrapper
+export default AppWrapper;
