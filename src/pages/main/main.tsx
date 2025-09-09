@@ -509,19 +509,7 @@ const AppWrapper = observer(() => {
               id="id-dcircles"
             >
 
-               <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  minHeight: "calc(100vh - 60px)",
-                  maxHeight: "100vh",
-                  overflow: "auto",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#eff6ff",
-                }}
-              >
+               
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
                 <Analysis />
               </Suspense>
