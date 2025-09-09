@@ -24,8 +24,8 @@ import RunStrategy from "../dashboard/run-strategy"
 const Chart = lazy(() => import("../chart"))
 const Tutorial = lazy(() => import("../tutorials"))
 const Copytrading = lazy(() => import("../copytrading"))
+const Analysis = lazy(() => import("../analysis")) // NEW
 
-/** BEAUTIFUL MODERN BLUE ICONS **/
 const FreeBotsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#blueGrad1)" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -42,7 +42,6 @@ const FreeBotsIcon = () => (
     <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9" />
   </svg>
 )
-
 const BotSettingsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#blueGrad2)" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -51,10 +50,9 @@ const BotSettingsIcon = () => (
         <stop offset="100%" stopColor="#1d4ed8" />
       </linearGradient>
     </defs>
-    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
+    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.52.37 1.09.68 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4a.5.5 0 0 0 .5-.42l-.38-2.65c.6-.3 1.17-.61 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z" fill="url(#blueGrad2)" />
   </svg>
 )
-
 const ChartsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#blueGrad3)" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -78,7 +76,6 @@ const ChartsIcon = () => (
     <circle cx="17" cy="9" r="1.5" fill="url(#blueGrad3)" />
   </svg>
 )
-
 const DCirclesIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -99,7 +96,6 @@ const DCirclesIcon = () => (
     <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9" />
   </svg>
 )
-
 const AnalysisToolIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -116,7 +112,6 @@ const AnalysisToolIcon = () => (
     <path d="M20 8L22 10" stroke="url(#blueGrad5)" strokeWidth="2" strokeLinecap="round" />
   </svg>
 )
-
 const ToolsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -134,7 +129,6 @@ const ToolsIcon = () => (
     />
   </svg>
 )
-
 const CopyTradingIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -148,7 +142,6 @@ const CopyTradingIcon = () => (
     <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#blueGrad6)" />
   </svg>
 )
-
 const StrategyIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -169,7 +162,6 @@ const StrategyIcon = () => (
     <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#blueGrad7)" />
   </svg>
 )
-
 const SignalsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -190,7 +182,6 @@ const SignalsIcon = () => (
     <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad8)" />
   </svg>
 )
-
 const TutorialsIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -211,18 +202,15 @@ const TutorialsIcon = () => (
     <polygon points="9,10.5 12,12 9,13.5" fill="white" />
   </svg>
 )
-
-// Social Media Icons
 const YouTubeIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path
-      d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"
+      d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2c.32-1.77.46-3.55.46-5.33s-.14-3.56-.46-5.33z"
       fill="#FF0000"
     />
     <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" fill="#fff" />
   </svg>
 )
-
 const InstagramIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <rect x="2" y="2" width="20" height="20" rx="5" stroke="#E1306C" strokeWidth="2" fill="none" />
@@ -230,29 +218,26 @@ const InstagramIcon = () => (
     <circle cx="18" cy="6" r="1" fill="#E1306C" />
   </svg>
 )
-
 const WhatsAppIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path
-      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.051-.173-.29-.018-.447.13-.597.134-.134.299-.349.448-.524.149-.175.198-.299.298-.498.099-.198.05-.373-.025-.522-.075-.149-.669-1.614-.917-2.214-.242-.582-.491-.503-.669-.513-.173-.009-.373-.011-.573-.011-.198 0-.522.075-.796.373-.273.298-1.045 1.021-1.045 2.487 0 1.466 1.07 2.883 1.219 3.083.149.199 2.118 3.231 5.13 4.4.718.25 1.282.399 1.722.509.722.183 1.381.157 1.903.095.58-.07 1.758-.719 2.006-1.413.249-.694.249-1.288.173-1.413-.074-.126-.272-.199-.57-.348z"
       fill="#25D366"
     />
   </svg>
 )
-
 const TikTokIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path
-      d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+      d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.7-1.42 3.75-1.38 1.64-3.74 2.1-5.58 1.04-1.98-1.12-2.98-3.61-2.29-5.77.56-1.75 2.18-3.06 4.04-3.02.01.99.01 1.98.02 2.97-.89-.02-1.65.81-1.63 1.7.06 1.11 1.69 1.55 2.37.59.15-.23.17-.53.17-.81V.02z"
       fill="#000000"
     />
   </svg>
 )
-
 const TelegramIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path
-      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.07.37-.04 1.58-.49 1.63-.67.05-.18.47-1.92.46-2-.01-.08-.09-.18-.19-.21-.09-.03-2.01-.64-2.71-.87-.18-.05-.41-.12-.41-.28.01-.12.17-.25.29-.34.13-.1.28-.13.36-.13.08 0 .18.01.29.05.09.03.23.08.35.13.25.11.94.36 2.03.74.82.28 1.74.6 1.83.63.08.03.16.06.2.13.04.06.04.16.02.22z"
       fill="#0088CC"
     />
   </svg>
@@ -278,7 +263,6 @@ const AppWrapper = observer(() => {
   const [bots, setBots] = useState([])
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const analysisUrl = "https://mesoflixldpnew.vercel.app/"
-  const dcirclesUrl = "https://analysern.netlify.app/"
   const strategyUrl = "https://mesoflixstrategies.netlify.app/"
   const toolsUrl = "https://alltools-ten.vercel.app/"
 
@@ -449,7 +433,6 @@ const AppWrapper = observer(() => {
                     <TelegramIcon />
                   </a>
                 </div>
-
                 <div className="free-bots__content-wrapper">
                   <div className="free-bots__content">
                     {bots.map((bot, index) => (
@@ -460,9 +443,7 @@ const AppWrapper = observer(() => {
                           animationDelay: `${index * 0.1}s`,
                         }}
                       >
-                        {/* Animated gradient border */}
                         <div className="gradient-border" />
-
                         <div className="bot-info">
                           <div className="bot-icon-container">
                             <FreeBotsIcon />
@@ -515,7 +496,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles */}
+            {/* 4. Dcircles - now loads from analysis folder */}
             <div
               label={
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -527,21 +508,9 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-                <iframe
-                  src={dcirclesUrl}
-                  width="100%"
-                  height="100%"
-                  title="Dcircles"
-                  style={{
-                    border: "none",
-                    display: "block",
-                    minHeight: "calc(100vh - 60px)",
-                    background: "#eff6ff",
-                  }}
-                  scrolling="yes"
-                />
-              </div>
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
+                <Analysis />
+              </Suspense>
             </div>
 
             {/* 5. Analysis */}
@@ -709,7 +678,6 @@ const AppWrapper = observer(() => {
             <button onClick={() => setShowDisclaimer(false)} className="disclaimer-close-button">
               ×
             </button>
-
             <div className="disclaimer-header">
               <div className="disclaimer-icon">
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
@@ -718,14 +686,12 @@ const AppWrapper = observer(() => {
               </div>
               <h3 className="disclaimer-title">Trading Risk Disclaimer</h3>
             </div>
-
             <div className="disclaimer-content">
               <p className="disclaimer-intro">
                 Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not
                 suitable for all investors. Before deciding to trade, carefully consider your financial situation and
                 experience level.
               </p>
-
               <h4 className="disclaimer-subtitle">Key Risks:</h4>
               <ul className="disclaimer-list">
                 <li>
@@ -749,7 +715,6 @@ const AppWrapper = observer(() => {
                   affect your rights as a trader.
                 </li>
               </ul>
-
               <h4 className="disclaimer-subtitle">Important Considerations:</h4>
               <ul className="disclaimer-list">
                 <li>You could lose some or all of your invested capital.</li>
@@ -760,14 +725,12 @@ const AppWrapper = observer(() => {
                 </li>
               </ul>
             </div>
-
             <div className="disclaimer-notice">
               <p className="disclaimer-notice-text">
                 By continuing to use this platform, you acknowledge that you have read, understood, and accept these
                 risks associated with trading on Deriv.
               </p>
             </div>
-
             <div className="disclaimer-footer">
               <button onClick={() => setShowDisclaimer(false)} className="disclaimer-accept-button">
                 I Understand the Risks
@@ -800,8 +763,6 @@ const AppWrapper = observer(() => {
       >
         {message}
       </Dialog>
-
-      {/* Smaller Risk Disclaimer Button - Moved Down */}
       <button onClick={() => setShowDisclaimer(true)} className="risk-disclaimer-button" style={{ bottom: "20px" }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
