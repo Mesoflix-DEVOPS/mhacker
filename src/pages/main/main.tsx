@@ -23,7 +23,6 @@ const Chart = lazy(() => import("../chart"));
 const Tutorial = lazy(() => import("../tutorials"));
 const Copytrading = lazy(() => import("../copytrading"));
 const Dcircles = lazy(() => import("../analysis"));
-
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
 <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
@@ -224,25 +223,6 @@ const TelegramIcon = () => (
     />
   </svg>
 )
-
-
-const ChartsIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#00c6ff" />
-        <stop offset="100%" stopColor="#0072ff" />
-      </linearGradient>
-    </defs>
-    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
-    <path d="M7 14L10 10L14 15L17 9" fill="none" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="7" cy="14" r="1.5" fill="url(#grad1)" />
-    <circle cx="10" cy="10" r="1.5" fill="url(#grad1)" />
-    <circle cx="14" cy="15" r="1.5" fill="url(#grad1)" />
-    <circle cx="17" cy="9" r="1.5" fill="url(#grad1)" />
-  </svg>
-);
-// ... (other icons omitted; copy from your original code)
 
 const tabTitleStyle = {
   color: "black",
