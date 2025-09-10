@@ -23,6 +23,7 @@ const Chart = lazy(() => import("../chart"));
 const Tutorial = lazy(() => import("../tutorials"));
 const Copytrading = lazy(() => import("../copytrading"));
 const Dcircles = lazy(() => import("../analysis"));
+
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
 <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
@@ -224,17 +225,6 @@ const TelegramIcon = () => (
   </svg>
 )
 
-const tabTitleStyle = {
-  color: "black",
-  fontWeight: 600,
-  fontSize: 16,
-  letterSpacing: 0.2,
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 6,
-  padding: "2px 0",
-};
-
 const AppWrapper = observer(() => {
   const { connectionStatus } = useApiBase();
   const { dashboard, load_modal, run_panel, summary_card } = useStore();
@@ -272,16 +262,15 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-        "Osam_Digit_Switcher🤖🤖.xml",
-        "Under-Destroyer💀.xml",
-        "Over-Destroyer💀.xml",
-        "Mega_Mind V1👻.xml",
-        "the Astro E_O🤖.xml",
-        "Osam.HnR.xml",
-        "Auto Bot by Osam💯.xml",
-        "DEC_entry_Point.xml",
-        "Over_HitnRun🤖.xml",
-        "Under 8 pro bot💯.xml",
+    "Osam_Digit_Switcher🤖🤖.xml",
+    "Under-Destroyer💀.xml",
+    "Over-Destroyer💀.xml",
+    "the Astro E_O🤖.xml",
+    "Osam.HnR.xml",
+    "Auto Bot by Osam💯.xml",
+    "DEC_entry_Point.xml",
+    "Over_HitnRun🤖.xml",
+    "Under 8 pro bot💯.xml",
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -340,6 +329,7 @@ const AppWrapper = observer(() => {
 
   const showRunPanel = [1, 2, 3, 4].includes(active_tab);
 
+  // Responsive style for full height/width and scroll for tab panels
   const fullPanelStyle: React.CSSProperties = {
     width: "100%",
     height: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
@@ -361,17 +351,14 @@ const AppWrapper = observer(() => {
             onTabItemClick={handleTabChange}
             top
           >
+            {/* 1. Free Bots */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <FreeBotsIcon />
-                  <Localize i18n_default_text="Free Bots" />
-                </span>
-              }
+              label={<><FreeBotsIcon /><Localize i18n_default_text="Free Bots" /></>}
               id="id-free-bots"
             >
               <div className="free-bots">
-                <div className="social-media-container">
+                {/* Social Media Icons */}
+                 <div className="social-media-container">
                   <a href="https://youtube.com/@osamtradinghub-cl1fs?si=JSF3lDV1TBzjUTTb" target="_blank" rel="noopener noreferrer" className="social-icon youtube-icon"><YouTubeIcon /></a>
                   <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer" className="social-icon instagram-icon"><InstagramIcon /></a>
                   <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer" className="social-icon whatsapp-icon"><WhatsAppIcon /></a>
@@ -397,38 +384,29 @@ const AppWrapper = observer(() => {
                 </div>
               </div>
             </div>
+
+            {/* 2. Bot Settings */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <BotSettingsIcon />
-                  <Localize i18n_default_text="Bot Settings" />
-                </span>
-              }
+              label={<><BotSettingsIcon /><Localize i18n_default_text="Bot Settings" /></>}
               id="id-bot-settings"
             >
               <Dashboard handleTabChange={handleTabChange} />
               <button onClick={handleOpen}>Load Bot</button>
             </div>
+
+            {/* 3. Charts */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <ChartsIcon />
-                  <Localize i18n_default_text="Charts" />
-                </span>
-              }
+              label={<><ChartsIcon /><Localize i18n_default_text="Charts" /></>}
               id="id-charts"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
                 <Chart show_digits_stats={false} />
               </Suspense>
             </div>
+
+            {/* 4. Dcircles */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <DCirclesIcon />
-                  <Localize i18n_default_text="Dcircles" />
-                </span>
-              }
+              label={<><DCirclesIcon /><Localize i18n_default_text="Dcircles" /></>}
               id="id-dcircles"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
@@ -437,13 +415,10 @@ const AppWrapper = observer(() => {
                 </div>
               </Suspense>
             </div>
+
+            {/* 5. Analysis */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <AnalysisToolIcon />
-                  <Localize i18n_default_text="Analysis" />
-                </span>
-              }
+              label={<><AnalysisToolIcon /><Localize i18n_default_text="Analysis" /></>}
               id="id-analysis"
             >
               <div style={fullPanelStyle}>
@@ -461,13 +436,10 @@ const AppWrapper = observer(() => {
                 />
               </div>
             </div>
+
+            {/* 6. Tools */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <ToolsIcon />
-                  <Localize i18n_default_text="Tools" />
-                </span>
-              }
+              label={<><ToolsIcon /><Localize i18n_default_text="Tools" /></>}
               id="id-tools"
             >
               <div style={fullPanelStyle}>
@@ -485,26 +457,20 @@ const AppWrapper = observer(() => {
                 />
               </div>
             </div>
+
+            {/* 7. Copytrading */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <CopyTradingIcon />
-                  <Localize i18n_default_text="Copytrading" />
-                </span>
-              }
+              label={<><CopyTradingIcon /><Localize i18n_default_text="Copytrading" /></>}
               id="id-copytrading"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
                 <Copytrading />
               </Suspense>
             </div>
+
+            {/* 8. Strategies */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <StrategyIcon />
-                  <Localize i18n_default_text="Strategy" />
-                </span>
-              }
+              label={<><StrategyIcon /><Localize i18n_default_text="Strategy" /></>}
               id="id-strategy"
             >
               <div style={fullPanelStyle}>
@@ -522,13 +488,10 @@ const AppWrapper = observer(() => {
                 />
               </div>
             </div>
+
+            {/* 9. Signals */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <SignalsIcon />
-                  <Localize i18n_default_text="Signals" />
-                </span>
-              }
+              label={<><SignalsIcon /><Localize i18n_default_text="Signals" /></>}
               id="id-signals"
             >
               <div
@@ -551,13 +514,10 @@ const AppWrapper = observer(() => {
                 />
               </div>
             </div>
+
+            {/* 10. Tutorials */}
             <div
-              label={
-                <span style={tabTitleStyle}>
-                  <TutorialsIcon />
-                  <Localize i18n_default_text="Tutorials" />
-                </span>
-              }
+              label={<><TutorialsIcon /><Localize i18n_default_text="Tutorials" /></>}
               id="id-tutorials"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
@@ -567,7 +527,7 @@ const AppWrapper = observer(() => {
           </Tabs>
         </div>
       </div>
-
+      
       {/* Risk Disclaimer Button */}
       <button
         onClick={() => setShowDisclaimer(true)}
@@ -661,7 +621,7 @@ const AppWrapper = observer(() => {
             </div>
             <div style={{ marginBottom: "16px" }}>
               <p style={{ lineHeight: "1.6", color: "#4B5563", marginBottom: "12px" }}>
-                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial objectives, level of experience, and risk appetite.
+                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
               </p>
               <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Key Risks:</h4>
               <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563", marginBottom: "16px" }}>
