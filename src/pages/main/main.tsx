@@ -476,19 +476,25 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <div style={{ 
-                width: "100%", 
-                height: "100%", 
-                overflow: "auto",
-                display: "block",
-                minHeight: "calc(100vh - 60px)",
-                background: "#f0f9ff" 
-              }}>
-                <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
-                  <Analysis />
-                </Suspense>
-              </div>
-            </div>
+             <div
+     style={{
+    display: "block",
+    width: "100%",
+    border: "none",
+    background: "var(--general-main-1)",
+    transition: "width 0.4s ease",
+    overflowY: "scroll",
+    maxHeight: "none",
+    position: "relative",
+    borderRadius: "20px",
+    minHeight: "calc(100vh - 60px)",
+  }}
+>
+  <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
+    <Analysis />
+  </Suspense>
+</div> 
+            
 
             {/* 5. Analysis - Now loads iframe from analysisUrl */}
             <div
