@@ -208,7 +208,7 @@ const TikTokIcon = () => (
 const TelegramIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path
-      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
       fill="#0088CC"
     />
   </svg>
@@ -466,7 +466,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles - Now loads Analysis component */}
+            {/* 4. Dcircles - Now with iframe-like styling but loads Analysis component */}
             <div
               label={
                 <>
@@ -476,9 +476,18 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
-                <Analysis />
-              </Suspense>
+              <div style={{ 
+                width: "100%", 
+                height: "100%", 
+                overflow: "auto",
+                display: "block",
+                minHeight: "calc(100vh - 60px)",
+                background: "#f0f9ff" 
+              }}>
+                <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
+                  <Analysis />
+                </Suspense>
+              </div>
             </div>
 
             {/* 5. Analysis - Now loads iframe from analysisUrl */}
