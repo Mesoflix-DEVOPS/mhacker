@@ -22,150 +22,79 @@ import RunStrategy from "../dashboard/run-strategy";
 const Chart = lazy(() => import("../chart"));
 const Tutorial = lazy(() => import("../tutorials"));
 const Copytrading = lazy(() => import("../copytrading"));
-const Analysis = lazy(() => import("../analysis")); // Added Analysis import
 
-/** BEAUTIFUL MODERN ICONS **/
+/** NEW ICONS WITH OUTLINE STYLE **/
 const FreeBotsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" stop-opacity="1" />
-      <stop offset="100%" stop-color="#0072ff" stop-opacity="1" />
-    </linearGradient>
-  </defs>
-  <rect x="4" y="6" width="16" height="12" rx="3" fill="url(#grad1)"/>
-  <line x1="12" y1="3" x2="12" y2="6" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="12" cy="2" r="1.5" fill="url(#grad1)"/>
-  <circle cx="9" cy="12" r="1.5" fill="white"/>
-  <circle cx="15" cy="12" r="1.5" fill="white"/>
-  <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <circle cx="15.5" cy="8.5" r="1.5" />
+    <line x1="8" y1="15" x2="16" y2="15" />
+    <line x1="10" y1="18" x2="14" y2="18" />
+  </svg>
 )
 
 const BotSettingsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 3.417 1.415 2 2 0 0 1-.587 1.415l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
 )
 
 const ChartsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
-  <path d="M7 14L10 10L14 15L17 9" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="7" cy="14" r="1.5" fill="url(#grad1)"/>
-  <circle cx="10" cy="10" r="1.5" fill="url(#grad1)"/>
-  <circle cx="14" cy="15" r="1.5" fill="url(#grad1)"/>
-  <circle cx="17" cy="9" r="1.5" fill="url(#grad1)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
 )
 
 const DCirclesIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <path d="M12 2a10 10 0 1 1-7.07 2.93" fill="none" stroke="url(#grad1)" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M12 6a6 6 0 1 1-4.24 1.76" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="12" cy="12" r="2.8" fill="url(#grad1)"/>
-    <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
 )
 
 const AnalysisToolIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
- <rect x="7" y="14" width="2" height="4" rx="1" fill="url(#grad1)"/>
-  <rect x="11" y="10" width="2" height="8" rx="1" fill="url(#grad1)"/>
-  <rect x="15" y="7" width="2" height="11" rx="1" fill="url(#grad1)"/>
-    <circle cx="18" cy="6" r="3" stroke="url(#grad1)" stroke-width="2" fill="white"/>
-  <path d="M20 8L22 10" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 21l-6-6m6 6l-6 6m6-16a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
 )
 
 const ToolsIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12 2.5L13.5 4.5L16 4L17 6.5L19.5 7.5L19 10L21.5 12L19 14L19.5 16.5L17 17.5L16 20L13.5 19.5L12 21.5L10.5 19.5L8 20L7 17.5L4.5 16.5L5 14L2.5 12L5 10L4.5 7.5L7 6.5L8 4L10.5 4.5L12 2.5Z" 
-    stroke="#1976D2" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11" 
-    stroke="#1976D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a1 1 0 00-.29-1.61l-4.11-1.71a1 1 0 00-1.24.49l-1.13 2.4z" />
+    <path d="M12.19 8.84l-7.9 7.9a1 1 0 00-.29.59l-.53 4.11a1 1 0 001.17 1.09l4.11-.53a1 1 0 00.59-.29l7.9-7.9a1 1 0 000-1.41l-4.24-4.24a1 1 0 00-1.41 0z" />
+    <path d="M6.51 17.49l-1.6-1.6a1 1 0 010-1.42l1.6-1.6a1 1 0 011.41 0l1.6 1.6a1 1 0 010 1.41l-1.6 1.6a1 1 0 01-1.41 0z" />
+  </svg>
 )
 
 const CopyTradingIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff"/>
-      <stop offset="100%" stop-color="#0072ff"/>
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
-  <circle cx="12" cy="9" r="2.3" fill="url(#grad1)"/>
-  <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#grad1)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <rect x="3" y="3" width="10" height="10" rx="2" />
+    <rect x="11" y="11" width="10" height="10" rx="2" />
+    <path d="M7 7h2M7 9h3M15 15h2M15 17h3M13 3v8M21 11h-8" />
+  </svg>
 )
 
 const StrategyIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
-  <path d="M8 7H12V17H8C7.45 17 7 16.55 7 16V8C7 7.45 7.45 7 8 7Z" fill="url(#grad1)"/>
-  <path d="M12 7H16C16.55 7 17 7.45 17 8V16C17 16.55 16.55 17 16 17H12V7Z" fill="white" stroke="url(#grad1)" stroke-width="1.5"/>
-  <line x1="12" y1="7" x2="12" y2="17" stroke="url(#grad1)" stroke-width="1.5"/>
-  <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#grad1)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+  </svg>
 )
 
 const SignalsIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00B4DB"/>
-      <stop offset="100%" stop-color="#0083B0"/>
-    </linearGradient>
-  </defs>
-  <rect x="3" y="4" width="18" height="14" rx="2" ry="2" fill="none" stroke="url(#blueGrad)" stroke-width="2"/>
-  <polyline points="5,14 8,10 11,12 14,7 17,9 20,6" 
-            fill="none" stroke="url(#blueGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+  </svg>
 )
 
 const TutorialsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path d="M4 5C4 4.447 4.447 4 5 4H15C16.105 4 17 4.895 17 6V20C17 20.553 16.553 21 16 21H6C4.895 21 4 20.105 4 19V5Z" 
-        stroke="#007BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-  <path d="M17 6H19C20.105 6 21 6.895 21 8V20C21 20.553 20.553 21 20 21H17" 
-        stroke="#007BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-  <circle cx="10" cy="12" r="3" fill="#007BFF"/>
-  <polygon points="9,10.5 12,12 9,13.5" fill="white"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
 )
 
 // Social Media Icons
@@ -208,7 +137,7 @@ const TikTokIcon = () => (
 const TelegramIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <path
-      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
       fill="#0088CC"
     />
   </svg>
@@ -251,13 +180,15 @@ const AppWrapper = observer(() => {
 
   useEffect(() => {
     const fetchBots = async () => {
-      const botFiles = [  
-       
-        "$DollarprinterbotOrignal$ (1).xml",
-        "Counterbalance dbot...xml",
-        "Promohub with entry point bot.xml",
-        "_Original 📉💵 Expert Speed Bot  (1).xml",
-       
+      const botFiles = [
+        "Osam_Digit_Switcher🤖🤖.xml",
+        "Under-Destroyer💀.xml",
+        "Over HitnRun.xml",
+        "Osam.HnR.xml",
+        "Over-Destroyer💀.xml",
+        "Auto Bot by Osam💯.xml",
+        "DEC_entry_Point.xml",
+        "Under 8 pro bot💯.xml",
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -326,29 +257,6 @@ const AppWrapper = observer(() => {
 
   return (
     <React.Fragment>
-      {/* Add CSS styles for forcing black font color on all tab titles */}
-      <style jsx global>{`
-        .main__tabs .dc-tabs__item,
-        .main__tabs .dc-tabs__item span,
-        .main__tabs .dc-tabs__item div,
-        .main__tabs .dc-tabs__item .dc-text,
-        .main__tabs .dc-tabs__item label,
-        .main__tabs .dc-tabs__item * {
-          color: #000000 !important;
-          font-weight: 600 !important;
-        }
-        
-        .main__tabs .dc-tabs__item--active,
-        .main__tabs .dc-tabs__item--active span,
-        .main__tabs .dc-tabs__item--active div,
-        .main__tabs .dc-tabs__item--active .dc-text,
-        .main__tabs .dc-tabs__item--active label,
-        .main__tabs .dc-tabs__item--active * {
-          color: #000000 !important;
-          font-weight: 700 !important;
-        }
-      `}</style>
-
       <div className="main">
         <div className="main__container">
           <Tabs
@@ -370,63 +278,268 @@ const AppWrapper = observer(() => {
             >
               <div className="free-bots">
                 {/* Social Media Icons */}
-                <div className="social-media-container">
-                  <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer"
-                    className="social-icon youtube-icon"
+                <div style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "16px",
+                  marginBottom: "20px",
+                  padding: "16px",
+                  background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.05))",
+                  borderRadius: "20px",
+                  boxShadow: "0 8px 32px rgba(16, 185, 129, 0.15)",
+                  position: "sticky",
+                  top: "0",
+                  zIndex: 10,
+                  backdropFilter: "blur(12px)",
+                  border: "1px solid rgba(16, 185, 129, 0.2)",
+                }}>
+                  <a href="https://youtube.com/@osamtradinghub-cl1fs?si=T7hBArbo4PeRLOXu" target="_blank" rel="noopener noreferrer"
+                    style={{ 
+                      transition: "all 0.3s ease", 
+                      display: "flex",
+                      padding: "8px",
+                      borderRadius: "12px",
+                      background: "rgba(255, 255, 255, 0.8)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "scale(1.15) translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(255, 0, 0, 0.3)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1) translateY(0)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   >
                     <YouTubeIcon />
                   </a>
-                  <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
-                    className="social-icon instagram-icon"
+                  <a href="https://www.instagram.com/osamtradinghub.com1?igsh=Mmh2aW43a3dpamRq" target="_blank" rel="noopener noreferrer"
+                    style={{ 
+                      transition: "all 0.3s ease", 
+                      display: "flex",
+                      padding: "8px",
+                      borderRadius: "12px",
+                      background: "rgba(255, 255, 255, 0.8)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "scale(1.15) translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(225, 48, 108, 0.3)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1) translateY(0)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   >
                     <InstagramIcon />
                   </a>
-                  <a href="https://chat.whatsapp.com/" target="_blank" rel="noopener noreferrer"
-                    className="social-icon whatsapp-icon"
+                  <a href="https://chat.whatsapp.com/E2cZOyZr75VExcbkprwuTe?mode=ac_t" target="_blank" rel="noopener noreferrer"
+                    style={{ 
+                      transition: "all 0.3s ease", 
+                      display: "flex",
+                      padding: "8px",
+                      borderRadius: "12px",
+                      background: "rgba(255, 255, 255, 0.8)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "scale(1.15) translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(37, 211, 102, 0.3)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1) translateY(0)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   >
                     <WhatsAppIcon />
                   </a>
-                  <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer"
-                    className="social-icon tiktok-icon"
+                  <a href="https://www.tiktok.com/@_its_osam?_t=ZM-8yUINW3W742&_r=1" target="_blank" rel="noopener noreferrer"
+                    style={{ 
+                      transition: "all 0.3s ease", 
+                      display: "flex",
+                      padding: "8px",
+                      borderRadius: "12px",
+                      background: "rgba(255, 255, 255, 0.8)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "scale(1.15) translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.3)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1) translateY(0)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   >
                     <TikTokIcon />
                   </a>
-                  <a href="https://t.me/" target="_blank" rel="noopener noreferrer"
-                    className="social-icon telegram-icon"
+                  <a href="https://t.me/+dLoQvTnT_2wzOGY0" target="_blank" rel="noopener noreferrer"
+                    style={{ 
+                      transition: "all 0.3s ease", 
+                      display: "flex",
+                      padding: "8px",
+                      borderRadius: "12px",
+                      background: "rgba(255, 255, 255, 0.8)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "scale(1.15) translateY(-2px)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 1)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 136, 204, 0.3)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1) translateY(0)";
+                      e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   >
                     <TelegramIcon />
                   </a>
                 </div>
 
                 <div className="free-bots__content-wrapper">
+                  <style>
+                    {`
+                      @keyframes glowPulse {
+                        0% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1); }
+                        50% { box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3); }
+                        100% { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1); }
+                      }
+                      @keyframes gradientShift {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                      }
+                      @keyframes fadeInScale {
+                        from {
+                          opacity: 0;
+                          transform: translateY(20px) scale(0.95);
+                        }
+                        to {
+                          opacity: 1;
+                          transform: translateY(0) scale(1);
+                        }
+                      }
+                    `}
+                  </style>
                   <div className="free-bots__content">
                     {bots.map((bot, index) => (
                       <div
                         key={index}
-                        className="free-bot-item"
                         style={{
-                          animationDelay: `${index * 0.1}s`
+                          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 250, 0.95))",
+                          borderRadius: "16px",
+                          padding: "20px",
+                          boxShadow: "0 8px 32px rgba(16, 185, 129, 0.12)",
+                          border: "2px solid rgba(16, 185, 129, 0.15)",
+                          transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                          cursor: "default",
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: "16px",
+                          position: "relative",
+                          overflow: "hidden",
+                          marginBottom: "20px",
+                          animation: `fadeInScale 0.8s ease ${index * 0.1}s both`,
+                          backdropFilter: "blur(10px)",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = "translateY(-4px) scale(1.02)";
+                          e.currentTarget.style.boxShadow = "0 16px 48px rgba(16, 185, 129, 0.25)";
+                          e.currentTarget.style.borderColor = "rgba(16, 185, 129, 0.4)";
+                          e.currentTarget.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(236, 253, 245, 0.98))";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = "translateY(0) scale(1)";
+                          e.currentTarget.style.boxShadow = "0 8px 32px rgba(16, 185, 129, 0.12)";
+                          e.currentTarget.style.borderColor = "rgba(16, 185, 129, 0.15)";
+                          e.currentTarget.style.background = "linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 250, 0.95))";
                         }}
                       >
                         {/* Animated gradient border */}
-                        <div className="gradient-border" />
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            height: "4px",
+                            background: "linear-gradient(90deg, #10b981, #22c55e, #16a085, #10b981)",
+                            backgroundSize: "300% 100%",
+                            animation: "gradientShift 4s ease infinite",
+                            borderRadius: "0 0 16px 16px",
+                          }}
+                        />
                         
-                        <div className="bot-info">
-                          <div className="bot-icon-container">
+                        <div style={{ display: "flex", alignItems: "center", flex: "1", minWidth: "200px", gap: "16px" }}>
+                          <div
+                            style={{
+                              background: "linear-gradient(135deg, #10b981, #059669)",
+                              borderRadius: "12px",
+                              padding: "12px",
+                              flexShrink: 0,
+                              boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+                              color: "white",
+                            }}
+                          >
                             <FreeBotsIcon />
                           </div>
-                          <div className="bot-details">
-                            <h3 className="bot-title">
+                          <div style={{ flex: 1 }}>
+                            <h3
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "700",
+                                color: "#065f46",
+                                margin: "0",
+                                lineHeight: "1.4",
+                                wordBreak: "break-word",
+                              }}
+                            >
                               {formatBotName(bot.title)}
                             </h3>
-                            <p className="bot-status">
+                            <p style={{
+                              fontSize: "13px",
+                              color: "#047857",
+                              margin: "6px 0 0 0",
+                              opacity: 0.8,
+                              fontWeight: "500",
+                            }}>
                               Ready to deploy • Click to load
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => handleBotClick(bot)}
-                          className="load-bot-button"
+                          style={{
+                            background: "linear-gradient(135deg, #10b981, #059669)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "12px",
+                            padding: "12px 24px",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                            boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+                            flexShrink: 0,
+                            minWidth: "100px",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = "translateY(-2px) scale(1.05)";
+                            e.currentTarget.style.boxShadow = "0 8px 24px rgba(16, 185, 129, 0.4)";
+                            e.currentTarget.style.background = "linear-gradient(135deg, #059669, #047857)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = "translateY(0) scale(1)";
+                            e.currentTarget.style.boxShadow = "0 4px 16px rgba(16, 185, 129, 0.3)";
+                            e.currentTarget.style.background = "linear-gradient(135deg, #10b981, #059669)";
+                          }}
                         >
                           Load Bot
                         </button>
@@ -466,7 +579,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles - Now with iframe-like styling but loads Analysis component */}
+            {/* 4. Dcircles */}
             <div
               label={
                 <>
@@ -476,27 +589,24 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-             <div
-     style={{
-    display: "block",
-    width: "100%",
-    border: "none",
-    background: "var(--general-main-1)",
-    transition: "width 0.4s ease",
-    overflowY: "scroll",
-    maxHeight: "none",
-    position: "relative",
-    borderRadius: "20px",
-    minHeight: "calc(100vh - 60px)",
-  }}
->
-  <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
-    <Analysis />
-  </Suspense>
-</div> 
-            
+              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+                <iframe
+                  src={dcirclesUrl}
+                  width="100%"
+                  height="100%"
+                  title="Dcircles"
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f0fdf4" 
+                  }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
 
-            {/* 5. Analysis - Now loads iframe from analysisUrl */}
+            {/* 5. Analysis */}
             <div
               label={
                 <>
@@ -642,56 +752,156 @@ const AppWrapper = observer(() => {
         </div>
       </div>
       
-      {/* Smaller Risk Disclaimer Button - Moved Up */}
+      {/* Enhanced Floating Disclaimer Button */}
       <button
         onClick={() => setShowDisclaimer(true)}
-        className="risk-disclaimer-button"
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          background: "linear-gradient(135deg, #f59e0b, #dc2626)",
+          color: "white",
+          border: "none",
+          borderRadius: "30px",
+          padding: "12px 20px",
+          fontSize: "13px",
+          fontWeight: "600",
+          cursor: "pointer",
+          transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+          boxShadow: "0 8px 25px rgba(220, 38, 38, 0.3)",
+          zIndex: 1000,
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = "scale(1.08) translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0 12px 35px rgba(220, 38, 38, 0.4)";
+          e.currentTarget.style.background = "linear-gradient(135deg, #dc2626, #b91c1c)";
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = "scale(1) translateY(0)";
+          e.currentTarget.style.boxShadow = "0 8px 25px rgba(220, 38, 38, 0.3)";
+          e.currentTarget.style.background = "linear-gradient(135deg, #f59e0b, #dc2626)";
+        }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        Risk
+        Risk Disclaimer
       </button>
 
       {/* Enhanced Risk Disclaimer Modal */}
       {showDisclaimer && (
-        <div className="disclaimer-overlay">
-          <div className="disclaimer-modal">
+        <div style={{
+          position: "fixed",
+          top: "0",
+          left: "0",
+          right: "0",
+          bottom: "0",
+          backgroundColor: "rgba(0,0,0,0.7)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1001,
+          backdropFilter: "blur(8px)",
+          animation: "fadeIn 0.3s ease",
+        }}>
+          <style>
+            {`
+              @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+              }
+              @keyframes slideInUp {
+                from { transform: translateY(50px) scale(0.95); opacity: 0; }
+                to { transform: translateY(0) scale(1); opacity: 1; }
+              }
+            `}
+          </style>
+          <div style={{
+            background: "linear-gradient(135deg, #ffffff, #fafafa)",
+            borderRadius: "20px",
+            padding: "32px",
+            maxWidth: "680px",
+            width: "90%",
+            maxHeight: "85vh",
+            overflowY: "auto",
+            position: "relative",
+            boxShadow: "0 25px 60px rgba(0,0,0,0.2)",
+            animation: "slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+          }}>
             <button
               onClick={() => setShowDisclaimer(false)}
-              className="disclaimer-close-button"
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "20px",
+                background: "rgba(239, 68, 68, 0.1)",
+                border: "none",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                fontSize: "20px",
+                cursor: "pointer",
+                color: "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
             >
               ×
             </button>
             
-            <div className="disclaimer-header">
-              <div className="disclaimer-icon">
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
+              <div style={{
+                background: "linear-gradient(135deg, #fee2e2, #fecaca)",
+                borderRadius: "50%",
+                width: "56px",
+                height: "56px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 16px rgba(239, 68, 68, 0.2)",
+              }}>
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5">
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="disclaimer-title">
+              <h3 style={{ fontSize: "26px", fontWeight: "800", color: "#1f2937", margin: 0 }}>
                 Trading Risk Disclaimer
               </h3>
             </div>
             
-            <div className="disclaimer-content">
-              <p className="disclaimer-intro">
+            <div style={{ marginBottom: "24px" }}>
+              <p style={{ lineHeight: "1.8", color: "#4b5563", marginBottom: "18px", fontSize: "15px" }}>
                 Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
               </p>
               
-              <h4 className="disclaimer-subtitle">Key Risks:</h4>
-              <ul className="disclaimer-list">
-                <li>
+              <h4 style={{ color: "#1f2937", margin: "20px 0 12px 0", fontSize: "18px", fontWeight: "700" }}>Key Risks:</h4>
+              <ul style={{ paddingLeft: "24px", lineHeight: "1.8", color: "#4b5563", marginBottom: "24px" }}>
+                <li style={{ marginBottom: "12px" }}>
                   <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.
                 </li>
-                <li>
+                <li style={{ marginBottom: "12px" }}>
                   <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.
                 </li>
-                <li>
+                <li style={{ marginBottom: "12px" }}>
                   <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.
                 </li>
-                <li>
+                <li style={{ marginBottom: "12px" }}>
                   <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.
                 </li>
                 <li>
@@ -699,15 +909,15 @@ const AppWrapper = observer(() => {
                 </li>
               </ul>
               
-              <h4 className="disclaimer-subtitle">Important Considerations:</h4>
-              <ul className="disclaimer-list">
-                <li>
+              <h4 style={{ color: "#1f2937", margin: "20px 0 12px 0", fontSize: "18px", fontWeight: "700" }}>Important Considerations:</h4>
+              <ul style={{ paddingLeft: "24px", lineHeight: "1.8", color: "#4b5563" }}>
+                <li style={{ marginBottom: "12px" }}>
                   You could lose some or all of your invested capital.
                 </li>
-                <li>
+                <li style={{ marginBottom: "12px" }}>
                   Never trade with money you cannot afford to lose.
                 </li>
-                <li>
+                <li style={{ marginBottom: "12px" }}>
                   Past performance is not indicative of future results.
                 </li>
                 <li>
@@ -716,16 +926,49 @@ const AppWrapper = observer(() => {
               </ul>
             </div>
             
-            <div className="disclaimer-notice">
-              <p className="disclaimer-notice-text">
+            <div style={{ 
+              background: "linear-gradient(135deg, #f0f9ff, #e0f2fe)",
+              padding: "20px",
+              borderRadius: "16px",
+              marginBottom: "24px",
+              border: "1px solid rgba(59, 130, 246, 0.2)"
+            }}>
+              <p style={{ 
+                fontSize: "14px",
+                color: "#1e40af",
+                fontStyle: "italic",
+                margin: 0,
+                lineHeight: "1.6"
+              }}>
                 By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
               </p>
             </div>
             
-            <div className="disclaimer-footer">
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
                 onClick={() => setShowDisclaimer(false)}
-                className="disclaimer-accept-button"
+                style={{
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "14px 28px",
+                  fontSize: "15px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  boxShadow: "0 6px 20px rgba(16, 185, 129, 0.3)",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+                  e.currentTarget.style.boxShadow = "0 8px 25px rgba(16, 185, 129, 0.4)";
+                  e.currentTarget.style.background = "linear-gradient(135deg, #059669, #047857)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = "translateY(0) scale(1)";
+                  e.currentTarget.style.boxShadow = "0 6px 20px rgba(16, 185, 129, 0.3)";
+                  e.currentTarget.style.background = "linear-gradient(135deg, #10b981, #059669)";
+                }}
               >
                 I Understand the Risks
               </button>
