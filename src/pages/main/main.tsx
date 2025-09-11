@@ -22,7 +22,7 @@ import RunStrategy from "../dashboard/run-strategy";
 const Chart = lazy(() => import("../chart"));
 const Tutorial = lazy(() => import("../tutorials"));
 const Copytrading = lazy(() => import("../copytrading"));
-const Analysis = lazy(() => import("../analysis"));
+const Analysis = lazy(() => import("../analysis")); // Added Analysis import
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
@@ -233,6 +233,8 @@ const AppWrapper = observer(() => {
   const { isDesktop } = useDevice();
   const [bots, setBots] = useState([]);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const analysisUrl = "https://mesoflixldpnew.vercel.app/";
+  const dcirclesUrl = "https://analysern.netlify.app/";
   const strategyUrl = "https://mesoflixstrategies.netlify.app/";
   const toolsUrl = "https://alltools-ten.vercel.app/";
 
@@ -250,15 +252,11 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [  
-    "Osam_Digit_Switcher🤖🤖.xml",
-    "Under-Destroyer💀.xml",
-    "Over-Destroyer💀.xml",
-    "the Astro E_O🤖.xml",
-    "Osam.HnR.xml",
-    "Auto Bot by Osam💯.xml",
-    "DEC_entry_Point.xml",
-    "Over_HitnRun🤖.xml",
-    "Under 8 pro bot💯.xml",
+       
+        "$DollarprinterbotOrignal$ (1).xml",
+        "Counterbalance dbot...xml",
+        "Promohub with entry point bot.xml",
+        "_Original 📉💵 Expert Speed Bot  (1).xml",
        
       ];
       const botPromises = botFiles.map(async (file) => {
@@ -285,26 +283,6 @@ const AppWrapper = observer(() => {
       setBots(bots);
     };
     fetchBots();
-  }, []);
-
-  // Add CSS to force black font color for all tab titles
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .main__tabs .tabs__item,
-      .main__tabs .tabs__item span,
-      .main__tabs .tabs__item div,
-      .main__tabs .tabs__item--active,
-      .main__tabs .tabs__item--active span,
-      .main__tabs .tabs__item--active div {
-        color: #000000 !important;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
   }, []);
 
   const formatBotName = (name) => {
@@ -348,6 +326,29 @@ const AppWrapper = observer(() => {
 
   return (
     <React.Fragment>
+      {/* Add CSS styles for forcing black font color on all tab titles */}
+      <style jsx global>{`
+        .main__tabs .dc-tabs__item,
+        .main__tabs .dc-tabs__item span,
+        .main__tabs .dc-tabs__item div,
+        .main__tabs .dc-tabs__item .dc-text,
+        .main__tabs .dc-tabs__item label,
+        .main__tabs .dc-tabs__item * {
+          color: #000000 !important;
+          font-weight: 600 !important;
+        }
+        
+        .main__tabs .dc-tabs__item--active,
+        .main__tabs .dc-tabs__item--active span,
+        .main__tabs .dc-tabs__item--active div,
+        .main__tabs .dc-tabs__item--active .dc-text,
+        .main__tabs .dc-tabs__item--active label,
+        .main__tabs .dc-tabs__item--active * {
+          color: #000000 !important;
+          font-weight: 700 !important;
+        }
+      `}</style>
+
       <div className="main">
         <div className="main__container">
           <Tabs
@@ -465,7 +466,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles - Now loading Analysis component */}
+            {/* 4. Dcircles - Now loads Analysis component */}
             <div
               label={
                 <>
@@ -480,7 +481,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 5. Analysis - Now using component */}
+            {/* 5. Analysis - Now loads iframe from analysisUrl */}
             <div
               label={
                 <>
@@ -490,9 +491,21 @@ const AppWrapper = observer(() => {
               }
               id="id-analysis"
             >
-              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
-                <Analysis />
-              </Suspense>
+              <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+                <iframe
+                  src={analysisUrl}
+                  width="100%"
+                  height="100%"
+                  title="Analysis"
+                  style={{ 
+                    border: "none", 
+                    display: "block", 
+                    minHeight: "calc(100vh - 60px)",
+                    background: "#f0f9ff" 
+                  }}
+                  scrolling="yes"
+                />
+              </div>
             </div>
 
             {/* 6. Tools */}
