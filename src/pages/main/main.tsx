@@ -467,19 +467,32 @@ const AppWrapper = observer(() => {
             </div>
 
             {/* 4. Dcircles - Now loads Analysis component */}
-            <div
-              label={
-                <>
-                  <DCirclesIcon />
-                  <Localize i18n_default_text="Dcircles" />
-                </>
-              }
-              id="id-dcircles"
-            >
-              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
-                <Analysis />
-              </Suspense>
-            </div>
+          {/* 4. Dcircles - should be device responsive and fill available space */}
+<div
+  label={
+    <>
+      <DCirclesIcon />
+      <Localize i18n_default_text="Dcircles" />
+    </>
+  }
+  id="id-dcircles"
+>
+  <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+    <iframe
+      src={dcirclesUrl}
+      width="100%"
+      height="100%"
+      title="Dcircles"
+      style={{
+        border: "none",
+        display: "block",
+        minHeight: "calc(100vh - 60px)",
+        background: "#f0f9ff",
+      }}
+      scrolling="yes"
+    />
+  </div>
+</div>
 
             {/* 5. Analysis - Now loads iframe from analysisUrl */}
             <div
