@@ -40,8 +40,6 @@ const FreeBotsIcon = () => (
   <circle cx="15" cy="12" r="1.5" fill="white"/>
   <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9"/>
 </svg>
-
-
 )
 
 const BotSettingsIcon = () => (
@@ -54,7 +52,6 @@ const BotSettingsIcon = () => (
   </defs>
   <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/>
 </svg>
-
 )
 
 const ChartsIcon = () => (
@@ -72,7 +69,6 @@ const ChartsIcon = () => (
   <circle cx="14" cy="15" r="1.5" fill="url(#grad1)"/>
   <circle cx="17" cy="9" r="1.5" fill="url(#grad1)"/>
 </svg>
-
 )
 
 const DCirclesIcon = () => (
@@ -88,7 +84,6 @@ const DCirclesIcon = () => (
     <circle cx="12" cy="12" r="2.8" fill="url(#grad1)"/>
     <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9"/>
 </svg>
-
 )
 
 const AnalysisToolIcon = () => (
@@ -106,7 +101,6 @@ const AnalysisToolIcon = () => (
     <circle cx="18" cy="6" r="3" stroke="url(#grad1)" stroke-width="2" fill="white"/>
   <path d="M20 8L22 10" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
 </svg>
-
 )
 
 const ToolsIcon = () => (
@@ -116,7 +110,6 @@ const ToolsIcon = () => (
   <path d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11" 
     stroke="#1976D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-
 )
 
 const CopyTradingIcon = () => (
@@ -131,7 +124,6 @@ const CopyTradingIcon = () => (
   <circle cx="12" cy="9" r="2.3" fill="url(#grad1)"/>
   <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#grad1)"/>
 </svg>
-
 )
 
 const StrategyIcon = () => (
@@ -148,7 +140,6 @@ const StrategyIcon = () => (
   <line x1="12" y1="7" x2="12" y2="17" stroke="url(#grad1)" stroke-width="1.5"/>
   <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#grad1)"/>
 </svg>
-
 )
 
 const SignalsIcon = () => (
@@ -164,7 +155,6 @@ const SignalsIcon = () => (
             fill="none" stroke="url(#blueGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad)"/>
 </svg>
-
 )
 
 const TutorialsIcon = () => (
@@ -176,7 +166,6 @@ const TutorialsIcon = () => (
   <circle cx="10" cy="12" r="3" fill="#007BFF"/>
   <polygon points="9,10.5 12,12 9,13.5" fill="white"/>
 </svg>
-
 )
 
 // Social Media Icons
@@ -296,6 +285,26 @@ const AppWrapper = observer(() => {
       setBots(bots);
     };
     fetchBots();
+  }, []);
+
+  // Add CSS to force black font color for all tab titles
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .main__tabs .tabs__item,
+      .main__tabs .tabs__item span,
+      .main__tabs .tabs__item div,
+      .main__tabs .tabs__item--active,
+      .main__tabs .tabs__item--active span,
+      .main__tabs .tabs__item--active div {
+        color: #000000 !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   const formatBotName = (name) => {
@@ -456,7 +465,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 4. Dcircles - Now component based */}
+            {/* 4. Dcircles - Now loading Analysis component */}
             <div
               label={
                 <>
@@ -466,13 +475,9 @@ const AppWrapper = observer(() => {
               }
               id="id-dcircles"
             >
-              <div className="dcircles-container">
-                <div className="dcircles-content">
-                  <h2>Dcircles Dashboard</h2>
-                  <p>Welcome to Dcircles - Your trading analysis companion</p>
-                  {/* Add your dcircles content here */}
-                </div>
-              </div>
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading analysis...")} />}>
+                <Analysis />
+              </Suspense>
             </div>
 
             {/* 5. Analysis - Now using component */}
