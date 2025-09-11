@@ -332,7 +332,7 @@ const AppWrapper = observer(() => {
   // Responsive style for full height/width and scroll for tab panels
   const fullPanelStyle: React.CSSProperties = {
     width: "100%",
-    height: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
+    height: isMobile ? "calc(100vh - 60px)" : "calc(100vh - 60px)",
     minHeight: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
     maxHeight: "100vh",
     overflowY: "auto",
