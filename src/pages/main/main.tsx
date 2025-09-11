@@ -266,6 +266,7 @@ const AppWrapper = observer(() => {
     "Under-Destroyer💀.xml",
     "Over-Destroyer💀.xml",
     "the Astro E_O🤖.xml",
+    "Mega_Mind V1👻.xml",
     "Osam.HnR.xml",
     "Auto Bot by Osam💯.xml",
     "DEC_entry_Point.xml",
