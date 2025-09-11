@@ -261,11 +261,15 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [  
-       
-        "$DollarprinterbotOrignal$ (1).xml",
-        "Counterbalance dbot...xml",
-        "Promohub with entry point bot.xml",
-        "_Original 📉💵 Expert Speed Bot  (1).xml",
+    "Osam_Digit_Switcher🤖🤖.xml",
+    "Under-Destroyer💀.xml",
+    "Over-Destroyer💀.xml",
+    "the Astro E_O🤖.xml",
+    "Osam.HnR.xml",
+    "Auto Bot by Osam💯.xml",
+    "DEC_entry_Point.xml",
+    "Over_HitnRun🤖.xml",
+    "Under 8 pro bot💯.xml",
        
       ];
       const botPromises = botFiles.map(async (file) => {
