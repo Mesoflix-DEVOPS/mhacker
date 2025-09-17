@@ -61,6 +61,8 @@ body {
   background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.1), transparent 70%),
               radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.1), transparent 70%),
               var(--bg-primary);
+  display: flex;
+  flex-direction: column;
 }
 
 // Header styles
@@ -79,7 +81,7 @@ body {
     padding: 0 24px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
   }
   
   .controls-section {
@@ -120,36 +122,6 @@ body {
     color: var(--text-muted);
     font-weight: 500;
   }
-  
-  .connection-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    
-    .status-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      transition: var(--transition-normal);
-      
-      &.connected {
-        background: var(--accent-success);
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-        animation: pulse 2s infinite;
-      }
-      
-      &.disconnected {
-        background: var(--accent-danger);
-        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
-      }
-    }
-    
-    .status-text {
-      font-size: 14px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-  }
 }
 
 @keyframes pulse {
@@ -171,6 +143,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 32px;
+  flex: 1;
 }
 
 // Current price section
@@ -620,10 +593,54 @@ body {
   }
 }
 
+// Bottom connection status footer
+.connection-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur-lg);
+  border-top: 1px solid var(--border-secondary);
+  padding: 8px 0;
+  z-index: 100;
+  
+  .connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      transition: var(--transition-normal);
+      
+      &.connected {
+        background: var(--accent-success);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        animation: pulse 2s infinite;
+      }
+      
+      &.disconnected {
+        background: var(--accent-danger);
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+      }
+    }
+    
+    .status-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 1200px) {
   .analysis-main {
-    padding: 24px 20px;
+    padding: 24px 20px 60px; // Add bottom padding for footer
     gap: 24px;
   }
   
@@ -634,24 +651,30 @@ body {
 
 @media (max-width: 768px) {
   .analysis-header {
+    padding: 6px 0; // Reduced padding on mobile
+    
     .header-content {
-      padding: 0 16px;
-      flex-direction: column;
-      gap: 12px;
+      padding: 0 12px; // Reduced padding
+      justify-content: center;
     }
     
     .controls-section {
-      width: 100%;
-      justify-content: space-between;
+      gap: 8px; // Reduced gap
     }
     
     .symbol-select {
       min-width: 120px;
+      padding: 6px 10px; // Reduced padding
+      font-size: 13px; // Smaller font
+    }
+    
+    .tick-info {
+      font-size: 12px; // Smaller font
     }
   }
   
   .analysis-main {
-    padding: 20px 16px;
+    padding: 16px 16px 60px; // Add bottom padding for footer
     gap: 20px;
   }
   
@@ -710,19 +733,37 @@ body {
     height: 28px;
     font-size: 12px;
   }
+  
+  .connection-footer {
+    .connection-status {
+      .status-text {
+        font-size: 11px;
+      }
+    }
+  }
 }
 
 @media (max-width: 480px) {
   .analysis-header {
-    padding: 8px 0;
+    padding: 4px 0; // Further reduced padding on small mobile
     
     .header-content {
-      padding: 0 12px;
+      padding: 0 8px; // Further reduced padding
+    }
+    
+    .symbol-select {
+      min-width: 110px;
+      padding: 4px 8px; // Further reduced padding
+      font-size: 12px; // Smaller font
+    }
+    
+    .tick-info {
+      font-size: 11px; // Smaller font
     }
   }
   
   .analysis-main {
-    padding: 16px 12px;
+    padding: 12px 12px 60px; // Add bottom padding for footer
     gap: 16px;
   }
   
@@ -800,6 +841,14 @@ body {
     .stat-name,
     .stat-data {
       font-size: 14px;
+    }
+  }
+  
+  .connection-footer {
+    .connection-status {
+      .status-text {
+        font-size: 10px;
+      }
     }
   }
 }
@@ -897,5 +946,9 @@ body {
     background: white;
     border: 1px solid #ccc;
     box-shadow: none;
+  }
+  
+  .connection-footer {
+    display: none;
   }
 }
