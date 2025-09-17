@@ -43,7 +43,14 @@ const OsamLogo = () => (
 );
 
 // Notification Bell SVG Component
-
+const NotificationBell = ({ count = 2, onClick }: { count?: number; onClick: () => void }) => (
+    <div className="notifications__wrapper" onClick={onClick} tabIndex={0} role="button" aria-label={`Show ${count} notifications`}>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{verticalAlign: 'middle'}}>
+            <path d="M14 24c1.104 0 2-.896 2-2h-4c0 1.104.896 2 2 2zm6.364-5c-.504-.598-1.364-1.498-1.364-5.5 0-3.07-2.003-5.64-5-6.32V6c0-.828-.672-1.5-1.5-1.5S11 5.172 11 6v1.18c-2.997.68-5 3.25-5 6.32 0 4.002-.86 4.902-1.364 5.5A1.003 1.003 0 006 20h16a1.003 1.003 0 00.364-1z" fill="#008C9E"/>
+        </svg>
+        <span className="notifications__count">{count}</span>
+    </div>
+);
 
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
