@@ -224,10 +224,16 @@ const Analysis: React.FC = () => {
 
   return (
     <div className="analysis-container">
-      {/* Compact Header */}
-      <header className="analysis-header">
-        <div className="header-content">
-          <div className="controls-section">
+      <main className="analysis-main">
+        {/* Current Price with Market Selector */}
+        <section className="price-section">
+          <div className="price-content">
+            <div className="current-price">
+              {currentPrice ? currentPrice.toFixed(decimalPlaces) : 'N/A'}
+            </div>
+            <div className="price-label">Current Price</div>
+          </div>
+          <div className="market-selector">
             <select
               value={currentSymbol}
               onChange={(e) => handleSymbolChange(e.target.value)}
@@ -239,24 +245,8 @@ const Analysis: React.FC = () => {
                 </option>
               ))}
             </select>
-            <div className="tick-info">1000 Ticks</div>
+            <div className="selector-label">Market</div>
           </div>
-          <div className="connection-status">
-            <div className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}></div>
-            <span className="status-text">
-              {isConnected ? 'Live' : 'Disconnected'}
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="analysis-main">
-        {/* Current Price */}
-        <section className="price-section">
-          <div className="current-price">
-            {currentPrice ? currentPrice.toFixed(decimalPlaces) : 'N/A'}
-          </div>
-          <div className="price-label">Current Price</div>
         </section>
 
         {/* Digit Analysis */}
@@ -405,15 +395,22 @@ const Analysis: React.FC = () => {
               <span className="stat-name">Decimal Places:</span>
               <span className="stat-data">{decimalPlaces}</span>
             </div>
-            <div className="stat-row">
-              <span className="stat-name">Status:</span>
-              <span className={`stat-data ${isConnected ? 'connected' : 'disconnected'}`}>
-                {isConnected ? 'Live' : 'Offline'}
-              </span>
-            </div>
           </div>
         </section>
       </main>
+
+      {/* Footer with connection status and tick info */}
+      <footer className="analysis-footer">
+        <div className="footer-content">
+          <div className="tick-info">1000 Ticks</div>
+          <div className="connection-status">
+            <div className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}></div>
+            <span className="status-text">
+              {isConnected ? 'Live' : 'Disconnected'}
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
