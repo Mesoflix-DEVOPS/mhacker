@@ -36,21 +36,14 @@ const OsamLogo = () => (
   <rect x="74" y="65" width="12" height="25" rx="2" fill="#ff4d4f"/>
   <line x1="105" y1="55" x2="105" y2="110" stroke="#00d084" stroke-width="3"/>
   <rect x="99" y="75" width="12" height="25" rx="2" fill="#00d084"/>
-  <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="22" fill="white" opacity="0.95">OSAM</text>
+  <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="2" fill="white" opacity="0.95">OSAM</text>
 </svg>
         <span className="osam-logo__text">OSAM</span>
     </div>
 );
 
 // Notification Bell SVG Component
-const NotificationBellIcon = () => (
-   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path
-            d="M12 2C8.686 2 6 4.686 6 8V10.58C6 12.17 5.36 13.69 4.24 14.82L3.29 15.77C2.92 16.14 3.18 16.75 3.7 16.75H20.3C20.82 16.75 21.08 16.14 20.71 15.77L19.76 14.82C18.64 13.69 18 12.17 18 10.58V8C18 4.686 15.314 2 12 2ZM12 22C13.104 22 14 21.104 14 20H10C10 21.104 10.896 22 12 22Z"
-            fill="currentColor"
-        />
-    </svg>
-);
+
 
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
