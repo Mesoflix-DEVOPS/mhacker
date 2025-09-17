@@ -65,65 +65,6 @@ body {
   flex-direction: column;
 }
 
-// Header styles
-.analysis-header {
-  background: var(--bg-secondary);
-  backdrop-filter: var(--blur-lg);
-  border-bottom: 1px solid var(--border-secondary);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 12px 0;
-  
-  .header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .controls-section {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  
-  .symbol-select {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
-    padding: 8px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: var(--transition-fast);
-    min-width: 150px;
-    
-    &:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    &:hover {
-      border-color: var(--accent-primary);
-    }
-    
-    option {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-    }
-  }
-  
-  .tick-info {
-    font-size: 14px;
-    color: var(--text-muted);
-    font-weight: 500;
-  }
-}
-
 @keyframes pulse {
   0%, 100% { 
     opacity: 1; 
@@ -139,33 +80,86 @@ body {
 .analysis-main {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 48px 24px 80px; // Added top padding and bottom padding for footer
   display: flex;
   flex-direction: column;
   gap: 32px;
   flex: 1;
 }
 
-// Current price section
+// Current price section with market selector
 .price-section {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
   
-  .current-price {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
+  .price-content {
+    text-align: center;
+    
+    .current-price {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    
+    .price-label {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
   }
   
-  .price-label {
-    font-size: 16px;
-    color: var(--text-secondary);
-    font-weight: 500;
+  .market-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    
+    .symbol-select {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 500;
+      transition: var(--transition-fast);
+      min-width: 180px;
+      cursor: pointer;
+      
+      &:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      &:hover {
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      
+      option {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+    }
+    
+    .selector-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
   }
 }
 
@@ -593,22 +587,36 @@ body {
   }
 }
 
-// Bottom connection status footer
-.connection-footer {
+// Footer styles
+.analysis-footer {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur-lg);
+  border-top: 1px solid var(--border-secondary);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--bg-secondary);
-  backdrop-filter: var(--blur-lg);
-  border-top: 1px solid var(--border-secondary);
-  padding: 8px 0;
   z-index: 100;
+  padding: 12px 0;
+  
+  .footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .tick-info {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
   
   .connection-status {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
     
     .status-indicator {
@@ -630,7 +638,7 @@ body {
     }
     
     .status-text {
-      font-size: 12px;
+      font-size: 14px;
       color: var(--text-secondary);
       font-weight: 500;
     }
@@ -640,42 +648,36 @@ body {
 // Responsive design
 @media (max-width: 1200px) {
   .analysis-main {
-    padding: 24px 20px 60px; // Add bottom padding for footer
+    padding: 40px 20px 80px;
     gap: 24px;
   }
   
   .analysis-section {
     padding: 24px;
   }
+  
+  .price-section {
+    gap: 32px;
+  }
 }
 
 @media (max-width: 768px) {
-  .analysis-header {
-    padding: 6px 0; // Reduced padding on mobile
-    
-    .header-content {
-      padding: 0 12px; // Reduced padding
-      justify-content: center;
-    }
-    
-    .controls-section {
-      gap: 8px; // Reduced gap
-    }
-    
-    .symbol-select {
-      min-width: 120px;
-      padding: 6px 10px; // Reduced padding
-      font-size: 13px; // Smaller font
-    }
-    
-    .tick-info {
-      font-size: 12px; // Smaller font
-    }
+  .analysis-main {
+    padding: 32px 16px 80px;
+    gap: 20px;
   }
   
-  .analysis-main {
-    padding: 16px 16px 60px; // Add bottom padding for footer
-    gap: 20px;
+  .price-section {
+    flex-direction: column;
+    gap: 24px;
+    
+    .market-selector {
+      .symbol-select {
+        min-width: 160px;
+        padding: 10px 14px;
+        font-size: 15px;
+      }
+    }
   }
   
   .analysis-section {
@@ -734,47 +736,49 @@ body {
     font-size: 12px;
   }
   
-  .connection-footer {
-    .connection-status {
-      .status-text {
-        font-size: 11px;
+  .analysis-footer {
+    .footer-content {
+      padding: 0 16px;
+      
+      .tick-info {
+        font-size: 12px;
+      }
+      
+      .connection-status {
+        .status-text {
+          font-size: 12px;
+        }
       }
     }
   }
 }
 
 @media (max-width: 480px) {
-  .analysis-header {
-    padding: 4px 0; // Further reduced padding on small mobile
-    
-    .header-content {
-      padding: 0 8px; // Further reduced padding
-    }
-    
-    .symbol-select {
-      min-width: 110px;
-      padding: 4px 8px; // Further reduced padding
-      font-size: 12px; // Smaller font
-    }
-    
-    .tick-info {
-      font-size: 11px; // Smaller font
-    }
+  .analysis-main {
+    padding: 24px 12px 80px;
+    gap: 16px;
   }
   
-  .analysis-main {
-    padding: 12px 12px 60px; // Add bottom padding for footer
-    gap: 16px;
+  .price-section {
+    gap: 20px;
+    
+    .price-content {
+      .current-price {
+        font-size: 2rem;
+      }
+    }
+    
+    .market-selector {
+      .symbol-select {
+        min-width: 140px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+    }
   }
   
   .analysis-section {
     padding: 16px;
-  }
-  
-  .price-section {
-    .current-price {
-      font-size: 2rem;
-    }
   }
   
   .section-title {
@@ -844,10 +848,18 @@ body {
     }
   }
   
-  .connection-footer {
-    .connection-status {
-      .status-text {
-        font-size: 10px;
+  .analysis-footer {
+    .footer-content {
+      padding: 0 12px;
+      
+      .tick-info {
+        font-size: 11px;
+      }
+      
+      .connection-status {
+        .status-text {
+          font-size: 11px;
+        }
       }
     }
   }
@@ -937,18 +949,13 @@ body {
     color: black;
   }
   
-  .analysis-header {
-    background: white;
-    border-bottom: 1px solid #ccc;
-  }
-  
   .analysis-section {
     background: white;
     border: 1px solid #ccc;
     box-shadow: none;
   }
   
-  .connection-footer {
+  .analysis-footer {
     display: none;
   }
 }
