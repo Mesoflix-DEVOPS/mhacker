@@ -20,30 +20,27 @@ import React, { useState } from 'react';
 // Beautiful OSAM Trading Hub Logo (Blue theme, stylized like DH)
 const OsamLogo = () => (
     <div className="osam-logo" title="OSAM Trading Hub">
-     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="26" viewBox="0 0 160 160">
-  <defs>
-    <linearGradient id="fxg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#00d084"/>
-      <stop offset="50%" stop-color="#1e90ff"/>
-      <stop offset="100%" stop-color="#1769aa"/>
-    </linearGradient>
-  </defs>
-  <circle cx="80" cy="80" r="70" fill="url(#fxg)"/>
-  <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="4" stroke-opacity="0.9"/>
-  <line x1="55" y1="50" x2="55" y2="105" stroke="#00d084" stroke-width="3"/>
-  <rect x="49" y="70" width="12" height="25" rx="2" fill="#00d084"/>
-  <line x1="80" y1="45" x2="80" y2="100" stroke="#ff4d4f" stroke-width="3"/>
-  <rect x="74" y="65" width="12" height="25" rx="2" fill="#ff4d4f"/>
-  <line x1="105" y1="55" x2="105" y2="110" stroke="#00d084" stroke-width="3"/>
-  <rect x="99" y="75" width="12" height="25" rx="2" fill="#00d084"/>
-  <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="2" fill="white" opacity="0.95">OSAM</text>
-</svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="26" viewBox="0 0 160 160">
+            <defs>
+                <linearGradient id="fxg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#00d084"/>
+                    <stop offset="50%" stop-color="#1e90ff"/>
+                    <stop offset="100%" stop-color="#1769aa"/>
+                </linearGradient>
+            </defs>
+            <circle cx="80" cy="80" r="70" fill="url(#fxg)"/>
+            <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="4" stroke-opacity="0.9"/>
+            <line x1="55" y1="50" x2="55" y2="105" stroke="#00d084" stroke-width="3"/>
+            <rect x="49" y="70" width="12" height="25" rx="2" fill="#00d084"/>
+            <line x1="80" y1="45" x2="80" y2="100" stroke="#ff4d4f" stroke-width="3"/>
+            <rect x="74" y="65" width="12" height="25" rx="2" fill="#ff4d4f"/>
+            <line x1="105" y1="55" x2="105" y2="110" stroke="#00d084" stroke-width="3"/>
+            <rect x="99" y="75" width="12" height="25" rx="2" fill="#00d084"/>
+            <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="2" fill="white" opacity="0.95">OSAM</text>
+        </svg>
         <span className="osam-logo__text">OSAM</span>
     </div>
 );
-
-// Notification Bell SVG Component
-
 
 const AppHeader = observer(() => {
     const { isDesktop } = useDevice();
@@ -54,7 +51,6 @@ const AppHeader = observer(() => {
     const has_wallet = Object.keys(accounts ?? {}).some(id => accounts?.[id].account_category === 'wallet');
     const { localize } = useTranslations();
     const { isOAuth2Enabled } = useOauth2();
-    const [showNotificationPopup, setShowNotificationPopup] = useState(false);
 
     const renderAccountSection = () => {
         if (isAuthorizing) {
@@ -122,11 +118,32 @@ const AppHeader = observer(() => {
         }
     };
 
-   
     return (
-
+        <Header
+            className={clsx('app-header', {
+                'app-header--desktop': isDesktop,
+                'app-header--mobile': !isDesktop,
+            })}
+        >
+            <Wrapper variant="left">
+                <div className="left-section">
+                    {!isDesktop && (
+                        <>
+                            <MobileMenu />
+                            <OsamLogo />
+                            <AppLogo />
+                        </>
+                    )}
+                    {isDesktop && (
+                        <>
+                            <OsamLogo />
+                        </>
+                    )}
+                </div>
             </Wrapper>
-            <Wrapper variant='right'>{renderAccountSection()}</Wrapper>
+            <Wrapper variant="right">
+                {renderAccountSection()}
+            </Wrapper>
         </Header>
     );
 });
