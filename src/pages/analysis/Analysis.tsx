@@ -400,17 +400,7 @@ const Analysis: React.FC = () => {
       </main>
 
       {/* Footer with connection status and tick info */}
-      <footer className="analysis-footer">
-        <div className="footer-content">
-          <div className="tick-info">1000 Ticks</div>
-          <div className="connection-status">
-            <div className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}></div>
-            <span className="status-text">
-              {isConnected ? 'Live' : 'Disconnected'}
-            </span>
-          </div>
-        </div>
-      </footer>
+
     </div>
   );
 };
