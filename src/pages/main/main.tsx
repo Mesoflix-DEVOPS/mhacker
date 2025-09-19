@@ -262,7 +262,8 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-                    "Osam_Digit_Switcher🤖🤖.xml",
+   "Osam_Digit_Switcher🤖🤖.xml",
+    "Over-Pro Bot💫.xml",
     "Under-Destroyer💀.xml",
     "Over-Destroyer💀.xml",
     "the Astro E_O🤖.xml",
