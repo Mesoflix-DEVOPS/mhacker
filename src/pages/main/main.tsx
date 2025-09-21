@@ -270,7 +270,6 @@ const AppWrapper = observer(() => {
     "M-16-Digit-Deriv-Version.xml",
     "OG BOT Big Boyz Auto Original 💵💵.xml",
     "OG BOTS Premium Rise_Fall  (1).xml",
-    "T FOREX AUTO C4 PRO 1 -BY💵C. E. O SONKO.xml",
     "T FOREX DOLLAR 💵 V5.2.xml",
     "T FX Pro 3.3 updated .xml",
      "T forex v2.3 Dollar printer 💸💹binary-bot  (1).xml",
