@@ -262,18 +262,22 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [
-   "Osam_Digit_Switcher🤖🤖.xml",
-    
-    "Under-Destroyer💀.xml",
-    "Over-Destroyer💀.xml",
-    "Over-Pro Bot💫.xml",
-    "the Astro E_O🤖.xml",
-    "Mega_Mind V1👻.xml",
-    "Osam.HnR.xml",
-    "Auto Bot by Osam💯.xml",
-    "DEC_entry_Point.xml",
-    "Over_HitnRun🤖.xml",
-    "Under 8 pro bot💯.xml",
+   "#Dollardispenser-1.xml",    
+    "DOLLAR  PRINTER  BOT11📉 (2).xml",
+    "Dragon Digits Split Martingale sonko (1).xml",
+    "LAS VEGAS V2 by app.binarytool.site.xml",
+    "Las Vegas 2024.xml",
+    "M-16-Digit-Deriv-Version.xml",
+    "OG BOT Big Boyz Auto Original 💵💵.xml",
+    "OG BOTS Premium Rise_Fall  (1).xml",
+    "T FOREX AUTO C4 PRO 1 -BY💵C. E. O SONKO.xml",
+    "T FOREX DOLLAR 💵 V5.2.xml",
+    "T FX Pro 3.3 updated .xml",
+     "T forex v2.3 Dollar printer 💸💹binary-bot  (1).xml",
+     "THE DOLLAR PATH PRO by SAMMYBOY_KENYA {INSTAGRAM} (1).xml",
+      "TheOracleV1.xml",
+        "oracleMultiplier.xml",
+        
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
