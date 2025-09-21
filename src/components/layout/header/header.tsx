@@ -102,7 +102,7 @@ const AppHeader = observer(() => {
                         tertiary
                         className='login-button'
                         onClick={() => {
-                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=82991&l=EN&brand=OSAMTRADINGHUB');
+                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=101942&l=EN&brand=TFOREXPRO');
                         }}
                     >
                         <Localize i18n_default_text='Log in' />
@@ -111,7 +111,7 @@ const AppHeader = observer(() => {
                         primary
                         className='signup-button'
                         onClick={() => {
-                            window.open('https://track.deriv.com/_qeVMn9Bcq2YKqFKZ7JdnQ2Nd7ZgqdRLk/1/', '_blank');
+                            window.open('https://track.deriv.com/_vgGqj-CGwUWNhxmBqQyZL2Nd7ZgqdRLk/1/', '_blank');
                         }}
                     >
                         <Localize i18n_default_text='Sign up' />
