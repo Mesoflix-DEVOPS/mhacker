@@ -261,10 +261,9 @@ const AppWrapper = observer(() => {
 
   useEffect(() => {
     const fetchBots = async () => {
-      const botFiles = [
-   "#Dollardispenser-1.xml",    
+      const botFiles = [ 
     
-    "LAS VEGAS V2 by app.binarytool.site.xml",
+    
     "Las Vegas 2024.xml",
     "M-16-Digit-Deriv-Version.xml",
     "OG BOT Big Boyz Auto Original 💵💵.xml",
