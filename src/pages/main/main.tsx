@@ -267,13 +267,12 @@ const AppWrapper = observer(() => {
     "Las Vegas 2024.xml",
     "M-16-Digit-Deriv-Version.xml",
     "OG BOT Big Boyz Auto Original 💵💵.xml",
-   
+    "Tforex_Money V1 .xml",
     "T FOREX DOLLAR 💵 V5.2.xml",
     "T FX Pro 3.3 updated .xml",
      "T forex v2.3 Dollar printer 💸💹binary-bot  (1).xml",
      
-      "TheOracleV1.xml",
-        "oracleMultiplier.xml",
+  
         
       ];
       const botPromises = botFiles.map(async (file) => {
