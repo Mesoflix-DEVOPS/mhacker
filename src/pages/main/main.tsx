@@ -269,7 +269,18 @@ const AppWrapper = observer(() => {
     "OG BOT Big Boyz Auto Original 💵💵.xml",
     "Tforex_Money V1 .xml",
     "T FOREX DOLLAR 💵 V5.2.xml",
-    "T FX Pro 3.3 updated .xml",
+    "T FX Pro 3.3 updated .xml",        
+    "Tfx Under_HitnRun.xml",
+    "Tfx the Astro E_O.xml",
+     "Tfx 1Over_HitnRun.xml",
+     "Tforex speed bot.xml",
+      "Tforex Over-Pro.xml",
+      "Tforex Digit_Switcher.xml",
+      "T FX  V47.9 Still Amazing.xml",
+       "MEMBERS BOT.xml",
+   
+        
+        
      "T forex v2.3 Dollar printer 💸💹binary-bot  (1).xml",
      
   
