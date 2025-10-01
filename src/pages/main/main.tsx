@@ -264,25 +264,14 @@ const AppWrapper = observer(() => {
       const botFiles = [ 
     
     
-    "Las Vegas 2024.xml",
-    "M-16-Digit-Deriv-Version.xml",
-    "OG BOT Big Boyz Auto Original 💵💵.xml",
-    "Tforex_Money V1 .xml",
-    "T FOREX DOLLAR 💵 V5.2.xml",
-    "T FX Pro 3.3 updated .xml",        
-    "Tfx Under_HitnRun.xml",
-    "Tfx the Astro E_O.xml",
-     "Tfx 1Over_HitnRun.xml",
-     "Tforex speed bot.xml",
-      "Tforex Over-Pro.xml",
-      "Tforex Digit_Switcher.xml",
-      "T FX  V47.9 Still Amazing.xml",
-       "MEMBERS BOT.xml",
-   
-        
-        
-     "T forex v2.3 Dollar printer 💸💹binary-bot  (1).xml",
+    "EVENODD BREAKER (1).xml",
+    "Hit & Run AI {Over 2 Recover Even- Odd} .xml",
+    "Mkorean Sv7 bot(2025).xml",
+    "Titan v3.xml",
+
      
+        
+   
   
         
       ];
