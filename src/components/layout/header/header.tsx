@@ -17,7 +17,7 @@ import MobileMenu from './mobile-menu';
 import './header.scss';
 import React, { useState } from 'react';
 
-// Beautiful OSAM Trading Hub Logo (Blue theme, stylized like DH)
+
 const OsamLogo = () => (
     <div className="osam-logo" title="OSAM Trading Hub">
        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="26" viewBox="0 0 160 160">
@@ -41,7 +41,7 @@ const OsamLogo = () => (
     </text>
 </svg>
 
-        <span className="osam-logo__text">TforexPro</span>
+        <span className="osam-logo__text">freedomhacker</span>
     </div>
 );
 
