@@ -102,7 +102,7 @@ const AppHeader = observer(() => {
                         tertiary
                         className='login-button'
                         onClick={() => {
-                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=101942&l=EN&brand=TFOREXPRO');
+                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=76418&l=EN&brand=freedomhacker');
                         }}
                     >
                         <Localize i18n_default_text='Log in' />
