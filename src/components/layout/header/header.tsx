@@ -37,11 +37,11 @@ const OsamLogo = () => (
     <line x1="105" y1="55" x2="105" y2="110" stroke="#00c853" stroke-width="3"/>
     <rect x="99" y="75" width="12" height="25" rx="2" fill="#00c853"/> 
     <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="10" fill="white" opacity="0.95">
-        tforexpro
+        freedom
     </text>
 </svg>
 
-        <span className="osam-logo__text">freedomhacker</span>
+        <span className="osam-logo__text"> freedomhacker </span>
     </div>
 );
 
