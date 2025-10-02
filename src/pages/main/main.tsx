@@ -264,9 +264,9 @@ const AppWrapper = observer(() => {
       const botFiles = [ 
     
     
-    "EVENODD BREAKER (1).xml",
-    "Hit & Run AI {Over 2 Recover Even- Odd} .xml",
-    "Mkorean Sv7 bot(2025).xml",
+    "AUTO Under 9 _ Under 3 D.Bot.xml",
+        "OLD Over 2 {If last 3 digits are bellow 2🔥.xml",
+        "Deriv wizard 1.xml",
     "Titan v3.xml",
 
      
@@ -363,7 +363,7 @@ const AppWrapper = observer(() => {
                 {/* Social Media Icons */}
                 <div className="social-media-container">
                   <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" className="social-icon youtube-icon"><YouTubeIcon /></a>
-                  <a href="https://www.instagram.com/tforexforex?igsh=ZTgzbnBzYnphYzE2" target="_blank" rel="noopener noreferrer" className="social-icon instagram-icon"><InstagramIcon /></a>
+                  <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="social-icon instagram-icon"><InstagramIcon /></a>
                   <a href="https://whatsapp.com/" target="_blank" rel="noopener noreferrer" className="social-icon whatsapp-icon"><WhatsAppIcon /></a>
                   <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" className="social-icon tiktok-icon"><TikTokIcon /></a>
                   <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="social-icon telegram-icon"><TelegramIcon /></a>
