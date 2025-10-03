@@ -1,4 +1,4 @@
 import AnalysisPage from "./main";
-import './style.css';
+import './advanced.scss';
 
 export default AnalysisPage
