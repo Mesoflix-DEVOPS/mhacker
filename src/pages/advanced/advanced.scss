@@ -168,6 +168,7 @@
     width: 24px;
     height: 24px;
     fill: white;
+    stroke: white; // Updated stroke color for better visibility
 
     &.sync_active {
       animation: rotate-circle 1s infinite linear;
@@ -268,14 +269,22 @@
 
 .digit_cursor {
   position: absolute;
-  bottom: 20px;
+  bottom: 20px; // Dynamic bottom position based on row using CSS custom property
   transform: translateX(-50%);
   color: #2196F3;
-  transition: left 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  transition: left 0.15s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.15s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
   filter: drop-shadow(0 2px 4px rgba(33, 150, 243, 0.5));
   animation: bounce 0.8s infinite;
   pointer-events: none;
   z-index: 10;
+
+  &[data-row="0"] {
+    bottom: calc(50% + 40px); // Below top row
+  }
+
+  &[data-row="1"] {
+    bottom: 4px; // Below bottom row
+  }
 
   svg {
     display: block;
@@ -662,28 +671,19 @@
   }
 
   .digit_cursor {
-    bottom: 24px;
+    bottom: 24px; // Adjusted positioning for mobile with proper row detection
+    
+    &[data-row="0"] {
+      bottom: calc(50% + 35px); // Below top row on mobile
+    }
+
+    &[data-row="1"] {
+      bottom: 4px; // Below bottom row on mobile
+    }
     
     svg {
       width: 20px;
       height: 20px;
-    }
-  }
-
-  .progress {
-    width: 60px;
-    height: 60px;
-
-    h3 {
-      font-size: 22px;
-    }
-
-    h4 {
-      font-size: 10px;
-    }
-
-    &.active {
-      transform: scale(1.15);
     }
   }
 }
@@ -697,7 +697,15 @@
   }
 
   .digit_cursor {
-    bottom: 26px;
+    bottom: 26px; // Adjusted positioning for small mobile with proper row detection
+    
+    &[data-row="0"] {
+      bottom: calc(50% + 32px); // Below top row on small mobile
+    }
+
+    &[data-row="1"] {
+      bottom: 4px; // Below bottom row on small mobile
+    }
     
     svg {
       width: 18px;
