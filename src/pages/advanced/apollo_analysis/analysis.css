@@ -1,0 +1,636 @@
+/* #DFE1E7 */
+.main_app {
+    height: 100vh;
+    overflow: auto;
+}
+
+.main_app .top_bar {
+    display: flex;
+    align-items: center;
+    gap: 5rem;
+    margin: 2rem;
+}
+
+.main_app #symbol_options {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 2px;
+}
+
+.no_of_ticks {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.no_of_ticks input {
+    text-align: center;
+    padding: 8px;
+    border-radius: 2px;
+    font-size: 14px;
+    width: 80px;
+}
+
+.no_of_ticks .sync_btn {
+    background: #0ba70b;
+    padding: 1px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.no_of_ticks .sync_btn svg {
+    width: 30px;
+    height: 30px;
+}
+
+.no_of_ticks .sync_btn svg.sync_active {
+    animation: rotate-circle 2s infinite linear;
+}
+
+@keyframes rotate-circle {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.main_app .symbol_price {
+    display: flex;
+    align-items: center;
+    gap: 1.8rem;
+}
+
+.main_app .symbol_price .current_price {
+    font-size: 16px;
+    font-weight: 700;
+    background: #dfe1e7;
+    padding: 10px 30px;
+    border-radius: 3px;
+}
+
+.main_app .top_bar .guide {
+    font-size: 2.8rem;
+    color: #0ba70b;
+    cursor: pointer;
+}
+
+.main_app .top_bar .bot_options {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.main_app .top_bar .bot_options .tp,
+.main_app .top_bar .bot_options .sl,
+.main_app .top_bar .bot_options .active_inactive,
+.main_app .top_bar .bot_options .copy_demo_trades,
+.main_app .top_bar .bot_options .account_cr {
+    display: flex;
+    gap: 2rem;
+}
+
+.main_app .top_bar .bot_options .tp input,
+.main_app .top_bar .bot_options .sl input {
+    font-size: 12px;
+    text-align: center;
+    border: none;
+    font-weight: 800;
+    border-radius: 2px;
+}
+
+.main_app .top_bar .bot_options .account_cr input {
+    font-size: 14px;
+    border: none;
+    border-radius: 2px;
+}
+
+.main_app .rf_ou {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.analysis_title {
+    font-size: 14px;
+}
+
+.main_app .rf_ou .rise_fall,
+.main_app .rf_ou .over_under {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px 40px 0px 15px;
+}
+
+.main_app .over_under_options {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+}
+
+.main_app .over_under_options .digit_inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.main_app .over_under_options .digit_inputs .over_digit,
+.main_app .over_under_options .digit_inputs .under_digit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.main_app .over_under_options .digit_inputs .over_digit input,
+.main_app .over_under_options .digit_inputs .under_digit input {
+    padding: 3%;
+    width: 50px;
+    text-align: center;
+}
+
+.main_app .over_under_options .over_oct_container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 12px;
+}
+
+.main_app .over_under_options .over_oct_container .over_oct {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main_app .over_under_options .over_oct_container .over_oct .overunder_buy_btn{
+    padding: 0px 10px;
+    background: #008079;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.main_app .over_under_options .over_oct_container .over_under_settings .ct_types_ou {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.main_app .over_under_options .over_oct_container .over_oct input {
+    height: 20px;
+    width: 20px;
+}
+
+.main_app .over_under_options .over_oct_container .over_oct .oneclick_amout {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main_app .over_under_options .over_oct_container .over_oct .oneclick_amout input {
+    width: 70px;
+    padding: 6px 0px;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.main_app .over_under_options .over_oct_container .over_under_settings {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main_app .over_under_options .over_oct_container .over_under_settings input {
+    width: 48px;
+    padding: 6px 0px;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.main_app .over_under_options .over_oct_container .over_under_settings .martingale,
+.main_app .over_under_options .over_oct_container .over_under_settings .percentage_value {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5px;
+}
+
+.main_app .line_chart .linechat_oct {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.main_app .line_chart .oct_trading_options {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.main_app .line_chart .oct_trading_options .details_options {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main_app .line_chart .oct_trading_options .details_options input {
+    width: 20px;
+    height: 20px;
+}
+
+.main_app .line_chart .oct_trading_options .details_options .oneclick_amout {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+}
+
+.main_app .line_chart .oct_trading_options .details_options .oneclick_amout input {
+    text-align: center;
+    width: 65px;
+    padding: 5px 0px;
+    border-radius: 2px;
+}
+
+.main_app .line_chart .oct_trading_options .rise_fall_buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.main_app .line_chart .oct_trading_options .rise_fall_buttons button {
+    border: none;
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.main_app .line_chart .oct_trading_options .rise_fall_buttons .rise_btn {
+    background: #00a79e;
+}
+
+.main_app .line_chart .oct_trading_options .rise_fall_buttons .fall_btn {
+    background: #cc2e3d;
+}
+
+.recharts-responsive-container {
+    font-size: 14px;
+}
+
+.card1 {
+    background: #dfe1e7;
+    width: 320px;
+    height: 269px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+}
+
+.card2 {
+    background: #dfe1e7;
+    width: 480px;
+    height: 269px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.card3 {
+    background: #dfe1e7;
+    width: 600px;
+    height: 269px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.pie_diff .pie {
+    display: flex;
+    flex-direction: column;
+    padding: 13px;
+}
+
+.line_chart {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.main_app .digit_diff {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.main_app .pie_diff {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.main_app .pie_diff .pie .odd_even_info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-direction: column;
+}
+
+.main_app .pie_diff .pie .odd_even_info #contract_types {
+    margin-top: 10px;
+}
+
+.main_app .pie_diff .pie .odd_even_info input[type='checkbox'] {
+    height: 20px;
+    width: 20px;
+    margin-top: 10px;
+}
+
+.main_app .pie_diff .pie .odd_even_info .martingale input,
+.main_app .pie_diff .pie .odd_even_info .percentage_value input {
+    padding: 5px 0px;
+    width: 60px;
+    text-align: center;
+}
+
+.main_app .pie_diff .pie .odd_even_info .odd_even_settings {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main_app .pie_diff .pie .odd_even_info .analysis_title {
+    margin-top: 20px;
+}
+
+.main_app .pie_diff .pie .odd_even_info .odd_even_settings .martingale,
+.main_app .pie_diff .pie .odd_even_info .odd_even_settings .percentage_value {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.main_app .pie_diff .pie .odd_even_info .tick_stake {
+    display: flex;
+    gap: 2px;
+}
+
+.main_app .pie_diff .pie .odd_even_info .oneclick_amout {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main_app .pie_diff .pie .odd_even_info .oneclick_amout input {
+    width: 70px;
+    padding: 6px 0px;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.main_app .pie_diff .pie .pie_container {
+    width: 100%;
+    height: 86%;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    align-items: center;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .auto_clicker {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .auto_clicker input {
+    width: 16px;
+    height: 16px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader input {
+    width: 20px;
+    height: 20px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader #contract_types {
+    border: none;
+    padding: 2px 5px;
+    border-radius: 2px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader #contract_duration {
+    border: none;
+    border-radius: 2px;
+    padding: 2px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader .oneclick_amout {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 13px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader .oneclick_amout input {
+    width: 75px;
+    padding: 12px 10px;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.main_app .pie_diff .digit_diff .title_oc_trader .oneclick_trader .diff_options {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.main_app .pie_diff .digit_diff .custom_prediction {
+    height: 24px !important;
+    width: 38px !important;
+    text-align: center;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.main_app .pie_diff .digit_diff .custom_buy_btn {
+    border: none;
+    padding: 4px 10px;
+    background: #00a79e;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+/* ========== DIFFERSBALLS CSS =============== */
+.differs_container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.differs_container .progress {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    color: #fff;
+    background: #444 linear-gradient(to bottom, transparent 80%, #877c7c 0);
+    transition: all 0.3s ease;
+}
+
+.differs_container .progress.top {
+    background: #444 linear-gradient(to bottom, transparent 80%, #43f94a 0);
+}
+
+.differs_container .progress.less {
+    background: #444 linear-gradient(to bottom, transparent 80%, #fb2929 0);
+}
+
+.differs_container .progress.active {
+    background: #13cfac linear-gradient(to bottom, transparent 80%, transparent 0);
+    transform: scale(1.3);
+    margin: 0px 10px;
+}
+
+.differs_container .progress.active.top {
+    background: #01ac8c linear-gradient(to bottom, transparent 80%, #43f94a 0);
+}
+
+.differs_container .progress.active.less {
+    background: #13cfac linear-gradient(to bottom, transparent 80%, #fb2929 0);
+}
+
+.differs_container .progress h3 {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    z-index: 1;
+    font-weight: 500;
+}
+
+.differs_container .progress h4 {
+    position: absolute;
+    top: 54%;
+    left: 54%;
+    font-size: 1rem;
+    transform: translateX(-50%);
+    z-index: 1;
+    font-weight: 500;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.differs_container .progress:after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    background: #222;
+}
+
+/* Responsive Desktop */
+@media (max-height: 660px) {
+    .main_app .pie_diff {
+        height: 70%;
+    }
+}
+
+/* Responsive (Mobile) */
+@media (max-width: 720px) {
+    .main_app .top_bar {
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .main_app .symbol_price {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    .main_app .rf_ou {
+        flex-direction: column;
+    }
+
+    .line_chart {
+        width: 90%;
+    }
+    .main_app .line_chart .linechat_oct {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .main_app .line_chart .oct_trading_options .rise_fall_buttons button {
+        padding: 6px 12px;
+    }
+
+    .card3 {
+        height: 27%;
+    }
+
+    .main_app .pie_diff {
+        flex-direction: column;
+        padding: 15px;
+        margin-top: 0rem;
+        height: 110%;
+    }
+
+    .pie_diff .pie {
+        width: 100%;
+    }
+
+    .main_app .digit_diff {
+        width: 100%;
+        height: 33.5%;
+    }
+
+    .differs_container {
+        display: grid;
+        gap: 30px 4px;
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .differs_container .progress {
+        width: 58px;
+        height: 58px;
+    }
+    .differs_container .progress.active h3 {
+        font-size: 11px;
+    }
+    .differs_container .progress.active h4 {
+        font-size: 8px;
+    }
+    .main_app .pie_diff .digit_diff .title_oc_trader {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
