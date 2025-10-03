@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 :root {
   --bg-gradient-start: #667eea;
   --bg-gradient-end: #764ba2;
@@ -34,7 +36,7 @@
   min-height: 100vh;
   overflow: auto;
   background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   padding: 2rem;
   transition: background 0.3s ease;
 }
@@ -261,6 +263,32 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
+  padding-bottom: 40px;
+}
+
+.digit_cursor {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  color: #2196F3;
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(33, 150, 243, 0.5));
+  animation: bounce 1s infinite;
+  pointer-events: none;
+  z-index: 10;
+
+  svg {
+    display: block;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-8px);
+  }
 }
 
 .progress {
@@ -629,6 +657,17 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
+    row-gap: 30px;
+    padding-bottom: 50px;
+  }
+
+  .digit_cursor {
+    bottom: 10px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 
   .progress {
@@ -647,28 +686,23 @@
       transform: scale(1.15);
     }
   }
-
-  .pie_svg {
-    width: 160px;
-    height: 160px;
-  }
-
-  .pie_legend {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .linechat_oct {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
 }
 
 @media (max-width: 480px) {
   .differs_container {
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
+    row-gap: 35px;
+    padding-bottom: 55px;
+  }
+
+  .digit_cursor {
+    bottom: 8px;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 
   .progress {
