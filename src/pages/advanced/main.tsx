@@ -46,6 +46,8 @@ const Advanced = () => {
   })
   const wsRef = useRef<WebSocket | null>(null)
   const [activeDigitIndex, setActiveDigitIndex] = useState<number | null>(null)
+  const digitsContainerRef = useRef<HTMLDivElement>(null)
+  const [cursorPosition, setCursorPosition] = useState<number>(0)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -55,6 +57,17 @@ const Advanced = () => {
   }, [isDarkMode])
 
   useEffect(() => {
+    if (activeLast !== null && digitsContainerRef.current) {
+      const digitBalls = digitsContainerRef.current.querySelectorAll(".progress")
+      const activeBall = digitBalls[activeLast] as HTMLElement
+
+      if (activeBall) {
+        const containerRect = digitsContainerRef.current.getBoundingClientRect()
+        const ballRect = activeBall.getBoundingClientRect()
+        const relativeLeft = ballRect.left - containerRect.left + ballRect.width / 2
+        setCursorPosition(relativeLeft)
+      }
+    }
     setActiveDigitIndex(activeLast)
   }, [activeLast])
 
@@ -387,7 +400,7 @@ const Advanced = () => {
           <div className="title_oc_trader">
             <h2 className="analysis_title">Digit Frequency</h2>
           </div>
-          <div className="differs_container">
+          <div className="differs_container" ref={digitsContainerRef}>
             {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => {
               const percentage = digitFreq[digit]
               const isActive = digit === activeLast
@@ -411,10 +424,7 @@ const Advanced = () => {
             <div
               className="digit_cursor"
               style={{
-                left:
-                  activeDigitIndex !== null
-                    ? `calc(${activeDigitIndex * 10}% + ${activeDigitIndex * 15}px + 37.5px)`
-                    : "0",
+                left: `${cursorPosition}px`,
                 opacity: activeDigitIndex !== null ? 1 : 0,
               }}
             >
