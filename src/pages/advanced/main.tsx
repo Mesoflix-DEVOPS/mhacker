@@ -50,6 +50,15 @@ const Advanced = () => {
   const [cursorPosition, setCursorPosition] = useState<number>(0)
   const [cursorRow, setCursorRow] = useState<number>(0)
 
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const pingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const reconnectAttemptsRef = useRef(0)
+  const maxReconnectAttempts = 10
+  const isReconnectingRef = useRef(false)
+  const [connectionStatus, setConnectionStatus] = useState<
+    "connecting" | "connected" | "disconnected" | "reconnecting"
+  >("connecting")
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("theme", isDarkMode ? "dark" : "light")
@@ -78,6 +87,12 @@ const Advanced = () => {
   useEffect(() => {
     connectWebSocket()
     return () => {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+      }
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+      }
       if (wsRef.current) {
         wsRef.current.close()
       }
@@ -106,15 +121,55 @@ const Advanced = () => {
     }
   }, [activeSymbol])
 
+  const startHeartbeat = () => {
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current)
+    }
+
+    pingIntervalRef.current = setInterval(() => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ ping: 1 }))
+      }
+    }, 30000) // Send ping every 30 seconds
+  }
+
+  const scheduleReconnect = () => {
+    if (isReconnectingRef.current || reconnectAttemptsRef.current >= maxReconnectAttempts) {
+      return
+    }
+
+    isReconnectingRef.current = true
+    setConnectionStatus("reconnecting")
+
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000) // Max 30 seconds
+
+    reconnectTimeoutRef.current = setTimeout(() => {
+      reconnectAttemptsRef.current++
+      console.log(`[v0] Reconnection attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts}`)
+      connectWebSocket()
+    }, delay)
+  }
+
   const connectWebSocket = () => {
     if (wsRef.current) {
       wsRef.current.close()
     }
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current)
+    }
 
+    setConnectionStatus("connecting")
     const ws = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=1089")
     wsRef.current = ws
 
     ws.onopen = () => {
+      console.log("[v0] WebSocket connected")
+      setConnectionStatus("connected")
+      reconnectAttemptsRef.current = 0 // Reset reconnection attempts on successful connection
+      isReconnectingRef.current = false
+
+      startHeartbeat()
+
       ws.send(
         JSON.stringify({
           active_symbols: "brief",
@@ -125,6 +180,11 @@ const Advanced = () => {
 
     ws.onmessage = (msg) => {
       const data = JSON.parse(msg.data)
+
+      if (data.msg_type === "ping") {
+        ws.send(JSON.stringify({ pong: 1 }))
+        return
+      }
 
       if (data.msg_type === "active_symbols") {
         const { active_symbols } = data
@@ -193,7 +253,23 @@ const Advanced = () => {
     }
 
     ws.onerror = (error) => {
-      console.error("WebSocket error:", error)
+      console.error("[v0] WebSocket error:", error)
+      setConnectionStatus("disconnected")
+    }
+
+    ws.onclose = (event) => {
+      console.log(`[v0] WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`)
+      setConnectionStatus("disconnected")
+
+      // Clean up heartbeat
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+      }
+
+      // Attempt to reconnect unless it was a clean close
+      if (event.code !== 1000) {
+        scheduleReconnect()
+      }
     }
   }
 
@@ -222,6 +298,8 @@ const Advanced = () => {
           }),
         )
       }, 100)
+    } else {
+      connectWebSocket()
     }
     setTimeout(() => setIsSyncing(false), 1000)
   }
@@ -368,6 +446,12 @@ const Advanced = () => {
           </div>
           <div className="current_price">
             <h3>{currentPrice}</h3>
+            {connectionStatus === "reconnecting" && (
+              <span className="connection_status reconnecting">Reconnecting...</span>
+            )}
+            {connectionStatus === "disconnected" && (
+              <span className="connection_status disconnected">Disconnected</span>
+            )}
           </div>
         </div>
         <div className="controls">
