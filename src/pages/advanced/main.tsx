@@ -48,6 +48,7 @@ const Advanced = () => {
   const [activeDigitIndex, setActiveDigitIndex] = useState<number | null>(null)
   const digitsContainerRef = useRef<HTMLDivElement>(null)
   const [cursorPosition, setCursorPosition] = useState<number>(0)
+  const [cursorRow, setCursorRow] = useState<number>(0)
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -66,12 +67,14 @@ const Advanced = () => {
         const ballRect = activeBall.getBoundingClientRect()
         const relativeLeft = ballRect.left - containerRect.left + ballRect.width / 2
         setCursorPosition(relativeLeft)
+
+        const row = Math.floor(activeLast / 5)
+        setCursorRow(row)
       }
     }
     setActiveDigitIndex(activeLast)
   }, [activeLast])
 
-  // Connect to Deriv WebSocket for tick data
   useEffect(() => {
     connectWebSocket()
     return () => {
@@ -171,7 +174,6 @@ const Advanced = () => {
           setActiveLast(getLastDigit(lastPrice, pip_size))
         }
 
-        // Subscribe to live ticks
         ws.send(
           JSON.stringify({
             ticks: ticks_history,
@@ -243,7 +245,6 @@ const Advanced = () => {
     return returnedList
   }
 
-  // Calculate Even/Odd percentages
   const calculateEvenOddPercentages = () => {
     const digits = getLastDigitList()
     let evenCount = 0
@@ -261,7 +262,6 @@ const Advanced = () => {
     }
   }
 
-  // Calculate Rise/Fall percentages
   const calculateRiseFallPercentages = () => {
     const digits = getLastDigitList()
     let riseCount = 0
@@ -279,7 +279,6 @@ const Advanced = () => {
     }
   }
 
-  // Calculate Over/Under percentages
   const calculateOverUnderPercentages = () => {
     const digits = getLastDigitList()
     const overCount = digits.filter((d) => d > overValue).length
@@ -292,7 +291,6 @@ const Advanced = () => {
     }
   }
 
-  // Calculate digit frequency percentages
   const calculateDigitFrequency = () => {
     const digits = getLastDigitList()
     const frequency: Record<number, number> = {}
@@ -320,7 +318,6 @@ const Advanced = () => {
     const last10 = requiredItems.slice(-10)
 
     if (isTickChart) {
-      // Show tick differences (Rise/Fall)
       const data: { value: number; tick: number }[] = []
       let previousTick = 0
 
@@ -331,7 +328,6 @@ const Advanced = () => {
       })
       return data
     } else {
-      // Show last digits
       return last10.map((tick: number) => ({
         value: getLastDigit(tick, pipSize),
         tick,
@@ -345,7 +341,6 @@ const Advanced = () => {
   const digitFreq = calculateDigitFrequency()
   const lineChartData = getLineChartData()
 
-  // Find min and max frequency digits
   const frequencies = Object.entries(digitFreq).filter(([_, val]) => val > 0)
   const maxFreq = frequencies.length > 0 ? Math.max(...frequencies.map(([_, val]) => val)) : 0
   const minFreq = frequencies.length > 0 ? Math.min(...frequencies.map(([_, val]) => val)) : 0
@@ -388,8 +383,18 @@ const Advanced = () => {
             )}
           </div>
           <div className="sync_btn" onClick={handleSync}>
-            <svg className={isSyncing ? "sync_active" : ""} fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+            <svg
+              className={isSyncing ? "sync_active" : ""}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
             </svg>
           </div>
         </div>
@@ -427,6 +432,7 @@ const Advanced = () => {
                 left: `${cursorPosition}px`,
                 opacity: activeDigitIndex !== null ? 1 : 0,
               }}
+              data-row={cursorRow}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L2 22h20L12 2z" />
@@ -444,7 +450,6 @@ const Advanced = () => {
           <div className="pie_container">
             <div className="pie_chart">
               <svg viewBox="0 0 200 200" className="pie_svg">
-                {/* Even segment */}
                 <circle
                   cx="100"
                   cy="100"
@@ -455,7 +460,6 @@ const Advanced = () => {
                   strokeDasharray={`${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65} 502.65`}
                   transform="rotate(-90 100 100)"
                 />
-                {/* Odd segment */}
                 <circle
                   cx="100"
                   cy="100"
@@ -572,7 +576,6 @@ const Advanced = () => {
           </div>
           <div className="line_chart_container">
             <svg viewBox="0 0 600 200" className="line_svg">
-              {/* Grid lines */}
               <defs>
                 <pattern id="grid" width="50" height="20" patternUnits="userSpaceOnUse">
                   <path d="M 50 0 L 0 0 0 20" fill="none" stroke="var(--grid-color)" strokeWidth="1" />
@@ -580,11 +583,9 @@ const Advanced = () => {
               </defs>
               <rect width="600" height="200" fill="url(#grid)" />
 
-              {/* Axes */}
               <line x1="50" y1="180" x2="550" y2="180" stroke="var(--axis-color)" strokeWidth="2" />
               <line x1="50" y1="20" x2="50" y2="180" stroke="var(--axis-color)" strokeWidth="2" />
 
-              {/* Line chart */}
               {lineChartData.map((item, index) => {
                 if (index === 0) return null
                 const prevItem = lineChartData[index - 1]
