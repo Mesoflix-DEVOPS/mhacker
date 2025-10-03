@@ -40,8 +40,6 @@ const FreeBotsIcon = () => (
   <circle cx="15" cy="12" r="1.5" fill="white"/>
   <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9"/>
 </svg>
-
-
 )
 
 const BotSettingsIcon = () => (
@@ -54,7 +52,6 @@ const BotSettingsIcon = () => (
   </defs>
   <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/>
 </svg>
-
 )
 
 const ChartsIcon = () => (
@@ -72,7 +69,6 @@ const ChartsIcon = () => (
   <circle cx="14" cy="15" r="1.5" fill="url(#grad1)"/>
   <circle cx="17" cy="9" r="1.5" fill="url(#grad1)"/>
 </svg>
-
 )
 
 const DCirclesIcon = () => (
@@ -88,7 +84,24 @@ const DCirclesIcon = () => (
     <circle cx="12" cy="12" r="2.8" fill="url(#grad1)"/>
     <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9"/>
 </svg>
+)
 
+const MToolIcon = () => (
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradMTool" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00c6ff" />
+      <stop offset="100%" stop-color="#0072ff" />
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#gradMTool)" stroke-width="2"/>
+  <path d="M7 8L9 15L12 10L15 15L17 8" fill="none" stroke="url(#gradMTool)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="7" cy="8" r="1.2" fill="url(#gradMTool)"/>
+  <circle cx="9" cy="15" r="1.2" fill="url(#gradMTool)"/>
+  <circle cx="12" cy="10" r="1.2" fill="url(#gradMTool)"/>
+  <circle cx="15" cy="15" r="1.2" fill="url(#gradMTool)"/>
+  <circle cx="17" cy="8" r="1.2" fill="url(#gradMTool)"/>
+</svg>
 )
 
 const AnalysisToolIcon = () => (
@@ -106,7 +119,6 @@ const AnalysisToolIcon = () => (
     <circle cx="18" cy="6" r="3" stroke="url(#grad1)" stroke-width="2" fill="white"/>
   <path d="M20 8L22 10" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
 </svg>
-
 )
 
 const ToolsIcon = () => (
@@ -116,7 +128,6 @@ const ToolsIcon = () => (
   <path d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11" 
     stroke="#1976D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-
 )
 
 const CopyTradingIcon = () => (
@@ -131,7 +142,6 @@ const CopyTradingIcon = () => (
   <circle cx="12" cy="9" r="2.3" fill="url(#grad1)"/>
   <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#grad1)"/>
 </svg>
-
 )
 
 const StrategyIcon = () => (
@@ -148,7 +158,6 @@ const StrategyIcon = () => (
   <line x1="12" y1="7" x2="12" y2="17" stroke="url(#grad1)" stroke-width="1.5"/>
   <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#grad1)"/>
 </svg>
-
 )
 
 const SignalsIcon = () => (
@@ -164,7 +173,6 @@ const SignalsIcon = () => (
             fill="none" stroke="url(#blueGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad)"/>
 </svg>
-
 )
 
 const TutorialsIcon = () => (
@@ -176,7 +184,6 @@ const TutorialsIcon = () => (
   <circle cx="10" cy="12" r="3" fill="#007BFF"/>
   <polygon points="9,10.5 12,12 9,13.5" fill="white"/>
 </svg>
-
 )
 
 // Social Media Icons
@@ -245,6 +252,7 @@ const AppWrapper = observer(() => {
   const [bots, setBots] = useState([]);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const analysisUrl = "https://mesoflixldpnew.vercel.app/";
+  const mtoolUrl = "https://your-mtool-url.com/"; // Replace with your MTool URL
   const strategyUrl = "https://mesoflixstrategies.netlify.app/";
   const toolsUrl = "https://alltools-ten.vercel.app/";
 
@@ -262,18 +270,10 @@ const AppWrapper = observer(() => {
   useEffect(() => {
     const fetchBots = async () => {
       const botFiles = [ 
-    
-    
-    "AUTO Under 9 _ Under 3 D.Bot.xml",
+        "AUTO Under 9 _ Under 3 D.Bot.xml",
         "EPIC 2prediction BOT🤑🥂.xml",
         "Deriv wizard 1.xml",
-    "Titan v3.xml",
-
-     
-        
-   
-  
-        
+        "Titan v3.xml",
       ];
       const botPromises = botFiles.map(async (file) => {
         try {
@@ -419,7 +419,28 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 5. Analysis */}
+            {/* 5. MTool - NEW TAB */}
+            <div
+              label={<><MToolIcon /><Localize i18n_default_text="MTool" /></>}
+              id="id-mtool"
+            >
+              <div style={fullPanelStyle}>
+                <iframe
+                  src={mtoolUrl}
+                  width="100%"
+                  height="100%"
+                  title="MTool"
+                  style={{
+                    border: "none",
+                    display: "block",
+                    background: "#f0f9ff"
+                  }}
+                  scrolling="yes"
+                />
+              </div>
+            </div>
+
+            {/* 6. Analysis */}
             <div
               label={<><AnalysisToolIcon /><Localize i18n_default_text="Analysis" /></>}
               id="id-analysis"
@@ -440,7 +461,7 @@ const AppWrapper = observer(() => {
               </div>
             </div>
 
-            {/* 6. Tools */}
+            {/* 7. Tools */}
             <div
               label={<><ToolsIcon /><Localize i18n_default_text="Tools" /></>}
               id="id-tools"
@@ -461,7 +482,7 @@ const AppWrapper = observer(() => {
               </div>
             </div>
 
-            {/* 7. Copytrading */}
+            {/* 8. Copytrading */}
             <div
               label={<><CopyTradingIcon /><Localize i18n_default_text="Copytrading" /></>}
               id="id-copytrading"
@@ -471,7 +492,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 8. Strategies */}
+            {/* 9. Strategies */}
             <div
               label={<><StrategyIcon /><Localize i18n_default_text="Strategy" /></>}
               id="id-strategy"
@@ -492,7 +513,7 @@ const AppWrapper = observer(() => {
               </div>
             </div>
 
-            {/* 9. Signals */}
+            {/* 10. Signals */}
             <div
               label={<><SignalsIcon /><Localize i18n_default_text="Signals" /></>}
               id="id-signals"
@@ -518,7 +539,7 @@ const AppWrapper = observer(() => {
               </div>
             </div>
 
-            {/* 10. Tutorials */}
+            {/* 11. Tutorials */}
             <div
               label={<><TutorialsIcon /><Localize i18n_default_text="Tutorials" /></>}
               id="id-tutorials"
