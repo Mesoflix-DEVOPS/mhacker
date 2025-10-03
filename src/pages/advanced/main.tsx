@@ -22,9 +22,14 @@ interface SymbolData {
 }
 
 const Advanced = () => {
-  const [activeSymbol, setActiveSymbol] = useState("R_100")
+  const [activeSymbol, setActiveSymbol] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("selectedSymbol") || "R_100"
+    }
+    return "R_100"
+  })
   const [currentPrice, setCurrentPrice] = useState("Loading...")
-  const [numberOfTicks, setNumberOfTicks] = useState(100)
+  const numberOfTicks = 1000
   const [allPriceList, setAllPriceList] = useState<number[]>([])
   const [activeLast, setActiveLast] = useState(0)
   const [overValue, setOverValue] = useState(5)
@@ -33,7 +38,20 @@ const Advanced = () => {
   const [isTickChart, setIsTickChart] = useState(false)
   const [pipSize, setPipSize] = useState(2)
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark"
+    }
+    return false
+  })
   const wsRef = useRef<WebSocket | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("theme", isDarkMode ? "dark" : "light")
+      document.documentElement.setAttribute("data-theme", isDarkMode ? "dark" : "light")
+    }
+  }, [isDarkMode])
 
   // Connect to Deriv WebSocket for tick data
   useEffect(() => {
@@ -89,14 +107,26 @@ const Advanced = () => {
 
       if (data.msg_type === "active_symbols") {
         const { active_symbols } = data
-        const filteredSymbols = active_symbols.filter((symbol: SymbolData) => symbol.subgroup === "synthetics")
-        filteredSymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
-        setSymbolsList(filteredSymbols)
+        const volatilitySymbols = active_symbols.filter(
+          (symbol: SymbolData) => symbol.subgroup === "synthetics" && symbol.market === "synthetic_index",
+        )
+        const otherSymbols = active_symbols.filter(
+          (symbol: SymbolData) => symbol.subgroup === "synthetics" && symbol.market !== "synthetic_index",
+        )
 
-        if (filteredSymbols.length > 0) {
+        volatilitySymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
+        otherSymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
+
+        const sortedSymbols = [...volatilitySymbols, ...otherSymbols]
+        setSymbolsList(sortedSymbols)
+
+        if (sortedSymbols.length > 0) {
+          const symbolToUse = sortedSymbols.find((s) => s.symbol === activeSymbol)
+            ? activeSymbol
+            : sortedSymbols[0].symbol
           ws.send(
             JSON.stringify({
-              ticks_history: filteredSymbols[0].symbol,
+              ticks_history: symbolToUse,
               count: 5000,
               end: "latest",
               style: "ticks",
@@ -177,8 +207,12 @@ const Advanced = () => {
   }
 
   const handleSymbolChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSymbol = e.target.value
     setCurrentPrice("Loading...")
-    setActiveSymbol(e.target.value)
+    setActiveSymbol(newSymbol)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedSymbol", newSymbol)
+    }
   }
 
   const getLastDigitList = () => {
@@ -316,52 +350,113 @@ const Advanced = () => {
             </select>
           </div>
           <div className="no_of_ticks">
-            <input
-              type="number"
-              value={numberOfTicks}
-              onChange={(e) => setNumberOfTicks(Number.parseInt(e.target.value) || 100)}
-              min="10"
-              max="1000"
-            />
+            <span className="tick_label">Ticks:</span>
+            <span className="tick_value">{numberOfTicks}</span>
           </div>
           <div className="current_price">
             <h3>{currentPrice}</h3>
           </div>
         </div>
-        <div className="sync_btn" onClick={handleSync}>
-          <svg className={isSyncing ? "sync_active" : ""} fill="white" viewBox="0 0 24 24">
-            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
-          </svg>
+        <div className="controls">
+          <div className="theme_toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
+            {isDarkMode ? (
+              <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+              </svg>
+            )}
+          </div>
+          <div className="sync_btn" onClick={handleSync}>
+            <svg className={isSyncing ? "sync_active" : ""} fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+            </svg>
+          </div>
         </div>
       </div>
 
-      {/* Middle Cards */}
-      <div className="rf_ou">
-        <div className="rise_fall card1">
-          <h2 className="analysis_title">Rise/Fall</h2>
-          <div className="bar_chart_container">
-            <div className="bar_item">
-              <div className="bar_label">Rise</div>
-              <div className="bar_wrapper">
-                <div className="bar rise_bar" style={{ width: `${riseFall.risePercentage}%` }}>
-                  <span className="bar_inner_label">{riseFall.risePercentage}%</span>
+      <div className="analysis_section">
+        <div className="digit_diff card3">
+          <div className="title_oc_trader">
+            <h2 className="analysis_title">Digit Frequency</h2>
+          </div>
+          <div className="differs_container">
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => {
+              const percentage = digitFreq[digit]
+              const isActive = digit === activeLast
+              const isTop = percentage === maxFreq && percentage > 0
+              const isLess = percentage === minFreq && percentage > 0
+
+              return (
+                <div
+                  key={digit}
+                  className={`progress ${isActive ? "active" : ""} ${isTop ? "top" : ""} ${isLess ? "less" : ""}`}
+                  data-number={digit}
+                >
+                  <h3>{digit}</h3>
+                  <h4>
+                    {percentage.toFixed(2)}
+                    <span>%</span>
+                  </h4>
                 </div>
-                <span className="bar_value">{riseFall.risePercentage}%</span>
-              </div>
-            </div>
-            <div className="bar_item">
-              <div className="bar_label">Fall</div>
-              <div className="bar_wrapper">
-                <div className="bar fall_bar" style={{ width: `${riseFall.fallPercentage}%` }}>
-                  <span className="bar_inner_label">{riseFall.fallPercentage}%</span>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="analysis_section">
+        <div className="pie card1">
+          <div className="odd_even_info">
+            <h2 className="analysis_title">Even/Odd Analysis</h2>
+          </div>
+          <div className="pie_container">
+            <div className="pie_chart">
+              <svg viewBox="0 0 200 200" className="pie_svg">
+                {/* Even segment */}
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="80"
+                  fill="transparent"
+                  stroke="#4CAF50"
+                  strokeWidth="60"
+                  strokeDasharray={`${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65} 502.65`}
+                  transform="rotate(-90 100 100)"
+                />
+                {/* Odd segment */}
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="80"
+                  fill="transparent"
+                  stroke="#F44336"
+                  strokeWidth="60"
+                  strokeDasharray={`${(Number.parseFloat(evenOdd.oddPercentage) / 100) * 502.65} 502.65`}
+                  strokeDashoffset={`-${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65}`}
+                  transform="rotate(-90 100 100)"
+                />
+              </svg>
+              <div className="pie_legend">
+                <div className="legend_item">
+                  <span className="legend_color even_color"></span>
+                  <span>Even: {evenOdd.evenPercentage}%</span>
                 </div>
-                <span className="bar_value">{riseFall.fallPercentage}%</span>
+                <div className="legend_item">
+                  <span className="legend_color odd_color"></span>
+                  <span>Odd: {evenOdd.oddPercentage}%</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="analysis_section">
         <div className="over_under card1">
+          <h2 className="analysis_title">Over/Under Comparison</h2>
           <div className="over_under_options">
             <div className="digit_inputs">
               <div className="over_digit">
@@ -409,29 +504,56 @@ const Advanced = () => {
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="analysis_section">
+        <div className="rise_fall card1">
+          <h2 className="analysis_title">Rise/Fall Analysis</h2>
+          <div className="bar_chart_container">
+            <div className="bar_item">
+              <div className="bar_label">Rise</div>
+              <div className="bar_wrapper">
+                <div className="bar rise_bar" style={{ width: `${riseFall.risePercentage}%` }}>
+                  <span className="bar_inner_label">{riseFall.risePercentage}%</span>
+                </div>
+                <span className="bar_value">{riseFall.risePercentage}%</span>
+              </div>
+            </div>
+            <div className="bar_item">
+              <div className="bar_label">Fall</div>
+              <div className="bar_wrapper">
+                <div className="bar fall_bar" style={{ width: `${riseFall.fallPercentage}%` }}>
+                  <span className="bar_inner_label">{riseFall.fallPercentage}%</span>
+                </div>
+                <span className="bar_value">{riseFall.fallPercentage}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="analysis_section">
         <div className="line_chart card2">
           <div className="linechat_oct">
+            <h2 className="analysis_title">{isTickChart ? "Rise/Fall Chart" : "Last Digits Chart"}</h2>
             <select name="" id="linechat_oct_options" onChange={(e) => setIsTickChart(e.target.value === "risefall")}>
-              <option value="risefall">Rise/Fall Chart</option>
               <option value="lastdigit">Last Digits Chart</option>
+              <option value="risefall">Rise/Fall Chart</option>
             </select>
-            {!isTickChart && <h2 className="analysis_title">Last Digits Chart</h2>}
-            {isTickChart && <h2 className="analysis_title">Rise/Fall Chart</h2>}
           </div>
           <div className="line_chart_container">
             <svg viewBox="0 0 600 200" className="line_svg">
               {/* Grid lines */}
               <defs>
                 <pattern id="grid" width="50" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 50 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                  <path d="M 50 0 L 0 0 0 20" fill="none" stroke="var(--grid-color)" strokeWidth="1" />
                 </pattern>
               </defs>
               <rect width="600" height="200" fill="url(#grid)" />
 
               {/* Axes */}
-              <line x1="50" y1="180" x2="550" y2="180" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
-              <line x1="50" y1="20" x2="50" y2="180" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+              <line x1="50" y1="180" x2="550" y2="180" stroke="var(--axis-color)" strokeWidth="2" />
+              <line x1="50" y1="20" x2="50" y2="180" stroke="var(--axis-color)" strokeWidth="2" />
 
               {/* Line chart */}
               {lineChartData.map((item, index) => {
@@ -446,8 +568,8 @@ const Advanced = () => {
 
                 return (
                   <g key={index}>
-                    <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#8884d8" strokeWidth="2" />
-                    <circle cx={x2} cy={y2} r="4" fill="#8884d8" />
+                    <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--chart-line-color)" strokeWidth="2" />
+                    <circle cx={x2} cy={y2} r="4" fill="var(--chart-line-color)" />
                     <text
                       x={x2}
                       y={y2 - 10}
@@ -462,82 +584,6 @@ const Advanced = () => {
                 )
               })}
             </svg>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Cards */}
-      <div className="pie_diff">
-        <div className="pie card1">
-          <div className="odd_even_info">
-            <h2 className="analysis_title">Even/Odd</h2>
-          </div>
-          <div className="pie_container">
-            <div className="pie_chart">
-              <svg viewBox="0 0 200 200" className="pie_svg">
-                {/* Even segment */}
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="80"
-                  fill="transparent"
-                  stroke="#4CAF50"
-                  strokeWidth="60"
-                  strokeDasharray={`${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65} 502.65`}
-                  transform="rotate(-90 100 100)"
-                />
-                {/* Odd segment */}
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="80"
-                  fill="transparent"
-                  stroke="#F44336"
-                  strokeWidth="60"
-                  strokeDasharray={`${(Number.parseFloat(evenOdd.oddPercentage) / 100) * 502.65} 502.65`}
-                  strokeDashoffset={`-${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65}`}
-                  transform="rotate(-90 100 100)"
-                />
-              </svg>
-              <div className="pie_legend">
-                <div className="legend_item">
-                  <span className="legend_color even_color"></span>
-                  <span>Even: {evenOdd.evenPercentage}%</span>
-                </div>
-                <div className="legend_item">
-                  <span className="legend_color odd_color"></span>
-                  <span>Odd: {evenOdd.oddPercentage}%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="digit_diff card3">
-          <div className="title_oc_trader">
-            <h2 className="analysis_title">Digit Frequency</h2>
-          </div>
-          <div className="differs_container">
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => {
-              const percentage = digitFreq[digit]
-              const isActive = digit === activeLast
-              const isTop = percentage === maxFreq && percentage > 0
-              const isLess = percentage === minFreq && percentage > 0
-
-              return (
-                <div
-                  key={digit}
-                  className={`progress ${isActive ? "active" : ""} ${isTop ? "top" : ""} ${isLess ? "less" : ""}`}
-                  data-number={digit}
-                >
-                  <h3>{digit}</h3>
-                  <h4>
-                    {percentage.toFixed(2)}
-                    <span>%</span>
-                  </h4>
-                </div>
-              )
-            })}
           </div>
         </div>
       </div>
