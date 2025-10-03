@@ -23,6 +23,7 @@ const Chart = lazy(() => import("../chart"));
 const Tutorial = lazy(() => import("../tutorials"));
 const Copytrading = lazy(() => import("../copytrading"));
 const Dcircles = lazy(() => import("../analysis"));
+const Advanced = lazy(() => import("../advanced"));
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
@@ -419,25 +420,16 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 5. MTool - NEW TAB */}
+            {/* 5. MTool */}
             <div
               label={<><MToolIcon /><Localize i18n_default_text="MTool" /></>}
               id="id-mtool"
             >
-              <div style={fullPanelStyle}>
-                <iframe
-                  src={mtoolUrl}
-                  width="100%"
-                  height="100%"
-                  title="MTool"
-                  style={{
-                    border: "none",
-                    display: "block",
-                    background: "#f0f9ff"
-                  }}
-                  scrolling="yes"
-                />
-              </div>
+              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading MTool...")} />}>
+                <div style={fullPanelStyle}>
+                  <Advanced />
+                </div>
+              </Suspense>
             </div>
 
             {/* 6. Analysis */}
