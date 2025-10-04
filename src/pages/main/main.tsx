@@ -16,32 +16,270 @@ import { useApiBase } from "@/hooks/useApiBase"
 import { useStore } from "@/hooks/useStore"
 import { Localize, localize } from "@deriv-com/translations"
 import { useDevice } from "@deriv-com/ui"
-import RunPanel from "@/components/run-panel"
-import ChartModal from "@/components/chart/chart-modal"
-import Dashboard from "@/components/dashboard"
-import RunStrategy from "@/components/dashboard/run-strategy"
-import FreeBotsIcon from "@/components/icons/free-bots-icon" // Declare the variable before using it
-import YouTubeIcon from "@/components/icons/youtube-icon" // Declare the variable before using it
-import InstagramIcon from "@/components/icons/instagram-icon" // Declare the variable before using it
-import WhatsAppIcon from "@/components/icons/whatsapp-icon" // Declare the variable before using it
-import TikTokIcon from "@/components/icons/tiktok-icon" // Declare the variable before using it
-import TelegramIcon from "@/components/icons/telegram-icon" // Declare the variable before using it
-import BotSettingsIcon from "@/components/icons/bot-settings-icon" // Declare the variable before using it
-import ChartsIcon from "@/components/icons/charts-icon" // Declare the variable before using it
-import DCirclesIcon from "@/components/icons/dcircles-icon" // Declare the variable before using it
-import MToolIcon from "@/components/icons/mtool-icon" // Declare the variable before using it
-import AnalysisToolIcon from "@/components/icons/analysis-tool-icon" // Declare the variable before using it
-import ToolsIcon from "@/components/icons/tools-icon" // Declare the variable before using it
-import CopyTradingIcon from "@/components/icons/copy-trading-icon" // Declare the variable before using it
-import StrategyIcon from "@/components/icons/strategy-icon" // Declare the variable before using it
-import SignalsIcon from "@/components/icons/signals-icon" // Declare the variable before using it
-import TutorialsIcon from "@/components/icons/tutorials-icon" // Declare the variable before using it
+import RunPanel from "../../components/run-panel"
+import ChartModal from "../chart/chart-modal"
+import Dashboard from "../dashboard"
+import RunStrategy from "../dashboard/run-strategy"
 
 const Chart = lazy(() => import("../chart"))
 const Tutorial = lazy(() => import("../tutorials"))
 const Copytrading = lazy(() => import("../copytrading"))
 const Dcircles = lazy(() => import("../analysis"))
 const Advanced = lazy(() => import("../advanced"))
+
+/** BEAUTIFUL MODERN ICONS **/
+const FreeBotsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" stopOpacity="1" />
+        <stop offset="100%" stopColor="#0072ff" stopOpacity="1" />
+      </linearGradient>
+    </defs>
+    <rect x="4" y="6" width="16" height="12" rx="3" fill="url(#grad1)" />
+    <line x1="12" y1="3" x2="12" y2="6" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="2" r="1.5" fill="url(#grad1)" />
+    <circle cx="9" cy="12" r="1.5" fill="white" />
+    <circle cx="15" cy="12" r="1.5" fill="white" />
+    <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9" />
+  </svg>
+)
+
+const BotSettingsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
+  </svg>
+)
+
+const ChartsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <path
+      d="M7 14L10 10L14 15L17 9"
+      fill="none"
+      stroke="url(#grad1)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="7" cy="14" r="1.5" fill="url(#grad1)" />
+    <circle cx="10" cy="10" r="1.5" fill="url(#grad1)" />
+    <circle cx="14" cy="15" r="1.5" fill="url(#grad1)" />
+    <circle cx="17" cy="9" r="1.5" fill="url(#grad1)" />
+  </svg>
+)
+
+const DCirclesIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <path d="M12 2a10 10 0 1 1-7.07 2.93" fill="none" stroke="url(#grad1)" strokeWidth="2.5" strokeLinecap="round" />
+    <path d="M12 6a6 6 0 1 1-4.24 1.76" fill="none" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="2.8" fill="url(#grad1)" />
+    <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9" />
+  </svg>
+)
+
+const MToolIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gradMTool" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#gradMTool)" strokeWidth="2" />
+    <path
+      d="M7 8L9 15L12 10L15 15L17 8"
+      fill="none"
+      stroke="url(#gradMTool)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="7" cy="8" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="9" cy="15" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="12" cy="10" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="15" cy="15" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="17" cy="8" r="1.2" fill="url(#gradMTool)" />
+  </svg>
+)
+
+const AnalysisToolIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <rect x="7" y="14" width="2" height="4" rx="1" fill="url(#grad1)" />
+    <rect x="11" y="10" width="2" height="8" rx="1" fill="url(#grad1)" />
+    <rect x="15" y="7" width="2" height="11" rx="1" fill="url(#grad1)" />
+    <circle cx="18" cy="6" r="3" stroke="url(#grad1)" strokeWidth="2" fill="white" />
+    <path d="M20 8L22 10" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+)
+
+const ToolsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M12 2.5L13.5 4.5L16 4L17 6.5L19.5 7.5L19 10L21.5 12L19 14L19.5 16.5L17 17.5L16 20L13.5 19.5L12 21.5L10.5 19.5L8 20L7 17.5L4.5 16.5L5 14L2.5 12L5 10L4.5 7.5L7 6.5L8 4L10.5 4.5L12 2.5Z"
+      stroke="#1976D2"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11"
+      stroke="#1976D2"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+const CopyTradingIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <circle cx="12" cy="9" r="2.3" fill="url(#grad1)" />
+    <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#grad1)" />
+  </svg>
+)
+
+const StrategyIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <path d="M8 7H12V17H8C7.45 17 7 16.55 7 16V8C7 7.45 7.45 7 8 7Z" fill="url(#grad1)" />
+    <path
+      d="M12 7H16C16.55 7 17 7.45 17 8V16C17 16.55 16.55 17 16 17H12V7Z"
+      fill="white"
+      stroke="url(#grad1)"
+      strokeWidth="1.5"
+    />
+    <line x1="12" y1="7" x2="12" y2="17" stroke="url(#grad1)" strokeWidth="1.5" />
+    <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#grad1)" />
+  </svg>
+)
+
+const SignalsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00B4DB" />
+        <stop offset="100%" stopColor="#0083B0" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="4" width="18" height="14" rx="2" ry="2" fill="none" stroke="url(#blueGrad)" strokeWidth="2" />
+    <polyline
+      points="5,14 8,10 11,12 14,7 17,9 20,6"
+      fill="none"
+      stroke="url(#blueGrad)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad)" />
+  </svg>
+)
+
+const TutorialsIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M4 5C4 4.447 4.447 4 5 4H15C16.105 4 17 4.895 17 6V20C17 20.553 16.553 21 16 21H6C4.895 21 4 20.105 4 19V5Z"
+      stroke="#007BFF"
+      strokeWidth="2"
+      fill="none"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M17 6H19C20.105 6 21 6.895 21 8V20C21 20.553 20.553 21 20 21H17"
+      stroke="#007BFF"
+      strokeWidth="2"
+      fill="none"
+      strokeLinejoin="round"
+    />
+    <circle cx="10" cy="12" r="3" fill="#007BFF" />
+    <polygon points="9,10.5 12,12 9,13.5" fill="white" />
+  </svg>
+)
+
+// Social Media Icons
+const YouTubeIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"
+      fill="#FF0000"
+    />
+    <path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" fill="#fff" />
+  </svg>
+)
+
+const InstagramIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <rect x="2" y="2" width="20" height="20" rx="5" stroke="#E1306C" strokeWidth="2" fill="none" />
+    <circle cx="12" cy="12" r="5" stroke="#E1306C" strokeWidth="2" fill="none" />
+    <circle cx="18" cy="6" r="1" fill="#E1306C" />
+  </svg>
+)
+
+const WhatsAppIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+      fill="#25D366"
+    />
+  </svg>
+)
+
+const TikTokIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"
+      fill="#000000"
+    />
+  </svg>
+)
+
+const TelegramIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-12S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.03-.58.05-1-.39-1.56-.76-.86-.56-1.35-.91-2.19-1.46-.96-.63-.34-1.01.21-1.59.14-.14 2.65-2.43 2.7-2.64.01-.04.01-.19-.06-.27-.07-.08-.17-.05-.25-.03-.1.03-1.79 1.12-5.06 3.3-.48.33-.92.5-1.4.49-.46-.02-1.36-.26-2.03-.48-.82-.27-1.48-.41-1.42-.87.03-.24.33-.5.91-.72 4.91-2.07 7.31-3.08 8.26-3.45 3.8-1.51 4.59-1.77 5.11-1.77.12 0 .38.03.55.18.13.12.16.28.15.4-.04.4-.52 4.69-.75 6.37z"
+      fill="#0088CC"
+    />
+  </svg>
+)
+
+const ACTIVE_TAB_STORAGE_KEY = "deriv_bot_active_tab"
 
 const AppWrapper = observer(() => {
   const { connectionStatus } = useApiBase()
@@ -63,25 +301,19 @@ const AppWrapper = observer(() => {
   const [bots, setBots] = useState([])
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const analysisUrl = "https://mesoflixldpnew.vercel.app/"
-  const mtoolUrl = "https://your-mtool-url.com/" // Replace with your MTool URL
+  const mtoolUrl = "https://your-mtool-url.com/"
   const strategyUrl = "https://mesoflixstrategies.netlify.app/"
   const toolsUrl = "https://alltools-ten.vercel.app/"
 
   useEffect(() => {
-    if (active_tab !== undefined && active_tab !== null) {
-      localStorage.setItem("dbot_active_tab", active_tab.toString())
-    }
-  }, [active_tab])
-
-  useEffect(() => {
-    const savedTab = localStorage.getItem("dbot_active_tab")
+    const savedTab = localStorage.getItem(ACTIVE_TAB_STORAGE_KEY)
     if (savedTab !== null) {
       const tabIndex = Number.parseInt(savedTab, 10)
-      if (!isNaN(tabIndex) && tabIndex !== active_tab) {
+      if (!isNaN(tabIndex) && tabIndex >= 0) {
         setActiveTab(tabIndex)
       }
     }
-  }, []) // Only run on mount
+  }, [setActiveTab])
 
   useEffect(() => {
     if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -130,11 +362,19 @@ const AppWrapper = observer(() => {
 
   const formatBotName = (name: string) => name.replace(/\.xml$/, "")
 
-  const handleTabChange = useCallback((tab_index: number) => setActiveTab(tab_index), [setActiveTab])
+  const handleTabChange = useCallback(
+    (tab_index: number) => {
+      setActiveTab(tab_index)
+      localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab_index.toString())
+    },
+    [setActiveTab],
+  )
 
   const handleBotClick = useCallback(
     async (bot: { filePath: string; xmlContent: string }) => {
-      setActiveTab(DBOT_TABS.BOT_BUILDER)
+      const newTabIndex = DBOT_TABS.BOT_BUILDER
+      setActiveTab(newTabIndex)
+      localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, newTabIndex.toString())
       try {
         if (typeof load_modal.loadFileFromContent === "function") {
           await load_modal.loadFileFromContent(bot.xmlContent)
@@ -151,12 +391,13 @@ const AppWrapper = observer(() => {
 
   const handleOpen = useCallback(async () => {
     await load_modal.loadFileFromRecent()
-    setActiveTab(DBOT_TABS.BOT_BUILDER)
+    const newTabIndex = DBOT_TABS.BOT_BUILDER
+    setActiveTab(newTabIndex)
+    localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, newTabIndex.toString())
   }, [load_modal, setActiveTab])
 
   const showRunPanel = [1, 2, 3, 4].includes(active_tab)
 
-  // Responsive style for full height/width and scroll for tab panels
   const fullPanelStyle: React.CSSProperties = {
     width: "100%",
     height: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
