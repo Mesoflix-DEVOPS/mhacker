@@ -1,190 +1,236 @@
-import React, { lazy, Suspense, useEffect, useState, useCallback } from "react";
-import classNames from "classnames";
-import { observer } from "mobx-react-lite";
-import ChunkLoader from "@/components/loader/chunk-loader";
-import DesktopWrapper from "@/components/shared_ui/desktop-wrapper";
-import Dialog from "@/components/shared_ui/dialog";
-import MobileWrapper from "@/components/shared_ui/mobile-wrapper";
-import Tabs from "@/components/shared_ui/tabs/tabs";
-import TradingViewModal from "@/components/trading-view-chart/trading-view-modal";
-import { DBOT_TABS } from "@/constants/bot-contents";
-import { api_base, updateWorkspaceName } from "@/external/bot-skeleton";
-import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream";
-import { useApiBase } from "@/hooks/useApiBase";
-import { useStore } from "@/hooks/useStore";
-import { Localize, localize } from "@deriv-com/translations";
-import { useDevice } from "@deriv-com/ui";
-import RunPanel from "../../components/run-panel";
-import ChartModal from "../chart/chart-modal";
-import Dashboard from "../dashboard";
-import RunStrategy from "../dashboard/run-strategy";
+"use client"
 
-const Chart = lazy(() => import("../chart"));
-const Tutorial = lazy(() => import("../tutorials"));
-const Copytrading = lazy(() => import("../copytrading"));
-const Dcircles = lazy(() => import("../analysis"));
-const Advanced = lazy(() => import("../advanced"));
+import React, { lazy, Suspense, useEffect, useState, useCallback } from "react"
+import classNames from "classnames"
+import { observer } from "mobx-react-lite"
+import ChunkLoader from "@/components/loader/chunk-loader"
+import DesktopWrapper from "@/components/shared_ui/desktop-wrapper"
+import Dialog from "@/components/shared_ui/dialog"
+import MobileWrapper from "@/components/shared_ui/mobile-wrapper"
+import Tabs from "@/components/shared_ui/tabs/tabs"
+import TradingViewModal from "@/components/trading-view-chart/trading-view-modal"
+import { DBOT_TABS } from "@/constants/bot-contents"
+import { api_base, updateWorkspaceName } from "@/external/bot-skeleton"
+import { CONNECTION_STATUS } from "@/external/bot-skeleton/services/api/observables/connection-status-stream"
+import { useApiBase } from "@/hooks/useApiBase"
+import { useStore } from "@/hooks/useStore"
+import { Localize, localize } from "@deriv-com/translations"
+import { useDevice } from "@deriv-com/ui"
+import RunPanel from "../../components/run-panel"
+import ChartModal from "../chart/chart-modal"
+import Dashboard from "../dashboard"
+import RunStrategy from "../dashboard/run-strategy"
+
+const Chart = lazy(() => import("../chart"))
+const Tutorial = lazy(() => import("../tutorials"))
+const Copytrading = lazy(() => import("../copytrading"))
+const Dcircles = lazy(() => import("../analysis"))
+const Advanced = lazy(() => import("../advanced"))
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" stop-opacity="1" />
-      <stop offset="100%" stop-color="#0072ff" stop-opacity="1" />
-    </linearGradient>
-  </defs>
-  <rect x="4" y="6" width="16" height="12" rx="3" fill="url(#grad1)"/>
-  <line x1="12" y1="3" x2="12" y2="6" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="12" cy="2" r="1.5" fill="url(#grad1)"/>
-  <circle cx="9" cy="12" r="1.5" fill="white"/>
-  <circle cx="15" cy="12" r="1.5" fill="white"/>
-  <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" stopOpacity="1" />
+        <stop offset="100%" stopColor="#0072ff" stopOpacity="1" />
+      </linearGradient>
+    </defs>
+    <rect x="4" y="6" width="16" height="12" rx="3" fill="url(#grad1)" />
+    <line x1="12" y1="3" x2="12" y2="6" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="2" r="1.5" fill="url(#grad1)" />
+    <circle cx="9" cy="12" r="1.5" fill="white" />
+    <circle cx="15" cy="12" r="1.5" fill="white" />
+    <rect x="9" y="15" width="6" height="1.5" rx="0.75" fill="white" opacity="0.9" />
+  </svg>
 )
 
 const BotSettingsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.65l-2-3.46a.5.5 0 0 0-.61-.21l-2.49 1a7.03 7.03 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.03 7.03 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.61.21l-2 3.46a.5.5 0 0 0 .12.65l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.65l2 3.46a.5.5 0 0 0 .61.21l2.49-1c.5.4 1.07.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4c.25 0 .46-.18.5-.42l.38-2.65c.62-.25 1.19-.58 1.69-.98l2.49 1a.5.5 0 0 0 .61-.21l2-3.46a.5.5 0 0 0-.12-.65l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z" />
+  </svg>
 )
 
 const ChartsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
-  <path d="M7 14L10 10L14 15L17 9" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="7" cy="14" r="1.5" fill="url(#grad1)"/>
-  <circle cx="10" cy="10" r="1.5" fill="url(#grad1)"/>
-  <circle cx="14" cy="15" r="1.5" fill="url(#grad1)"/>
-  <circle cx="17" cy="9" r="1.5" fill="url(#grad1)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <path
+      d="M7 14L10 10L14 15L17 9"
+      fill="none"
+      stroke="url(#grad1)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="7" cy="14" r="1.5" fill="url(#grad1)" />
+    <circle cx="10" cy="10" r="1.5" fill="url(#grad1)" />
+    <circle cx="14" cy="15" r="1.5" fill="url(#grad1)" />
+    <circle cx="17" cy="9" r="1.5" fill="url(#grad1)" />
+  </svg>
 )
 
 const DCirclesIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <path d="M12 2a10 10 0 1 1-7.07 2.93" fill="none" stroke="url(#grad1)" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M12 6a6 6 0 1 1-4.24 1.76" fill="none" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="12" cy="12" r="2.8" fill="url(#grad1)"/>
-    <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <path d="M12 2a10 10 0 1 1-7.07 2.93" fill="none" stroke="url(#grad1)" strokeWidth="2.5" strokeLinecap="round" />
+    <path d="M12 6a6 6 0 1 1-4.24 1.76" fill="none" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" />
+    <circle cx="12" cy="12" r="2.8" fill="url(#grad1)" />
+    <circle cx="13" cy="11" r="0.8" fill="white" opacity="0.9" />
+  </svg>
 )
 
 const MToolIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="gradMTool" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#gradMTool)" stroke-width="2"/>
-  <path d="M7 8L9 15L12 10L15 15L17 8" fill="none" stroke="url(#gradMTool)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="7" cy="8" r="1.2" fill="url(#gradMTool)"/>
-  <circle cx="9" cy="15" r="1.2" fill="url(#gradMTool)"/>
-  <circle cx="12" cy="10" r="1.2" fill="url(#gradMTool)"/>
-  <circle cx="15" cy="15" r="1.2" fill="url(#gradMTool)"/>
-  <circle cx="17" cy="8" r="1.2" fill="url(#gradMTool)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gradMTool" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#gradMTool)" strokeWidth="2" />
+    <path
+      d="M7 8L9 15L12 10L15 15L17 8"
+      fill="none"
+      stroke="url(#gradMTool)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="7" cy="8" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="9" cy="15" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="12" cy="10" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="15" cy="15" r="1.2" fill="url(#gradMTool)" />
+    <circle cx="17" cy="8" r="1.2" fill="url(#gradMTool)" />
+  </svg>
 )
 
 const AnalysisToolIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
- <rect x="7" y="14" width="2" height="4" rx="1" fill="url(#grad1)"/>
-  <rect x="11" y="10" width="2" height="8" rx="1" fill="url(#grad1)"/>
-  <rect x="15" y="7" width="2" height="11" rx="1" fill="url(#grad1)"/>
-    <circle cx="18" cy="6" r="3" stroke="url(#grad1)" stroke-width="2" fill="white"/>
-  <path d="M20 8L22 10" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <rect x="7" y="14" width="2" height="4" rx="1" fill="url(#grad1)" />
+    <rect x="11" y="10" width="2" height="8" rx="1" fill="url(#grad1)" />
+    <rect x="15" y="7" width="2" height="11" rx="1" fill="url(#grad1)" />
+    <circle cx="18" cy="6" r="3" stroke="url(#grad1)" strokeWidth="2" fill="white" />
+    <path d="M20 8L22 10" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" />
+  </svg>
 )
 
 const ToolsIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M12 2.5L13.5 4.5L16 4L17 6.5L19.5 7.5L19 10L21.5 12L19 14L19.5 16.5L17 17.5L16 20L13.5 19.5L12 21.5L10.5 19.5L8 20L7 17.5L4.5 16.5L5 14L2.5 12L5 10L4.5 7.5L7 6.5L8 4L10.5 4.5L12 2.5Z" 
-    stroke="#1976D2" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11" 
-    stroke="#1976D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M12 2.5L13.5 4.5L16 4L17 6.5L19.5 7.5L19 10L21.5 12L19 14L19.5 16.5L17 17.5L16 20L13.5 19.5L12 21.5L10.5 19.5L8 20L7 17.5L4.5 16.5L5 14L2.5 12L5 10L4.5 7.5L7 6.5L8 4L10.5 4.5L12 2.5Z"
+      stroke="#1976D2"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 15L12 12M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 10.55 10.45 11 11 11"
+      stroke="#1976D2"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
 )
 
 const CopyTradingIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff"/>
-      <stop offset="100%" stop-color="#0072ff"/>
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
-  <circle cx="12" cy="9" r="2.3" fill="url(#grad1)"/>
-  <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#grad1)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <circle cx="12" cy="9" r="2.3" fill="url(#grad1)" />
+    <rect x="7.5" y="12.2" width="9" height="5" rx="2.5" fill="url(#grad1)" />
+  </svg>
 )
 
 const StrategyIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00c6ff" />
-      <stop offset="100%" stop-color="#0072ff" />
-    </linearGradient>
-  </defs>
-    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" stroke-width="2"/>
-  <path d="M8 7H12V17H8C7.45 17 7 16.55 7 16V8C7 7.45 7.45 7 8 7Z" fill="url(#grad1)"/>
-  <path d="M12 7H16C16.55 7 17 7.45 17 8V16C17 16.55 16.55 17 16 17H12V7Z" fill="white" stroke="url(#grad1)" stroke-width="1.5"/>
-  <line x1="12" y1="7" x2="12" y2="17" stroke="url(#grad1)" stroke-width="1.5"/>
-  <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#grad1)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00c6ff" />
+        <stop offset="100%" stopColor="#0072ff" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#grad1)" strokeWidth="2" />
+    <path d="M8 7H12V17H8C7.45 17 7 16.55 7 16V8C7 7.45 7.45 7 8 7Z" fill="url(#grad1)" />
+    <path
+      d="M12 7H16C16.55 7 17 7.45 17 8V16C17 16.55 16.55 17 16 17H12V7Z"
+      fill="white"
+      stroke="url(#grad1)"
+      strokeWidth="1.5"
+    />
+    <line x1="12" y1="7" x2="12" y2="17" stroke="url(#grad1)" strokeWidth="1.5" />
+    <path d="M14 7V11L15 10.2L16 11V7H14Z" fill="url(#grad1)" />
+  </svg>
 )
 
 const SignalsIcon = () => (
- <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00B4DB"/>
-      <stop offset="100%" stop-color="#0083B0"/>
-    </linearGradient>
-  </defs>
-  <rect x="3" y="4" width="18" height="14" rx="2" ry="2" fill="none" stroke="url(#blueGrad)" stroke-width="2"/>
-  <polyline points="5,14 8,10 11,12 14,7 17,9 20,6" 
-            fill="none" stroke="url(#blueGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad)"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00B4DB" />
+        <stop offset="100%" stopColor="#0083B0" />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="4" width="18" height="14" rx="2" ry="2" fill="none" stroke="url(#blueGrad)" strokeWidth="2" />
+    <polyline
+      points="5,14 8,10 11,12 14,7 17,9 20,6"
+      fill="none"
+      stroke="url(#blueGrad)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="19" cy="16.5" r="2.5" fill="url(#blueGrad)" />
+  </svg>
 )
 
 const TutorialsIcon = () => (
-<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path d="M4 5C4 4.447 4.447 4 5 4H15C16.105 4 17 4.895 17 6V20C17 20.553 16.553 21 16 21H6C4.895 21 4 20.105 4 19V5Z" 
-        stroke="#007BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-  <path d="M17 6H19C20.105 6 21 6.895 21 8V20C21 20.553 20.553 21 20 21H17" 
-        stroke="#007BFF" stroke-width="2" fill="none" stroke-linejoin="round"/>
-  <circle cx="10" cy="12" r="3" fill="#007BFF"/>
-  <polygon points="9,10.5 12,12 9,13.5" fill="white"/>
-</svg>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M4 5C4 4.447 4.447 4 5 4H15C16.105 4 17 4.895 17 6V20C17 20.553 16.553 21 16 21H6C4.895 21 4 20.105 4 19V5Z"
+      stroke="#007BFF"
+      strokeWidth="2"
+      fill="none"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M17 6H19C20.105 6 21 6.895 21 8V20C21 20.553 20.553 21 20 21H17"
+      stroke="#007BFF"
+      strokeWidth="2"
+      fill="none"
+      strokeLinejoin="round"
+    />
+    <circle cx="10" cy="12" r="3" fill="#007BFF" />
+    <polygon points="9,10.5 12,12 9,13.5" fill="white" />
+  </svg>
 )
 
 // Social Media Icons
@@ -234,10 +280,10 @@ const TelegramIcon = () => (
 )
 
 const AppWrapper = observer(() => {
-  const { connectionStatus } = useApiBase();
-  const { dashboard, load_modal, run_panel, summary_card } = useStore();
-  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard;
-  const { onEntered } = load_modal;
+  const { connectionStatus } = useApiBase()
+  const { dashboard, load_modal, run_panel, summary_card } = useStore()
+  const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard
+  const { onEntered } = load_modal
   const {
     is_dialog_open,
     dialog_options,
@@ -246,92 +292,89 @@ const AppWrapper = observer(() => {
     onOkButtonClick,
     stopBot,
     is_drawer_open,
-  } = run_panel;
-  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string };
-  const { clear } = summary_card;
-  const { isDesktop, isMobile } = useDevice();
-  const [bots, setBots] = useState([]);
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
-  const analysisUrl = "https://mesoflixldpnew.vercel.app/";
-  const mtoolUrl = "https://your-mtool-url.com/"; // Replace with your MTool URL
-  const strategyUrl = "https://mesoflixstrategies.netlify.app/";
-  const toolsUrl = "https://alltools-ten.vercel.app/";
+  } = run_panel
+  const { cancel_button_text, ok_button_text, title, message } = dialog_options as { [key: string]: string }
+  const { clear } = summary_card
+  const { isDesktop, isMobile } = useDevice()
+  const [bots, setBots] = useState([])
+  const [showDisclaimer, setShowDisclaimer] = useState(false)
+  const analysisUrl = "https://mesoflixldpnew.vercel.app/"
+  const mtoolUrl = "https://your-mtool-url.com/" // Replace with your MTool URL
+  const strategyUrl = "https://mesoflixstrategies.netlify.app/"
+  const toolsUrl = "https://alltools-ten.vercel.app/"
 
   useEffect(() => {
     if (connectionStatus !== CONNECTION_STATUS.OPENED) {
-      const is_bot_running = document.getElementById("db-animation__stop-button") !== null;
+      const is_bot_running = document.getElementById("db-animation__stop-button") !== null
       if (is_bot_running) {
-        clear();
-        stopBot();
-        api_base.setIsRunning(false);
+        clear()
+        stopBot()
+        api_base.setIsRunning(false)
       }
     }
-  }, [clear, connectionStatus, stopBot]);
+  }, [clear, connectionStatus, stopBot])
 
   useEffect(() => {
     const fetchBots = async () => {
-      const botFiles = [ 
+      const botFiles = [
         "AUTO Under 9 _ Under 3 D.Bot.xml",
         "EPIC 2prediction BOT🤑🥂.xml",
         "Deriv wizard 1.xml",
         "Titan v3.xml",
-      ];
+      ]
       const botPromises = botFiles.map(async (file) => {
         try {
-          const response = await fetch(file);
+          const response = await fetch(file)
           if (!response.ok) {
-            throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
+            throw new Error(`Failed to fetch ${file}: ${response.statusText}`)
           }
-          const text = await response.text();
-          const parser = new DOMParser();
-          const xml = parser.parseFromString(text, "application/xml");
+          const text = await response.text()
+          const parser = new DOMParser()
+          const xml = parser.parseFromString(text, "application/xml")
           return {
             title: file.split("/").pop(),
             image: xml.getElementsByTagName("image")[0]?.textContent || "default_image_path",
             filePath: file,
             xmlContent: text,
-          };
+          }
         } catch (error) {
-          console.error(error);
-          return null;
+          console.error(error)
+          return null
         }
-      });
-      const bots = (await Promise.all(botPromises)).filter(Boolean);
-      setBots(bots);
-    };
-    fetchBots();
-  }, []);
+      })
+      const bots = (await Promise.all(botPromises)).filter(Boolean)
+      setBots(bots)
+    }
+    fetchBots()
+  }, [])
 
-  const formatBotName = (name: string) => name.replace(/\.xml$/, '');
+  const formatBotName = (name: string) => name.replace(/\.xml$/, "")
 
-  const handleTabChange = useCallback(
-    (tab_index: number) => setActiveTab(tab_index),
-    [setActiveTab]
-  );
+  const handleTabChange = useCallback((tab_index: number) => setActiveTab(tab_index), [setActiveTab])
 
   const handleBotClick = useCallback(
     async (bot: { filePath: string; xmlContent: string }) => {
-      setActiveTab(DBOT_TABS.BOT_BUILDER);
+      setActiveTab(DBOT_TABS.BOT_BUILDER)
       try {
         if (typeof load_modal.loadFileFromContent === "function") {
-          await load_modal.loadFileFromContent(bot.xmlContent);
+          await load_modal.loadFileFromContent(bot.xmlContent)
         } else {
-          console.error("loadFileFromContent is not defined on load_modal");
+          console.error("loadFileFromContent is not defined on load_modal")
         }
-        updateWorkspaceName(bot.xmlContent);
+        updateWorkspaceName(bot.xmlContent)
       } catch (error) {
-        console.error("Error loading bot file:", error);
+        console.error("Error loading bot file:", error)
       }
     },
-    [setActiveTab, load_modal, updateWorkspaceName]
-  );
+    [setActiveTab, load_modal, updateWorkspaceName],
+  )
 
   const handleOpen = useCallback(async () => {
-    await load_modal.loadFileFromRecent();
-    setActiveTab(DBOT_TABS.BOT_BUILDER);
-  }, [load_modal, setActiveTab]);
+    await load_modal.loadFileFromRecent()
+    setActiveTab(DBOT_TABS.BOT_BUILDER)
+  }, [load_modal, setActiveTab])
 
-  const showRunPanel = [1, 2, 3, 4].includes(active_tab);
+  const showRunPanel = [1, 2, 3, 4].includes(active_tab)
 
   // Responsive style for full height/width and scroll for tab panels
   const fullPanelStyle: React.CSSProperties = {
@@ -341,8 +384,8 @@ const AppWrapper = observer(() => {
     maxHeight: "100vh",
     overflowY: "auto",
     overflowX: "hidden",
-    background: "#f0fdf4"
-  };
+    background: "#f0fdf4",
+  }
 
   return (
     <React.Fragment>
@@ -357,17 +400,57 @@ const AppWrapper = observer(() => {
           >
             {/* 1. Free Bots */}
             <div
-              label={<><FreeBotsIcon /><Localize i18n_default_text="Free Bots" /></>}
+              label={
+                <>
+                  <FreeBotsIcon />
+                  <Localize i18n_default_text="Free Bots" />
+                </>
+              }
               id="id-free-bots"
             >
               <div className="free-bots">
                 {/* Social Media Icons */}
                 <div className="social-media-container">
-                  <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" className="social-icon youtube-icon"><YouTubeIcon /></a>
-                  <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="social-icon instagram-icon"><InstagramIcon /></a>
-                  <a href="https://whatsapp.com/" target="_blank" rel="noopener noreferrer" className="social-icon whatsapp-icon"><WhatsAppIcon /></a>
-                  <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" className="social-icon tiktok-icon"><TikTokIcon /></a>
-                  <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="social-icon telegram-icon"><TelegramIcon /></a>
+                  <a
+                    href="https://youtube.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon youtube-icon"
+                  >
+                    <YouTubeIcon />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon instagram-icon"
+                  >
+                    <InstagramIcon />
+                  </a>
+                  <a
+                    href="https://whatsapp.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon whatsapp-icon"
+                  >
+                    <WhatsAppIcon />
+                  </a>
+                  <a
+                    href="https://www.tiktok.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon tiktok-icon"
+                  >
+                    <TikTokIcon />
+                  </a>
+                  <a
+                    href="https://t.me/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon telegram-icon"
+                  >
+                    <TelegramIcon />
+                  </a>
                 </div>
                 <div className="free-bots__content-wrapper">
                   <div className="free-bots__content">
@@ -375,13 +458,17 @@ const AppWrapper = observer(() => {
                       <div key={index} className="free-bot-item" style={{ animationDelay: `${index * 0.1}s` }}>
                         <div className="gradient-border" />
                         <div className="bot-info">
-                          <div className="bot-icon-container"><FreeBotsIcon /></div>
+                          <div className="bot-icon-container">
+                            <FreeBotsIcon />
+                          </div>
                           <div className="bot-details">
                             <h3 className="bot-title">{formatBotName(bot.title)}</h3>
                             <p className="bot-status">Ready to deploy • Click to load</p>
                           </div>
                         </div>
-                        <button onClick={() => handleBotClick(bot)} className="load-bot-button">Load Bot</button>
+                        <button onClick={() => handleBotClick(bot)} className="load-bot-button">
+                          Load Bot
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -391,7 +478,12 @@ const AppWrapper = observer(() => {
 
             {/* 2. Bot Settings */}
             <div
-              label={<><BotSettingsIcon /><Localize i18n_default_text="Bot Settings" /></>}
+              label={
+                <>
+                  <BotSettingsIcon />
+                  <Localize i18n_default_text="Bot Settings" />
+                </>
+              }
               id="id-bot-settings"
             >
               <Dashboard handleTabChange={handleTabChange} />
@@ -400,7 +492,12 @@ const AppWrapper = observer(() => {
 
             {/* 3. Charts */}
             <div
-              label={<><ChartsIcon /><Localize i18n_default_text="Charts" /></>}
+              label={
+                <>
+                  <ChartsIcon />
+                  <Localize i18n_default_text="Charts" />
+                </>
+              }
               id="id-charts"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
@@ -410,7 +507,12 @@ const AppWrapper = observer(() => {
 
             {/* 4. Dcircles */}
             <div
-              label={<><DCirclesIcon /><Localize i18n_default_text="Dcircles" /></>}
+              label={
+                <>
+                  <DCirclesIcon />
+                  <Localize i18n_default_text="Dcircles" />
+                </>
+              }
               id="id-dcircles"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading Dcircles...")} />}>
@@ -422,7 +524,12 @@ const AppWrapper = observer(() => {
 
             {/* 5. MTool */}
             <div
-              label={<><MToolIcon /><Localize i18n_default_text="MTool" /></>}
+              label={
+                <>
+                  <MToolIcon />
+                  <Localize i18n_default_text="MTool" />
+                </>
+              }
               id="id-mtool"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading MTool...")} />}>
@@ -434,7 +541,12 @@ const AppWrapper = observer(() => {
 
             {/* 6. Analysis */}
             <div
-              label={<><AnalysisToolIcon /><Localize i18n_default_text="Analysis" /></>}
+              label={
+                <>
+                  <AnalysisToolIcon />
+                  <Localize i18n_default_text="Analysis" />
+                </>
+              }
               id="id-analysis"
             >
               <div style={fullPanelStyle}>
@@ -446,7 +558,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    background: "#f0f9ff"
+                    background: "#f0f9ff",
                   }}
                   scrolling="yes"
                 />
@@ -455,7 +567,12 @@ const AppWrapper = observer(() => {
 
             {/* 7. Tools */}
             <div
-              label={<><ToolsIcon /><Localize i18n_default_text="Tools" /></>}
+              label={
+                <>
+                  <ToolsIcon />
+                  <Localize i18n_default_text="Tools" />
+                </>
+              }
               id="id-tools"
             >
               <div style={fullPanelStyle}>
@@ -467,7 +584,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    background: "#f0fdf4"
+                    background: "#f0fdf4",
                   }}
                   scrolling="yes"
                 />
@@ -476,7 +593,12 @@ const AppWrapper = observer(() => {
 
             {/* 8. Copytrading */}
             <div
-              label={<><CopyTradingIcon /><Localize i18n_default_text="Copytrading" /></>}
+              label={
+                <>
+                  <CopyTradingIcon />
+                  <Localize i18n_default_text="Copytrading" />
+                </>
+              }
               id="id-copytrading"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
@@ -486,7 +608,12 @@ const AppWrapper = observer(() => {
 
             {/* 9. Strategies */}
             <div
-              label={<><StrategyIcon /><Localize i18n_default_text="Strategy" /></>}
+              label={
+                <>
+                  <StrategyIcon />
+                  <Localize i18n_default_text="Strategy" />
+                </>
+              }
               id="id-strategy"
             >
               <div style={fullPanelStyle}>
@@ -498,7 +625,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    background: "#f0f9ff"
+                    background: "#f0f9ff",
                   }}
                   scrolling="yes"
                 />
@@ -507,7 +634,12 @@ const AppWrapper = observer(() => {
 
             {/* 10. Signals */}
             <div
-              label={<><SignalsIcon /><Localize i18n_default_text="Signals" /></>}
+              label={
+                <>
+                  <SignalsIcon />
+                  <Localize i18n_default_text="Signals" />
+                </>
+              }
               id="id-signals"
             >
               <div
@@ -524,7 +656,7 @@ const AppWrapper = observer(() => {
                   style={{
                     border: "none",
                     display: "block",
-                    background: "#f0fdf4"
+                    background: "#f0fdf4",
                   }}
                   scrolling="yes"
                 />
@@ -533,7 +665,12 @@ const AppWrapper = observer(() => {
 
             {/* 11. Tutorials */}
             <div
-              label={<><TutorialsIcon /><Localize i18n_default_text="Tutorials" /></>}
+              label={
+                <>
+                  <TutorialsIcon />
+                  <Localize i18n_default_text="Tutorials" />
+                </>
+              }
               id="id-tutorials"
             >
               <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
@@ -543,7 +680,7 @@ const AppWrapper = observer(() => {
           </Tabs>
         </div>
       </div>
-      
+
       {/* Risk Disclaimer Button */}
       <button
         onClick={() => setShowDisclaimer(true)}
@@ -567,13 +704,13 @@ const AppWrapper = observer(() => {
           alignItems: "center",
           gap: "6px",
         }}
-        onMouseOver={e => {
-          e.currentTarget.style.transform = "scale(1.05)";
-          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)";
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = "scale(1.05)"
+          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.3)"
         }}
-        onMouseOut={e => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = "scale(1)"
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)"
         }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -584,26 +721,33 @@ const AppWrapper = observer(() => {
 
       {/* Risk Disclaimer Modal */}
       {showDisclaimer && (
-        <div style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1001,
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            padding: "24px",
-            maxWidth: "600px",
-            width: "90%",
-            maxHeight: "80vh",
-            overflowY: "auto",
-            position: "relative",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-          }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1001,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+              position: "relative",
+              boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+            }}
+          >
             <button
               onClick={() => setShowDisclaimer(false)}
               style={{
@@ -620,44 +764,68 @@ const AppWrapper = observer(() => {
               ×
             </button>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-              <div style={{
-                background: "#FEE2E2",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
+              <div
+                style={{
+                  background: "#FEE2E2",
+                  borderRadius: "50%",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
                   <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1F2937", margin: 0 }}>Deriv Trading Risk Disclaimer</h3>
+              <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1F2937", margin: 0 }}>
+                Deriv Trading Risk Disclaimer
+              </h3>
             </div>
             <div style={{ marginBottom: "16px" }}>
               <p style={{ lineHeight: "1.6", color: "#4B5563", marginBottom: "12px" }}>
-                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not suitable for all investors. Before deciding to trade, carefully consider your financial situation and experience level.
+                Trading multipliers and other derivative products on Deriv involves significant risk of loss and is not
+                suitable for all investors. Before deciding to trade, carefully consider your financial situation and
+                experience level.
               </p>
               <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Key Risks:</h4>
               <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563", marginBottom: "16px" }}>
-                <li style={{ marginBottom: "8px" }}><strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but also magnify potential losses.</li>
-                <li style={{ marginBottom: "8px" }}><strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected directions.</li>
-                <li style={{ marginBottom: "8px" }}><strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close positions.</li>
-                <li style={{ marginBottom: "8px" }}><strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical problems may prevent order execution.</li>
-                <li><strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may affect your rights as a trader.</li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Leverage Risk:</strong> Deriv's multiplier products allow you to multiply potential gains, but
+                  also magnify potential losses.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Market Risk:</strong> Financial markets are volatile and can move rapidly in unexpected
+                  directions.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Liquidity Risk:</strong> Some markets may become illiquid, making it difficult to close
+                  positions.
+                </li>
+                <li style={{ marginBottom: "8px" }}>
+                  <strong>Technical Risk:</strong> System failures, internet connectivity issues, or other technical
+                  problems may prevent order execution.
+                </li>
+                <li>
+                  <strong>Regulatory Risk:</strong> Deriv operates under different regulatory frameworks which may
+                  affect your rights as a trader.
+                </li>
               </ul>
               <h4 style={{ color: "#1F2937", margin: "12px 0 8px 0" }}>Important Considerations:</h4>
               <ul style={{ paddingLeft: "20px", lineHeight: "1.6", color: "#4B5563" }}>
                 <li style={{ marginBottom: "8px" }}>You could lose some or all of your invested capital.</li>
                 <li style={{ marginBottom: "8px" }}>Never trade with money you cannot afford to lose.</li>
                 <li style={{ marginBottom: "8px" }}>Past performance is not indicative of future results.</li>
-                <li>Seek independent financial advice if you have any doubts about your understanding of these risks.</li>
+                <li>
+                  Seek independent financial advice if you have any doubts about your understanding of these risks.
+                </li>
               </ul>
             </div>
             <div style={{ backgroundColor: "#F3F4F6", padding: "12px", borderRadius: "8px", marginBottom: "16px" }}>
               <p style={{ fontSize: "14px", color: "#6B7280", fontStyle: "italic", margin: 0, lineHeight: "1.5" }}>
-                By continuing to use this platform, you acknowledge that you have read, understood, and accept these risks associated with trading on Deriv.
+                By continuing to use this platform, you acknowledge that you have read, understood, and accept these
+                risks associated with trading on Deriv.
               </p>
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -707,7 +875,7 @@ const AppWrapper = observer(() => {
         {message}
       </Dialog>
     </React.Fragment>
-  );
-});
+  )
+})
 
-export default AppWrapper;
+export default AppWrapper
