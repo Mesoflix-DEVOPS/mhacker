@@ -21,6 +21,23 @@ interface SymbolData {
   symbol_type: string
 }
 
+interface TradeRecord {
+  id: string
+  timestamp: number
+  signal: string
+  runs: number
+  result: "win" | "loss" | "pending"
+  entryDigit: number
+  confidence: number
+}
+
+interface TradingJournal {
+  date: string
+  trades: TradeRecord[]
+}
+
+type AnalysisMode = "digit-frequency" | "even-odd" | "over-under" | "rise-fall" | "streak-analyzer"
+
 const Advanced = () => {
   const [activeSymbol, setActiveSymbol] = useState(() => {
     if (typeof window !== "undefined") {
@@ -42,13 +59,30 @@ const Advanced = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark"
     }
-    return false
+    return true
   })
   const wsRef = useRef<WebSocket | null>(null)
   const [activeDigitIndex, setActiveDigitIndex] = useState<number | null>(null)
   const digitsContainerRef = useRef<HTMLDivElement>(null)
   const [cursorPosition, setCursorPosition] = useState<number>(0)
   const [cursorRow, setCursorRow] = useState<number>(0)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>("digit-frequency")
+  const [streakData, setStreakData] = useState<number[]>([])
+  const [streakSignal, setStreakSignal] = useState<{
+    signal: string
+    entryDigit: number
+    confidence: number
+    suggestedRuns: number
+  } | null>(null)
+  const [tradingJournal, setTradingJournal] = useState<TradingJournal>(() => {
+    if (typeof window !== "undefined") {
+      const today = new Date().toISOString().split("T")[0]
+      const stored = localStorage.getItem(`trading-journal-${today}`)
+      return stored ? JSON.parse(stored) : { date: today, trades: [] }
+    }
+    return { date: new Date().toISOString().split("T")[0], trades: [] }
+  })
 
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -58,6 +92,27 @@ const Advanced = () => {
   const [connectionStatus, setConnectionStatus] = useState<
     "connecting" | "connected" | "disconnected" | "reconnecting"
   >("connecting")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const today = new Date().toISOString().split("T")[0]
+      localStorage.setItem(`trading-journal-${today}`, JSON.stringify(tradingJournal))
+    }
+  }, [tradingJournal])
+
+  useEffect(() => {
+    const checkDateChange = () => {
+      if (typeof window !== "undefined") {
+        const today = new Date().toISOString().split("T")[0]
+        if (tradingJournal.date !== today) {
+          setTradingJournal({ date: today, trades: [] })
+        }
+      }
+    }
+
+    const interval = setInterval(checkDateChange, 60000) // Check every minute
+    return () => clearInterval(interval)
+  }, [tradingJournal.date])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -130,7 +185,7 @@ const Advanced = () => {
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({ ping: 1 }))
       }
-    }, 30000) // Send ping every 30 seconds
+    }, 30000)
   }
 
   const scheduleReconnect = () => {
@@ -141,7 +196,7 @@ const Advanced = () => {
     isReconnectingRef.current = true
     setConnectionStatus("reconnecting")
 
-    const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000) // Max 30 seconds
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000)
 
     reconnectTimeoutRef.current = setTimeout(() => {
       reconnectAttemptsRef.current++
@@ -165,7 +220,7 @@ const Advanced = () => {
     ws.onopen = () => {
       console.log("[v0] WebSocket connected")
       setConnectionStatus("connected")
-      reconnectAttemptsRef.current = 0 // Reset reconnection attempts on successful connection
+      reconnectAttemptsRef.current = 0
       isReconnectingRef.current = false
 
       startHeartbeat()
@@ -261,12 +316,10 @@ const Advanced = () => {
       console.log(`[v0] WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`)
       setConnectionStatus("disconnected")
 
-      // Clean up heartbeat
       if (pingIntervalRef.current) {
         clearInterval(pingIntervalRef.current)
       }
 
-      // Attempt to reconnect unless it was a clean close
       if (event.code !== 1000) {
         scheduleReconnect()
       }
@@ -323,6 +376,41 @@ const Advanced = () => {
     return returnedList
   }
 
+  const calculateOverUnderPercentages = () => {
+    const digits = getLastDigitList()
+    const overCount = digits.filter((d) => d > overValue).length
+    const underCount = digits.filter((d) => d < underValue).length
+    const total = digits.length || 1
+
+    return {
+      overPercentage: ((overCount / total) * 100).toFixed(2),
+      underPercentage: ((underCount / total) * 100).toFixed(2),
+      overCount,
+      underCount,
+    }
+  }
+
+  const calculateRiseFallPercentages = () => {
+    const digits = getLastDigitList()
+    let riseCount = 0
+    let fallCount = 0
+    let equalCount = 0
+
+    for (let i = 1; i < digits.length; i++) {
+      if (digits[i] > digits[i - 1]) riseCount++
+      else if (digits[i] < digits[i - 1]) fallCount++
+      else equalCount++
+    }
+
+    const total = digits.length - 1 || 1
+    return {
+      risePercentage: ((riseCount / total) * 100).toFixed(2),
+      fallPercentage: ((fallCount / total) * 100).toFixed(2),
+      riseCount,
+      fallCount,
+    }
+  }
+
   const calculateEvenOddPercentages = () => {
     const digits = getLastDigitList()
     let evenCount = 0
@@ -337,35 +425,6 @@ const Advanced = () => {
     return {
       evenPercentage: ((evenCount / total) * 100).toFixed(2),
       oddPercentage: ((oddCount / total) * 100).toFixed(2),
-    }
-  }
-
-  const calculateRiseFallPercentages = () => {
-    const digits = getLastDigitList()
-    let riseCount = 0
-    let fallCount = 0
-
-    for (let i = 1; i < digits.length; i++) {
-      if (digits[i] > digits[i - 1]) riseCount++
-      else if (digits[i] < digits[i - 1]) fallCount++
-    }
-
-    const total = digits.length - 1 || 1
-    return {
-      risePercentage: ((riseCount / total) * 100).toFixed(2),
-      fallPercentage: ((fallCount / total) * 100).toFixed(2),
-    }
-  }
-
-  const calculateOverUnderPercentages = () => {
-    const digits = getLastDigitList()
-    const overCount = digits.filter((d) => d > overValue).length
-    const underCount = digits.filter((d) => d < underValue).length
-    const total = digits.length || 1
-
-    return {
-      overPercentage: ((overCount / total) * 100).toFixed(2),
-      underPercentage: ((underCount / total) * 100).toFixed(2),
     }
   }
 
@@ -389,6 +448,80 @@ const Advanced = () => {
     }
 
     return percentages
+  }
+
+  const analyzeStreaks = () => {
+    const digits = getLastDigitList()
+    const streaks: { digit: number; length: number; position: number }[] = []
+
+    let currentDigit = digits[0]
+    let streakLength = 1
+    let streakStart = 0
+
+    for (let i = 1; i < digits.length; i++) {
+      if (digits[i] === currentDigit) {
+        streakLength++
+      } else {
+        if (streakLength >= 2) {
+          streaks.push({ digit: currentDigit, length: streakLength, position: streakStart })
+        }
+        currentDigit = digits[i]
+        streakLength = 1
+        streakStart = i
+      }
+    }
+
+    if (streakLength >= 2) {
+      streaks.push({ digit: currentDigit, length: streakLength, position: streakStart })
+    }
+
+    setStreakData(digits)
+
+    // Find best entry point
+    if (streaks.length > 0) {
+      const longestStreak = streaks.reduce((prev, current) => (current.length > prev.length ? current : prev))
+
+      const volatility = calculateMarketVolatility(digits)
+      const confidence = Math.min(100, (longestStreak.length / 5) * 100)
+      const suggestedRuns = Math.max(2, Math.ceil(5 - volatility / 20))
+
+      setStreakSignal({
+        signal: `Streak of ${longestStreak.length} detected on digit ${longestStreak.digit}`,
+        entryDigit: longestStreak.digit,
+        confidence: Math.round(confidence),
+        suggestedRuns,
+      })
+    }
+  }
+
+  const calculateMarketVolatility = (digits: number[]) => {
+    if (digits.length < 2) return 0
+
+    let changes = 0
+    for (let i = 1; i < digits.length; i++) {
+      if (digits[i] !== digits[i - 1]) changes++
+    }
+
+    return (changes / (digits.length - 1)) * 100
+  }
+
+  const recordTrade = (result: "win" | "loss") => {
+    if (!streakSignal) return
+
+    const newTrade: TradeRecord = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      signal: streakSignal.signal,
+      runs: streakSignal.suggestedRuns,
+      result,
+      entryDigit: streakSignal.entryDigit,
+      confidence: streakSignal.confidence,
+    }
+
+    setTradingJournal((prev) => ({
+      ...prev,
+      trades: [...prev.trades, newTrade],
+    }))
   }
 
   const getLineChartData = () => {
@@ -423,6 +556,10 @@ const Advanced = () => {
   const maxFreq = frequencies.length > 0 ? Math.max(...frequencies.map(([_, val]) => val)) : 0
   const minFreq = frequencies.length > 0 ? Math.min(...frequencies.map(([_, val]) => val)) : 0
 
+  const winCount = tradingJournal.trades.filter((t) => t.result === "win").length
+  const lossCount = tradingJournal.trades.filter((t) => t.result === "loss").length
+  const winRate = tradingJournal.trades.length > 0 ? ((winCount / tradingJournal.trades.length) * 100).toFixed(1) : 0
+
   return (
     <div className="main_app">
       <div className="top_bar">
@@ -455,6 +592,11 @@ const Advanced = () => {
           </div>
         </div>
         <div className="controls">
+          <div className="menu_toggle" onClick={() => setMenuOpen(!menuOpen)}>
+            <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+              <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
           <div className="theme_toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
             {isDarkMode ? (
               <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
@@ -484,223 +626,324 @@ const Advanced = () => {
         </div>
       </div>
 
-      <div className="analysis_section">
-        <div className="digit_diff card3">
-          <div className="title_oc_trader">
-            <h2 className="analysis_title">Digit Frequency</h2>
-          </div>
-          <div className="differs_container" ref={digitsContainerRef}>
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => {
-              const percentage = digitFreq[digit]
-              const isActive = digit === activeLast
-              const isTop = percentage === maxFreq && percentage > 0
-              const isLess = percentage === minFreq && percentage > 0
-
-              return (
-                <div
-                  key={digit}
-                  className={`progress ${isActive ? "active" : ""} ${isTop ? "top" : ""} ${isLess ? "less" : ""}`}
-                  data-number={digit}
-                >
-                  <h3>{digit}</h3>
-                  <h4>
-                    {percentage.toFixed(2)}
-                    <span>%</span>
-                  </h4>
-                </div>
-              )
-            })}
-            <div
-              className="digit_cursor"
-              style={{
-                left: `${cursorPosition}px`,
-                opacity: activeDigitIndex !== null ? 1 : 0,
-              }}
-              data-row={cursorRow}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 22h20L12 2z" />
-              </svg>
-            </div>
-          </div>
+      {menuOpen && (
+        <div className="analysis_menu">
+          <button
+            className={`menu_item ${analysisMode === "digit-frequency" ? "active" : ""}`}
+            onClick={() => {
+              setAnalysisMode("digit-frequency")
+              setMenuOpen(false)
+            }}
+          >
+            Digit Frequency
+          </button>
+          <button
+            className={`menu_item ${analysisMode === "even-odd" ? "active" : ""}`}
+            onClick={() => {
+              setAnalysisMode("even-odd")
+              setMenuOpen(false)
+            }}
+          >
+            Even/Odd
+          </button>
+          <button
+            className={`menu_item ${analysisMode === "over-under" ? "active" : ""}`}
+            onClick={() => {
+              setAnalysisMode("over-under")
+              setMenuOpen(false)
+            }}
+          >
+            Over/Under
+          </button>
+          <button
+            className={`menu_item ${analysisMode === "rise-fall" ? "active" : ""}`}
+            onClick={() => {
+              setAnalysisMode("rise-fall")
+              setMenuOpen(false)
+            }}
+          >
+            Rise/Fall
+          </button>
+          <button
+            className={`menu_item ${analysisMode === "streak-analyzer" ? "active" : ""}`}
+            onClick={() => {
+              setAnalysisMode("streak-analyzer")
+              analyzeStreaks()
+              setMenuOpen(false)
+            }}
+          >
+            Streak Analyzer
+          </button>
         </div>
-      </div>
+      )}
 
-      <div className="analysis_section">
-        <div className="pie card1">
-          <div className="odd_even_info">
-            <h2 className="analysis_title">Even/Odd Analysis</h2>
-          </div>
-          <div className="pie_container">
-            <div className="pie_chart">
-              <svg viewBox="0 0 200 200" className="pie_svg">
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="80"
-                  fill="transparent"
-                  stroke="#4CAF50"
-                  strokeWidth="60"
-                  strokeDasharray={`${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65} 502.65`}
-                  transform="rotate(-90 100 100)"
-                />
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="80"
-                  fill="transparent"
-                  stroke="#F44336"
-                  strokeWidth="60"
-                  strokeDasharray={`${(Number.parseFloat(evenOdd.oddPercentage) / 100) * 502.65} 502.65`}
-                  strokeDashoffset={`-${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65}`}
-                  transform="rotate(-90 100 100)"
-                />
-              </svg>
-              <div className="pie_legend">
-                <div className="legend_item">
-                  <span className="legend_color even_color"></span>
-                  <span>Even: {evenOdd.evenPercentage}%</span>
-                </div>
-                <div className="legend_item">
-                  <span className="legend_color odd_color"></span>
-                  <span>Odd: {evenOdd.oddPercentage}%</span>
-                </div>
-              </div>
+      {/* Digit Frequency Analysis */}
+      {analysisMode === "digit-frequency" && (
+        <div className="analysis_section">
+          <div className="digit_diff card3">
+            <div className="title_oc_trader">
+              <h2 className="analysis_title">Digit Frequency Analysis</h2>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="analysis_section">
-        <div className="over_under card1">
-          <h2 className="analysis_title">Over/Under Comparison</h2>
-          <div className="over_under_options">
-            <div className="digit_inputs">
-              <div className="over_digit">
-                <label htmlFor="over_input">Over</label>
-                <input
-                  type="number"
-                  id="over_input"
-                  value={overValue}
-                  onChange={(e) => setOverValue(Number.parseInt(e.target.value) || 5)}
-                  min="0"
-                  max="9"
-                />
-              </div>
-              <div className="under_digit">
-                <label htmlFor="under_input">Under</label>
-                <input
-                  type="number"
-                  id="under_input"
-                  value={underValue}
-                  onChange={(e) => setUnderValue(Number.parseInt(e.target.value) || 4)}
-                  min="0"
-                  max="9"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="bar_chart_container">
-            <div className="bar_item">
-              <div className="bar_label">Over {overValue}</div>
-              <div className="bar_wrapper">
-                <div className="bar over_bar" style={{ width: `${overUnder.overPercentage}%` }}>
-                  <span className="bar_inner_label">{overUnder.overPercentage}%</span>
-                </div>
-                <span className="bar_value">{overUnder.overPercentage}%</span>
-              </div>
-            </div>
-            <div className="bar_item">
-              <div className="bar_label">Under {underValue}</div>
-              <div className="bar_wrapper">
-                <div className="bar under_bar" style={{ width: `${overUnder.underPercentage}%` }}>
-                  <span className="bar_inner_label">{overUnder.underPercentage}%</span>
-                </div>
-                <span className="bar_value">{overUnder.underPercentage}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="analysis_section">
-        <div className="rise_fall card1">
-          <h2 className="analysis_title">Rise/Fall Analysis</h2>
-          <div className="bar_chart_container">
-            <div className="bar_item">
-              <div className="bar_label">Rise</div>
-              <div className="bar_wrapper">
-                <div className="bar rise_bar" style={{ width: `${riseFall.risePercentage}%` }}>
-                  <span className="bar_inner_label">{riseFall.risePercentage}%</span>
-                </div>
-                <span className="bar_value">{riseFall.risePercentage}%</span>
-              </div>
-            </div>
-            <div className="bar_item">
-              <div className="bar_label">Fall</div>
-              <div className="bar_wrapper">
-                <div className="bar fall_bar" style={{ width: `${riseFall.fallPercentage}%` }}>
-                  <span className="bar_inner_label">{riseFall.fallPercentage}%</span>
-                </div>
-                <span className="bar_value">{riseFall.fallPercentage}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="analysis_section">
-        <div className="line_chart card2">
-          <div className="linechat_oct">
-            <h2 className="analysis_title">{isTickChart ? "Rise/Fall Chart" : "Last Digits Chart"}</h2>
-            <select name="" id="linechat_oct_options" onChange={(e) => setIsTickChart(e.target.value === "risefall")}>
-              <option value="lastdigit">Last Digits Chart</option>
-              <option value="risefall">Rise/Fall Chart</option>
-            </select>
-          </div>
-          <div className="line_chart_container">
-            <svg viewBox="0 0 600 200" className="line_svg">
-              <defs>
-                <pattern id="grid" width="50" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 50 0 L 0 0 0 20" fill="none" stroke="var(--grid-color)" strokeWidth="1" />
-                </pattern>
-              </defs>
-              <rect width="600" height="200" fill="url(#grid)" />
-
-              <line x1="50" y1="180" x2="550" y2="180" stroke="var(--axis-color)" strokeWidth="2" />
-              <line x1="50" y1="20" x2="50" y2="180" stroke="var(--axis-color)" strokeWidth="2" />
-
-              {lineChartData.map((item, index) => {
-                if (index === 0) return null
-                const prevItem = lineChartData[index - 1]
-                const x1 = 50 + ((index - 1) * 500) / (lineChartData.length - 1)
-                const y1 = isTickChart ? 100 - prevItem.value * 5 : 180 - prevItem.value * 16
-                const x2 = 50 + (index * 500) / (lineChartData.length - 1)
-                const y2 = isTickChart ? 100 - item.value * 5 : 180 - item.value * 16
-
-                const isRise = item.value > (prevItem?.value || 0)
+            <div className="differs_container" ref={digitsContainerRef}>
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => {
+                const percentage = digitFreq[digit]
+                const isActive = digit === activeLast
+                const isTop = percentage === maxFreq && percentage > 0
+                const isLess = percentage === minFreq && percentage > 0
 
                 return (
-                  <g key={index}>
-                    <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--chart-line-color)" strokeWidth="2" />
-                    <circle cx={x2} cy={y2} r="4" fill="var(--chart-line-color)" />
-                    <text
-                      x={x2}
-                      y={y2 - 10}
-                      textAnchor="middle"
-                      fill={isRise ? "#00a79e" : "#cc2e3d"}
-                      fontSize="12"
-                      fontWeight="600"
-                    >
-                      {item.value}
-                    </text>
-                  </g>
+                  <div
+                    key={digit}
+                    className={`progress ${isActive ? "active" : ""} ${isTop ? "top" : ""} ${isLess ? "less" : ""}`}
+                    data-number={digit}
+                  >
+                    <h3>{digit}</h3>
+                    <h4>
+                      {percentage.toFixed(2)}
+                      <span>%</span>
+                    </h4>
+                  </div>
                 )
               })}
-            </svg>
+              <div
+                className="digit_cursor"
+                style={{
+                  left: `${cursorPosition}px`,
+                  opacity: activeDigitIndex !== null ? 1 : 0,
+                }}
+                data-row={cursorRow}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L2 22h20L12 2z" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Even/Odd Analysis */}
+      {analysisMode === "even-odd" && (
+        <div className="analysis_section">
+          <div className="pie card1">
+            <div className="odd_even_info">
+              <h2 className="analysis_title">Even/Odd Analysis</h2>
+            </div>
+            <div className="pie_container">
+              <div className="pie_chart">
+                <svg viewBox="0 0 200 200" className="pie_svg">
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    fill="transparent"
+                    stroke="#4CAF50"
+                    strokeWidth="60"
+                    strokeDasharray={`${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65} 502.65`}
+                    transform="rotate(-90 100 100)"
+                  />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    fill="transparent"
+                    stroke="#F44336"
+                    strokeWidth="60"
+                    strokeDasharray={`${(Number.parseFloat(evenOdd.oddPercentage) / 100) * 502.65} 502.65`}
+                    strokeDashoffset={`-${(Number.parseFloat(evenOdd.evenPercentage) / 100) * 502.65}`}
+                    transform="rotate(-90 100 100)"
+                  />
+                </svg>
+                <div className="pie_legend">
+                  <div className="legend_item">
+                    <span className="legend_color even_color"></span>
+                    <span>Even: {evenOdd.evenPercentage}%</span>
+                  </div>
+                  <div className="legend_item">
+                    <span className="legend_color odd_color"></span>
+                    <span>Odd: {evenOdd.oddPercentage}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Over/Under Analysis */}
+      {analysisMode === "over-under" && (
+        <div className="analysis_section">
+          <div className="over_under card1">
+            <h2 className="analysis_title">Over/Under Comparison</h2>
+            <div className="over_under_options">
+              <div className="digit_inputs">
+                <div className="over_digit">
+                  <label htmlFor="over_input">Over</label>
+                  <input
+                    type="number"
+                    id="over_input"
+                    value={overValue}
+                    onChange={(e) => setOverValue(Number.parseInt(e.target.value) || 5)}
+                    min="0"
+                    max="9"
+                  />
+                </div>
+                <div className="under_digit">
+                  <label htmlFor="under_input">Under</label>
+                  <input
+                    type="number"
+                    id="under_input"
+                    value={underValue}
+                    onChange={(e) => setUnderValue(Number.parseInt(e.target.value) || 4)}
+                    min="0"
+                    max="9"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="bar_chart_container">
+              <div className="bar_item">
+                <div className="bar_label">Over {overValue}</div>
+                <div className="bar_wrapper">
+                  <div className="bar over_bar" style={{ width: `${overUnder.overPercentage}%` }}>
+                    <span className="bar_inner_label">{overUnder.overPercentage}%</span>
+                  </div>
+                  <span className="bar_value">{overUnder.overPercentage}%</span>
+                </div>
+              </div>
+              <div className="bar_item">
+                <div className="bar_label">Under {underValue}</div>
+                <div className="bar_wrapper">
+                  <div className="bar under_bar" style={{ width: `${overUnder.underPercentage}%` }}>
+                    <span className="bar_inner_label">{overUnder.underPercentage}%</span>
+                  </div>
+                  <span className="bar_value">{overUnder.underPercentage}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rise/Fall Analysis */}
+      {analysisMode === "rise-fall" && (
+        <div className="analysis_section">
+          <div className="rise_fall card1">
+            <h2 className="analysis_title">Rise/Fall Analysis</h2>
+            <div className="bar_chart_container">
+              <div className="bar_item">
+                <div className="bar_label">Rise</div>
+                <div className="bar_wrapper">
+                  <div className="bar rise_bar" style={{ width: `${riseFall.risePercentage}%` }}>
+                    <span className="bar_inner_label">{riseFall.risePercentage}%</span>
+                  </div>
+                  <span className="bar_value">{riseFall.risePercentage}%</span>
+                </div>
+              </div>
+              <div className="bar_item">
+                <div className="bar_label">Fall</div>
+                <div className="bar_wrapper">
+                  <div className="bar fall_bar" style={{ width: `${riseFall.fallPercentage}%` }}>
+                    <span className="bar_inner_label">{riseFall.fallPercentage}%</span>
+                  </div>
+                  <span className="bar_value">{riseFall.fallPercentage}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {analysisMode === "streak-analyzer" && (
+        <div className="analysis_section">
+          <div className="streak_analyzer_container">
+            <div className="streak_card card2">
+              <h2 className="analysis_title">Streak Entry Point Analyzer</h2>
+              <button className="analyze_btn" onClick={analyzeStreaks}>
+                Analyze Streaks
+              </button>
+
+              {streakSignal && (
+                <div className="signal_box">
+                  <div className="signal_header">
+                    <h3>🎯 Signal Detected</h3>
+                  </div>
+                  <div className="signal_content">
+                    <p className="signal_text">{streakSignal.signal}</p>
+                    <div className="signal_stats">
+                      <div className="stat">
+                        <span className="stat_label">Confidence</span>
+                        <span className="stat_value">{streakSignal.confidence}%</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat_label">Suggested Runs</span>
+                        <span className="stat_value">{streakSignal.suggestedRuns}</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat_label">Entry Digit</span>
+                        <span className="stat_value">{streakSignal.entryDigit}</span>
+                      </div>
+                    </div>
+                    <div className="signal_actions">
+                      <button className="action_btn win_btn" onClick={() => recordTrade("win")}>
+                        ✓ Win
+                      </button>
+                      <button className="action_btn loss_btn" onClick={() => recordTrade("loss")}>
+                        ✗ Loss
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="journal_card card2">
+              <h2 className="analysis_title">Trading Journal - {tradingJournal.date}</h2>
+              <div className="journal_stats">
+                <div className="journal_stat">
+                  <span className="stat_label">Total Trades</span>
+                  <span className="stat_value">{tradingJournal.trades.length}</span>
+                </div>
+                <div className="journal_stat">
+                  <span className="stat_label">Wins</span>
+                  <span className="stat_value win_color">{winCount}</span>
+                </div>
+                <div className="journal_stat">
+                  <span className="stat_label">Losses</span>
+                  <span className="stat_value loss_color">{lossCount}</span>
+                </div>
+                <div className="journal_stat">
+                  <span className="stat_label">Win Rate</span>
+                  <span className="stat_value">{winRate}%</span>
+                </div>
+              </div>
+
+              <div className="trades_list">
+                {tradingJournal.trades.length > 0 ? (
+                  tradingJournal.trades
+                    .slice()
+                    .reverse()
+                    .map((trade) => (
+                      <div key={trade.id} className={`trade_item ${trade.result}`}>
+                        <div className="trade_info">
+                          <span className="trade_signal">{trade.signal}</span>
+                          <span className="trade_meta">
+                            Runs: {trade.runs} | Confidence: {trade.confidence}%
+                          </span>
+                        </div>
+                        <div className={`trade_result ${trade.result}`}>
+                          {trade.result === "win" ? "✓ WIN" : "✗ LOSS"}
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  <p className="no_trades">No trades recorded yet</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
