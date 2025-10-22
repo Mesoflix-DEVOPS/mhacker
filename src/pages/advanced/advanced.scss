@@ -20,19 +20,19 @@
 }
 
 [data-theme="light"] {
-  --bg-gradient-start: #f8fafc;
-  --bg-gradient-end: #e2e8f0;
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --card-border: rgba(71, 85, 105, 0.15);
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
+  --bg-gradient-start: #0f172a;
+  --bg-gradient-end: #1e293b;
+  --card-bg: rgba(15, 23, 42, 0.8);
+  --card-border: rgba(148, 163, 184, 0.15);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
   --text-light: #fff;
-  --input-bg: #f1f5f9;
-  --input-border: #cbd5e1;
-  --grid-color: rgba(71, 85, 105, 0.08);
-  --axis-color: rgba(71, 85, 105, 0.2);
-  --chart-line-color: #3b82f6;
-  --shadow-color: rgba(0, 0, 0, 0.1);
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --grid-color: rgba(148, 163, 184, 0.08);
+  --axis-color: rgba(148, 163, 184, 0.2);
+  --chart-line-color: #60a5fa;
+  --shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 .main_app {
@@ -56,6 +56,8 @@
   border-radius: 16px;
   box-shadow: 0 8px 32px var(--shadow-color);
   border: 1px solid var(--card-border);
+  position: relative;
+  z-index: 100;
 }
 
 .symbol_price {
@@ -167,10 +169,11 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: relative;
+  z-index: 101;
 }
 
 .menu_toggle,
-.theme_toggle,
 .sync_btn {
   background: linear-gradient(135deg, var(--accent-primary) 0%, #0ea5e9 100%);
   padding: 10px;
@@ -183,6 +186,8 @@
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
   color: white;
   border: none;
+  position: relative;
+  z-index: 102;
 
   &:hover {
     transform: translateY(-2px);
@@ -540,11 +545,14 @@
   align-items: center;
   width: 100%;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .digit_inputs {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 
   .over_digit,
   .under_digit {
@@ -565,11 +573,17 @@
       color: var(--text-primary);
       font-weight: 600;
       transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+      }
 
       &:focus {
         outline: none;
         border-color: var(--accent-primary);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
       }
     }
   }
