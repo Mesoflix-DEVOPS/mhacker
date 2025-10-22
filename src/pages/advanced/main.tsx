@@ -36,6 +36,18 @@ interface TradingJournal {
   trades: TradeRecord[]
 }
 
+interface SignalHistory {
+  id: string
+  timestamp: number
+  signal: string
+  initialConfidence: number
+  currentConfidence: number
+  status: "active" | "expired" | "upgraded"
+  entryDigit: number
+  suggestedRuns: number
+  percentageChange: number
+}
+
 type AnalysisMode = "digit-frequency" | "even-odd" | "over-under" | "rise-fall" | "streak-analyzer"
 
 const Advanced = () => {
@@ -77,6 +89,9 @@ const Advanced = () => {
     }
     return { date: new Date().toISOString().split("T")[0], trades: [] }
   })
+  const [signalHistory, setSignalHistory] = useState<SignalHistory[]>([])
+  const signalIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [lastSignalTime, setLastSignalTime] = useState<number>(0)
 
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -168,6 +183,67 @@ const Advanced = () => {
       }, 100)
     }
   }, [activeSymbol])
+
+  useEffect(() => {
+    if (analysisMode === "streak-analyzer") {
+      // Generate initial signal
+      analyzeStreaks()
+      setLastSignalTime(Date.now())
+
+      // Set up 5-minute interval for new signals
+      signalIntervalRef.current = setInterval(
+        () => {
+          analyzeStreaks()
+          setLastSignalTime(Date.now())
+        },
+        5 * 60 * 1000,
+      ) // 5 minutes
+
+      return () => {
+        if (signalIntervalRef.current) {
+          clearInterval(signalIntervalRef.current)
+        }
+      }
+    }
+  }, [analysisMode])
+
+  useEffect(() => {
+    if (streakSignal && signalHistory.length > 0) {
+      const lastSignal = signalHistory[signalHistory.length - 1]
+      const confidenceDiff = streakSignal.confidence - lastSignal.initialConfidence
+
+      if (confidenceDiff < -10) {
+        // Confidence decreased significantly
+        setSignalHistory((prev) =>
+          prev.map((s) =>
+            s.id === lastSignal.id
+              ? {
+                  ...s,
+                  status: "expired",
+                  currentConfidence: streakSignal.confidence,
+                  percentageChange: confidenceDiff,
+                }
+              : s,
+          ),
+        )
+      } else if (confidenceDiff > 10) {
+        // Confidence increased - suggest more runs
+        setSignalHistory((prev) =>
+          prev.map((s) =>
+            s.id === lastSignal.id
+              ? {
+                  ...s,
+                  status: "upgraded",
+                  currentConfidence: streakSignal.confidence,
+                  percentageChange: confidenceDiff,
+                  suggestedRuns: Math.min(10, s.suggestedRuns + 1),
+                }
+              : s,
+          ),
+        )
+      }
+    }
+  }, [streakSignal])
 
   const startHeartbeat = () => {
     if (pingIntervalRef.current) {
@@ -447,7 +523,7 @@ const Advanced = () => {
     streak: { digit: number; length: number; position: number },
     volatility: number,
     confidence: number,
-  ): string => {
+  ): { signal: string; isSafe: boolean } => {
     const overUnder = calculateOverUnderPercentages()
     const riseFall = calculateRiseFallPercentages()
 
@@ -456,28 +532,51 @@ const Advanced = () => {
     const risePercentage = Number.parseFloat(riseFall.risePercentage)
     const fallPercentage = Number.parseFloat(riseFall.fallPercentage)
 
-    // Determine if market favors over or under
+    const minConfidenceThreshold = 60
+    const isSafeConfidence = confidence >= minConfidenceThreshold
+
+    if (!isSafeConfidence) {
+      return {
+        signal: `⚠️ UNSAFE - Confidence ${confidence}% below ${minConfidenceThreshold}%. Change volatility settings.`,
+        isSafe: false,
+      }
+    }
+
+    const digit = streak.digit
     const favorOver = overPercentage > underPercentage
     const favorRise = risePercentage > fallPercentage
 
-    // Generate signal based on streak digit and market conditions
-    const digit = streak.digit
-    const streakStrength = streak.length >= 4 ? "Strong" : "Moderate"
+    const isSafeRange = digit >= 2 && digit <= 7
 
-    if (favorOver && digit > 5) {
-      return `🎯 ${streakStrength} Signal: Trader Over ${digit} (${overPercentage.toFixed(1)}% Over Bias)`
-    } else if (!favorOver && digit < 5) {
-      return `🎯 ${streakStrength} Signal: Trader Under ${digit} (${underPercentage.toFixed(1)}% Under Bias)`
-    } else if (favorRise) {
-      return `🎯 ${streakStrength} Signal: Trader Rise on ${digit} (${risePercentage.toFixed(1)}% Rise Bias)`
-    } else {
-      return `🎯 ${streakStrength} Signal: Trader Fall on ${digit} (${fallPercentage.toFixed(1)}% Fall Bias)`
+    if (!isSafeRange) {
+      return {
+        signal: `⚠️ UNSAFE - Digit ${digit} outside safe trading range (2-7). Wait for better entry.`,
+        isSafe: false,
+      }
+    }
+
+    // Generate signal based on market bias
+    if (favorOver && digit >= 2 && digit <= 7) {
+      return {
+        signal: `🎯 SIGNAL: Trader Over ${digit} (${overPercentage.toFixed(1)}% Over Bias) - Confidence: ${confidence}%`,
+        isSafe: true,
+      }
+    } else if (!favorOver && digit >= 2 && digit <= 7) {
+      return {
+        signal: `🎯 SIGNAL: Trader Under ${digit} (${underPercentage.toFixed(1)}% Under Bias) - Confidence: ${confidence}%`,
+        isSafe: true,
+      }
+    }
+
+    return {
+      signal: `⚠️ UNSAFE - Market conditions not favorable. Confidence: ${confidence}%`,
+      isSafe: false,
     }
   }
 
   const analyzeStreaks = () => {
     const allDigits = getLastDigitList()
-    const digits = allDigits.slice(-50)
+    const digits = allDigits.slice(-50) // Last 50 ticks only
     const streaks: { digit: number; length: number; position: number }[] = []
 
     let currentDigit = digits[0]
@@ -510,7 +609,7 @@ const Advanced = () => {
       const confidence = Math.min(100, (longestStreak.length / 5) * 100)
       const suggestedRuns = Math.max(2, Math.ceil(5 - volatility / 20))
 
-      const signal = generateTradingSignal(longestStreak, volatility, confidence)
+      const { signal, isSafe } = generateTradingSignal(longestStreak, volatility, confidence)
 
       setStreakSignal({
         signal,
@@ -518,6 +617,21 @@ const Advanced = () => {
         confidence: Math.round(confidence),
         suggestedRuns,
       })
+
+      if (isSafe) {
+        const newSignalRecord: SignalHistory = {
+          id: Date.now().toString(),
+          timestamp: Date.now(),
+          signal,
+          initialConfidence: Math.round(confidence),
+          currentConfidence: Math.round(confidence),
+          status: "active",
+          entryDigit: longestStreak.digit,
+          suggestedRuns,
+          percentageChange: 0,
+        }
+        setSignalHistory((prev) => [...prev, newSignalRecord])
+      }
     }
   }
 
@@ -875,39 +989,73 @@ const Advanced = () => {
           <div className="streak_analyzer_container">
             <div className="streak_card card2">
               <h2 className="analysis_title">Streak Entry Point Analyzer</h2>
+              <div className="signal_timer">
+                <span className="timer_label">Next Signal In:</span>
+                <span className="timer_value">
+                  {Math.max(0, 5 - Math.floor((Date.now() - lastSignalTime) / 60000))} min
+                </span>
+              </div>
               <button className="analyze_btn" onClick={analyzeStreaks}>
-                Analyze Streaks
+                Analyze Streaks Now
               </button>
 
               {streakSignal && (
-                <div className="signal_box">
+                <div className={`signal_box ${streakSignal.signal.includes("UNSAFE") ? "unsafe" : "safe"}`}>
                   <div className="signal_header">
-                    <h3>🎯 Signal Detected</h3>
+                    <h3>{streakSignal.signal.includes("UNSAFE") ? "⚠️ UNSAFE SIGNAL" : "✅ SAFE SIGNAL"}</h3>
                   </div>
                   <div className="signal_content">
                     <p className="signal_text">{streakSignal.signal}</p>
-                    <div className="signal_stats">
-                      <div className="stat">
-                        <span className="stat_label">Confidence</span>
-                        <span className="stat_value">{streakSignal.confidence}%</span>
+                    {!streakSignal.signal.includes("UNSAFE") && (
+                      <>
+                        <div className="signal_stats">
+                          <div className="stat">
+                            <span className="stat_label">Confidence</span>
+                            <span className="stat_value">{streakSignal.confidence}%</span>
+                          </div>
+                          <div className="stat">
+                            <span className="stat_label">Suggested Runs</span>
+                            <span className="stat_value">{streakSignal.suggestedRuns}</span>
+                          </div>
+                          <div className="stat">
+                            <span className="stat_label">Entry Digit</span>
+                            <span className="stat_value">{streakSignal.entryDigit}</span>
+                          </div>
+                        </div>
+                        <div className="signal_actions">
+                          <button className="action_btn win_btn" onClick={() => recordTrade("win")}>
+                            ✓ Win
+                          </button>
+                          <button className="action_btn loss_btn" onClick={() => recordTrade("loss")}>
+                            ✗ Loss
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {signalHistory.length > 0 && (
+                <div className="signal_history">
+                  <h3 className="history_title">Signal History (Last 5 Minutes)</h3>
+                  <div className="history_list">
+                    {signalHistory.slice(-5).map((sig) => (
+                      <div key={sig.id} className={`history_item ${sig.status}`}>
+                        <div className="history_status">
+                          {sig.status === "active" && <span className="status_badge active">Active</span>}
+                          {sig.status === "expired" && <span className="status_badge expired">Expired</span>}
+                          {sig.status === "upgraded" && <span className="status_badge upgraded">Upgraded</span>}
+                        </div>
+                        <div className="history_details">
+                          <p className="history_signal">{sig.signal.substring(0, 50)}...</p>
+                          <p className="history_meta">
+                            Confidence: {sig.currentConfidence}% ({sig.percentageChange > 0 ? "+" : ""}
+                            {sig.percentageChange}%)
+                          </p>
+                        </div>
                       </div>
-                      <div className="stat">
-                        <span className="stat_label">Suggested Runs</span>
-                        <span className="stat_value">{streakSignal.suggestedRuns}</span>
-                      </div>
-                      <div className="stat">
-                        <span className="stat_label">Entry Digit</span>
-                        <span className="stat_value">{streakSignal.entryDigit}</span>
-                      </div>
-                    </div>
-                    <div className="signal_actions">
-                      <button className="action_btn win_btn" onClick={() => recordTrade("win")}>
-                        ✓ Win
-                      </button>
-                      <button className="action_btn loss_btn" onClick={() => recordTrade("loss")}>
-                        ✗ Loss
-                      </button>
-                    </div>
+                    ))}
                   </div>
                 </div>
               )}
