@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import styles from "./copytradingpage.module.scss"
+import styles from "./CopyTradingPage.module.scss"
 
 interface Account {
   loginid: string
