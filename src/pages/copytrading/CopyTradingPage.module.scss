@@ -1,10 +1,9 @@
-// Color variables
 $dark-bg: #0a0a0a;
 $card-bg: #121212;
 $header-bg: #1a1a1a;
-$gold-primary: #d4af37;
-$gold-secondary: #f4d03f;
-$gold-light: #f9e076;
+$green-primary: #10b981;
+$green-secondary: #34d399;
+$green-light: #6ee7b7;
 $text-primary: #e0e0e0;
 $text-secondary: #a0a0a0;
 $success: #2ecc71;
@@ -20,18 +19,22 @@ $info: #3498db;
     padding: 16px;
     font-family: 'Arial', sans-serif;
     overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 // Role Selection Screen
 .roleSelectionCard {
     max-width: 900px;
-    margin: 60px auto;
+    margin: 40px auto;
     background-color: $card-bg;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     overflow: hidden;
-    border: 1px solid rgba($gold-primary, 0.3);
+    border: 1px solid rgba($green-primary, 0.3);
     animation: slideIn 0.5s ease;
+    position: relative;
 
     &::before {
         content: '';
@@ -40,7 +43,7 @@ $info: #3498db;
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, $gold-primary, $gold-secondary, $gold-primary);
+        background: linear-gradient(90deg, $green-primary, $green-secondary, $green-primary);
     }
 }
 
@@ -48,18 +51,18 @@ $info: #3498db;
     background: linear-gradient(to right, #1a1a1a, #2a2a2a);
     padding: 40px 24px;
     text-align: center;
-    border-bottom: 1px solid rgba($gold-primary, 0.2);
+    border-bottom: 1px solid rgba($green-primary, 0.2);
 
     h1 {
         font-size: 32px;
         font-weight: bold;
-        color: $gold-primary;
+        color: $green-primary;
         margin: 0 0 8px 0;
-        text-shadow: 0 0 8px rgba($gold-light, 0.3);
+        text-shadow: 0 0 8px rgba($green-light, 0.3);
     }
 
     p {
-        color: $gold-secondary;
+        color: $green-secondary;
         font-size: 16px;
         margin: 0;
     }
@@ -76,15 +79,15 @@ $info: #3498db;
     background-color: rgba(26, 26, 26, 0.8);
     padding: 32px 24px;
     border-radius: 8px;
-    border: 1px solid rgba($gold-primary, 0.2);
+    border: 1px solid rgba($green-primary, 0.2);
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
 
     &:hover {
         transform: translateY(-8px);
-        border-color: $gold-primary;
-        box-shadow: 0 12px 24px rgba($gold-primary, 0.2);
+        border-color: $green-primary;
+        box-shadow: 0 12px 24px rgba($green-primary, 0.2);
     }
 
     .roleIcon {
@@ -94,7 +97,7 @@ $info: #3498db;
 
     h2 {
         font-size: 20px;
-        color: $gold-primary;
+        color: $green-primary;
         margin: 0 0 8px 0;
     }
 
@@ -115,7 +118,7 @@ $info: #3498db;
         color: $text-secondary;
         font-size: 14px;
         padding: 6px 0;
-        border-bottom: 1px solid rgba($gold-primary, 0.1);
+        border-bottom: 1px solid rgba($green-primary, 0.1);
 
         &:last-child {
             border-bottom: none;
@@ -126,14 +129,16 @@ $info: #3498db;
 // Main Card
 .card {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto 40px auto;
     background-color: $card-bg;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
+    overflow: visible;
     width: 100%;
-    border: 1px solid rgba($gold-primary, 0.3);
+    border: 1px solid rgba($green-primary, 0.3);
     position: relative;
+    display: flex;
+    flex-direction: column;
 
     &::before {
         content: '';
@@ -142,15 +147,16 @@ $info: #3498db;
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, $gold-primary, $gold-secondary, $gold-primary);
+        background: linear-gradient(90deg, $green-primary, $green-secondary, $green-primary);
     }
 }
 
 .header {
     background: linear-gradient(to right, #1a1a1a, #2a2a2a);
     padding: 24px;
-    color: $gold-primary;
-    border-bottom: 1px solid rgba($gold-primary, 0.2);
+    color: $green-primary;
+    border-bottom: 1px solid rgba($green-primary, 0.2);
+    flex-shrink: 0;
 }
 
 .headerContent {
@@ -163,13 +169,13 @@ $info: #3498db;
         font-size: 24px;
         font-weight: bold;
         margin: 0;
-        text-shadow: 0 0 8px rgba($gold-light, 0.3);
+        text-shadow: 0 0 8px rgba($green-light, 0.3);
         letter-spacing: 0.5px;
     }
 }
 
 .roleLabel {
-    color: $gold-secondary;
+    color: $green-secondary;
     font-size: 12px;
     margin-top: 4px;
     margin-bottom: 0;
@@ -178,7 +184,7 @@ $info: #3498db;
 }
 
 .subtitle {
-    color: $gold-secondary;
+    color: $green-secondary;
     margin-top: 8px;
     margin-bottom: 0;
     font-size: 14px;
@@ -190,7 +196,7 @@ $info: #3498db;
     padding: 6px 12px;
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 20px;
-    border: 1px solid rgba($gold-primary, 0.2);
+    border: 1px solid rgba($green-primary, 0.2);
     white-space: nowrap;
 }
 
@@ -226,12 +232,13 @@ $info: #3498db;
 .content {
     padding: 24px;
     width: 100%;
+    flex: 1;
 }
 
 .tabs {
     display: flex;
     flex-wrap: wrap;
-    border-bottom: 1px solid rgba($gold-primary, 0.2);
+    border-bottom: 1px solid rgba($green-primary, 0.2);
     margin-bottom: 24px;
     gap: 8px;
 }
@@ -250,7 +257,7 @@ $info: #3498db;
     font-size: 14px;
 
     &:hover {
-        color: $gold-primary;
+        color: $green-primary;
     }
 
     &::after {
@@ -260,7 +267,7 @@ $info: #3498db;
         left: 0;
         width: 0;
         height: 2px;
-        background: linear-gradient(90deg, $gold-primary, $gold-secondary);
+        background: linear-gradient(90deg, $green-primary, $green-secondary);
         transition: width 0.3s ease;
     }
 
@@ -270,7 +277,7 @@ $info: #3498db;
 }
 
 .activeTab {
-    color: $gold-primary;
+    color: $green-primary;
 
     &::after {
         width: 100%;
@@ -297,21 +304,21 @@ $info: #3498db;
     padding: 20px;
     border-radius: 8px;
     width: 100%;
-    border: 1px solid rgba($gold-primary, 0.1);
+    border: 1px solid rgba($green-primary, 0.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        border-color: rgba($gold-primary, 0.3);
+        border-color: rgba($green-primary, 0.3);
     }
 
     h2 {
         font-size: 20px;
         font-weight: 600;
         margin-bottom: 16px;
-        color: $gold-primary;
+        color: $green-primary;
         display: flex;
         align-items: center;
 
@@ -320,7 +327,7 @@ $info: #3498db;
             display: inline-block;
             width: 8px;
             height: 8px;
-            background-color: $gold-primary;
+            background-color: $green-primary;
             border-radius: 50%;
             margin-right: 12px;
         }
@@ -332,7 +339,7 @@ $info: #3498db;
     background-color: rgba(10, 10, 10, 0.8);
     padding: 16px;
     border-radius: 6px;
-    border-left: 3px solid $gold-primary;
+    border-left: 3px solid $green-primary;
 }
 
 .accountRow {
@@ -340,7 +347,7 @@ $info: #3498db;
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid rgba($gold-primary, 0.1);
+    border-bottom: 1px solid rgba($green-primary, 0.1);
 
     &:last-child {
         border-bottom: none;
@@ -352,7 +359,7 @@ $info: #3498db;
     }
 
     .value {
-        color: $gold-primary;
+        color: $green-primary;
         font-weight: 600;
         font-size: 14px;
 
@@ -374,7 +381,7 @@ $info: #3498db;
     margin-bottom: 16px;
 
     label {
-        color: $gold-primary;
+        color: $green-primary;
         font-weight: 600;
         font-size: 14px;
     }
@@ -384,7 +391,7 @@ $info: #3498db;
     width: 100%;
     padding: 12px 16px;
     background-color: rgba(10, 10, 10, 0.8);
-    border: 1px solid rgba($gold-primary, 0.3);
+    border: 1px solid rgba($green-primary, 0.3);
     border-radius: 6px;
     color: $text-primary;
     outline: none;
@@ -393,8 +400,8 @@ $info: #3498db;
     letter-spacing: 0.5px;
 
     &:focus {
-        border-color: $gold-primary;
-        box-shadow: 0 0 0 2px rgba($gold-primary, 0.2);
+        border-color: $green-primary;
+        box-shadow: 0 0 0 2px rgba($green-primary, 0.2);
     }
 
     &::placeholder {
@@ -405,7 +412,7 @@ $info: #3498db;
 .helperText {
     margin-top: 4px;
     font-size: 12px;
-    color: rgba($gold-secondary, 0.8);
+    color: rgba($green-secondary, 0.8);
     font-style: italic;
 }
 
@@ -443,7 +450,7 @@ $info: #3498db;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, $gold-primary, $gold-secondary);
+        background: linear-gradient(135deg, $green-primary, $green-secondary);
         z-index: -1;
         transition: all 0.3s ease;
     }
@@ -461,10 +468,10 @@ $info: #3498db;
 
 .primaryButton {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 4px 12px rgba($gold-primary, 0.3);
+    box-shadow: 0 4px 12px rgba($green-primary, 0.3);
 
     &:hover:not(:disabled) {
-        box-shadow: 0 6px 16px rgba($gold-primary, 0.4);
+        box-shadow: 0 6px 16px rgba($green-primary, 0.4);
     }
 }
 
@@ -500,8 +507,8 @@ $info: #3498db;
     animation: spin 1s linear infinite;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba($gold-primary, 0.2);
-    border-top-color: $gold-primary;
+    border: 3px solid rgba($green-primary, 0.2);
+    border-top-color: $green-primary;
     border-radius: 50%;
     margin-right: 12px;
 }
@@ -518,7 +525,7 @@ $info: #3498db;
     background-color: rgba(18, 18, 18, 0.8);
     padding: 16px;
     border-radius: 8px;
-    border-left: 3px solid $gold-primary;
+    border-left: 3px solid $green-primary;
     transition: all 0.3s ease;
 
     &:hover {
@@ -551,12 +558,12 @@ $info: #3498db;
     background-color: rgba(18, 18, 18, 0.8);
     padding: 16px;
     border-radius: 8px;
-    border: 1px solid rgba($gold-primary, 0.2);
+    border: 1px solid rgba($green-primary, 0.2);
     transition: all 0.3s ease;
 
     &:hover {
-        border-color: $gold-primary;
-        box-shadow: 0 4px 12px rgba($gold-primary, 0.1);
+        border-color: $green-primary;
+        box-shadow: 0 4px 12px rgba($green-primary, 0.1);
     }
 }
 
@@ -567,7 +574,7 @@ $info: #3498db;
     margin-bottom: 12px;
 
     h3 {
-        color: $gold-primary;
+        color: $green-primary;
         margin: 0;
         font-size: 16px;
     }
@@ -587,7 +594,7 @@ $info: #3498db;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px;
     padding-top: 12px;
-    border-top: 1px solid rgba($gold-primary, 0.1);
+    border-top: 1px solid rgba($green-primary, 0.1);
 
     div {
         display: flex;
@@ -601,7 +608,7 @@ $info: #3498db;
     }
 
     .value {
-        color: $gold-primary;
+        color: $green-primary;
         font-weight: 600;
         font-size: 14px;
     }
@@ -616,7 +623,7 @@ $info: #3498db;
     background-color: rgba(18, 18, 18, 0.8);
     border-radius: 6px;
     margin-bottom: 12px;
-    border: 1px solid rgba($gold-primary, 0.1);
+    border: 1px solid rgba($green-primary, 0.1);
 
     &:last-child {
         margin-bottom: 0;
@@ -698,24 +705,24 @@ $info: #3498db;
     padding: 12px 16px;
     background-color: rgba(18, 18, 18, 0.8);
     border-radius: 6px;
-    border: 1px solid rgba($gold-primary, 0.2);
+    border: 1px solid rgba($green-primary, 0.2);
     cursor: pointer;
     transition: all 0.3s ease;
 
     &:hover {
-        border-color: $gold-primary;
+        border-color: $green-primary;
         background-color: rgba(26, 26, 26, 0.8);
     }
 
     &.active {
-        border-color: $gold-primary;
-        background-color: rgba($gold-primary, 0.1);
+        border-color: $green-primary;
+        background-color: rgba($green-primary, 0.1);
     }
 }
 
 .accountItemContent {
     h4 {
-        color: $gold-primary;
+        color: $green-primary;
         margin: 0;
         font-size: 14px;
     }
@@ -739,9 +746,8 @@ $info: #3498db;
     padding: 20px;
     border-radius: 8px;
     overflow: auto;
-    max-height: 500px;
     width: 100%;
-    border: 1px solid rgba($gold-primary, 0.2);
+    border: 1px solid rgba($green-primary, 0.2);
 }
 
 .responseContent {
@@ -754,7 +760,7 @@ $info: #3498db;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-family: 'Courier New', monospace;
-    border-left: 3px solid $gold-primary;
+    border-left: 3px solid $green-primary;
     margin: 0;
 }
 
@@ -795,9 +801,10 @@ $info: #3498db;
     padding: 16px;
     text-align: center;
     font-size: 14px;
-    color: rgba($gold-secondary, 0.8);
-    border-top: 1px solid rgba($gold-primary, 0.1);
+    color: rgba($green-secondary, 0.8);
+    border-top: 1px solid rgba($green-primary, 0.1);
     letter-spacing: 0.5px;
+    flex-shrink: 0;
 }
 
 // No Data Message
@@ -857,6 +864,7 @@ $info: #3498db;
 
     .card {
         border-radius: 8px;
+        margin-bottom: 20px;
     }
 
     .header {
@@ -874,11 +882,14 @@ $info: #3498db;
 
     .tabs {
         gap: 4px;
+        overflow-x: auto;
+        padding-bottom: 8px;
     }
 
     .tabButton {
         padding: 6px 12px;
         font-size: 12px;
+        white-space: nowrap;
     }
 
     .switchRoleButton {
@@ -915,5 +926,9 @@ $info: #3498db;
         right: 10px;
         left: 10px;
         max-width: none;
+    }
+
+    .roleSelectionCard {
+        margin: 20px auto;
     }
 }
