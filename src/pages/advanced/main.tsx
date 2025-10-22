@@ -55,12 +55,6 @@ const Advanced = () => {
   const [isTickChart, setIsTickChart] = useState(false)
   const [pipSize, setPipSize] = useState(2)
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") === "dark"
-    }
-    return true
-  })
   const wsRef = useRef<WebSocket | null>(null)
   const [activeDigitIndex, setActiveDigitIndex] = useState<number | null>(null)
   const digitsContainerRef = useRef<HTMLDivElement>(null)
@@ -116,10 +110,9 @@ const Advanced = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("theme", isDarkMode ? "dark" : "light")
-      document.documentElement.setAttribute("data-theme", isDarkMode ? "dark" : "light")
+      document.documentElement.setAttribute("data-theme", "dark")
     }
-  }, [isDarkMode])
+  }, [])
 
   useEffect(() => {
     if (activeLast !== null && digitsContainerRef.current) {
@@ -402,7 +395,7 @@ const Advanced = () => {
       else equalCount++
     }
 
-    const total = digits.length - 1 || 1
+    const total = riseCount + fallCount || 1
     return {
       risePercentage: ((riseCount / total) * 100).toFixed(2),
       fallPercentage: ((fallCount / total) * 100).toFixed(2),
@@ -450,8 +443,41 @@ const Advanced = () => {
     return percentages
   }
 
+  const generateTradingSignal = (
+    streak: { digit: number; length: number; position: number },
+    volatility: number,
+    confidence: number,
+  ): string => {
+    const overUnder = calculateOverUnderPercentages()
+    const riseFall = calculateRiseFallPercentages()
+
+    const overPercentage = Number.parseFloat(overUnder.overPercentage)
+    const underPercentage = Number.parseFloat(overUnder.underPercentage)
+    const risePercentage = Number.parseFloat(riseFall.risePercentage)
+    const fallPercentage = Number.parseFloat(riseFall.fallPercentage)
+
+    // Determine if market favors over or under
+    const favorOver = overPercentage > underPercentage
+    const favorRise = risePercentage > fallPercentage
+
+    // Generate signal based on streak digit and market conditions
+    const digit = streak.digit
+    const streakStrength = streak.length >= 4 ? "Strong" : "Moderate"
+
+    if (favorOver && digit > 5) {
+      return `🎯 ${streakStrength} Signal: Trader Over ${digit} (${overPercentage.toFixed(1)}% Over Bias)`
+    } else if (!favorOver && digit < 5) {
+      return `🎯 ${streakStrength} Signal: Trader Under ${digit} (${underPercentage.toFixed(1)}% Under Bias)`
+    } else if (favorRise) {
+      return `🎯 ${streakStrength} Signal: Trader Rise on ${digit} (${risePercentage.toFixed(1)}% Rise Bias)`
+    } else {
+      return `🎯 ${streakStrength} Signal: Trader Fall on ${digit} (${fallPercentage.toFixed(1)}% Fall Bias)`
+    }
+  }
+
   const analyzeStreaks = () => {
-    const digits = getLastDigitList()
+    const allDigits = getLastDigitList()
+    const digits = allDigits.slice(-50)
     const streaks: { digit: number; length: number; position: number }[] = []
 
     let currentDigit = digits[0]
@@ -477,7 +503,6 @@ const Advanced = () => {
 
     setStreakData(digits)
 
-    // Find best entry point
     if (streaks.length > 0) {
       const longestStreak = streaks.reduce((prev, current) => (current.length > prev.length ? current : prev))
 
@@ -485,8 +510,10 @@ const Advanced = () => {
       const confidence = Math.min(100, (longestStreak.length / 5) * 100)
       const suggestedRuns = Math.max(2, Math.ceil(5 - volatility / 20))
 
+      const signal = generateTradingSignal(longestStreak, volatility, confidence)
+
       setStreakSignal({
-        signal: `Streak of ${longestStreak.length} detected on digit ${longestStreak.digit}`,
+        signal,
         entryDigit: longestStreak.digit,
         confidence: Math.round(confidence),
         suggestedRuns,
@@ -596,17 +623,6 @@ const Advanced = () => {
             <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
               <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-          </div>
-          <div className="theme_toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
-            {isDarkMode ? (
-              <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
-                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            ) : (
-              <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
-                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-              </svg>
-            )}
           </div>
           <div className="sync_btn" onClick={handleSync}>
             <svg
