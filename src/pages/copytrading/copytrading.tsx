@@ -58,6 +58,7 @@ interface ApiLog {
 const CopyTradingPage = () => {
   const [wsConnected, setWsConnected] = useState(false)
   const [wsConnecting, setWsConnecting] = useState(false)
+  const [ping, setPing] = useState<number | null>(null)
 
   const [userRole, setUserRole] = useState<"trader" | "follower" | "personal" | null>(null)
   const [demoToRealMode, setDemoToRealMode] = useState(false)
@@ -93,7 +94,8 @@ const CopyTradingPage = () => {
   const wsRef = useRef<WebSocket | null>(null)
   const balanceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const wsConnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const pingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const lastPingTimeRef = useRef<number>(0)
 
   const accountDetailsCache = useRef<Map<string, { name: string; wallets: Wallet[] }>>(new Map())
   const balanceFetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -108,7 +110,6 @@ const CopyTradingPage = () => {
     setApiLogs((prev) => [log, ...prev.slice(0, 99)])
   }, [])
 
-  // Initialize from localStorage
   useEffect(() => {
     const savedRole = localStorage.getItem("copytrading_role") as "trader" | "follower" | "personal" | null
     const savedCopyMode =
@@ -143,14 +144,12 @@ const CopyTradingPage = () => {
     return () => {
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-      if (wsConnectTimeoutRef.current) clearTimeout(wsConnectTimeoutRef.current)
+      if (pingIntervalRef.current) clearInterval(pingIntervalRef.current)
     }
   }, [])
 
   useEffect(() => {
-    if (activeAccount && userRole) {
-      setAccountBalance(null)
-      setAccountName("")
+    if (activeAccount && userRole && !wsRef.current) {
       connectWebSocket(activeAccount.token)
     }
   }, [activeAccount, userRole])
@@ -190,9 +189,7 @@ const CopyTradingPage = () => {
 
   const fetchAccountDetails = useCallback(
     async (token: string): Promise<{ name: string; wallets: Wallet[] }> => {
-      // Check cache first
       if (accountDetailsCache.current.has(token)) {
-        console.log("[v0] Using cached account details")
         return accountDetailsCache.current.get(token)!
       }
 
@@ -264,7 +261,7 @@ const CopyTradingPage = () => {
       }
 
       setWsConnecting(true)
-      console.log("[v0] Starting WebSocket connection...")
+      console.log("[v0] Starting persistent WebSocket connection...")
 
       wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
 
@@ -276,14 +273,24 @@ const CopyTradingPage = () => {
 
         wsRef.current?.send(JSON.stringify({ authorize: token }))
         addApiLog("request", { authorize: token })
+
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = setInterval(() => {
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            lastPingTimeRef.current = Date.now()
+            wsRef.current.send(JSON.stringify({ ping: 1 }))
+          }
+        }, 5000)
       }
 
       wsRef.current.onclose = () => {
         console.log("[v0] WebSocket closed")
         setWsConnecting(false)
         setWsConnected(false)
+        setPing(null)
         showNotification("warning", "Connection lost. Reconnecting in 3 seconds...")
 
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current)
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
 
         reconnectTimeoutRef.current = setTimeout(() => {
@@ -302,6 +309,11 @@ const CopyTradingPage = () => {
         const data: ResponseData = JSON.parse(event.data)
         addApiLog("response", data)
         console.log("[v0] WebSocket message:", data.msg_type)
+
+        if (data.msg_type === "pong") {
+          const latency = Date.now() - lastPingTimeRef.current
+          setPing(latency)
+        }
 
         if (data.msg_type === "authorize") {
           if (data.error) {
@@ -588,11 +600,19 @@ const CopyTradingPage = () => {
               </p>
               {accountName && <p className={styles.accountNameDisplay}>Account: {accountName}</p>}
             </div>
-            <div className={styles.connectionStatus}>
-              <div
-                className={`${styles.statusIndicator} ${wsConnected ? styles.connected : wsConnecting ? styles.syncing : styles.disconnected}`}
-              ></div>
-              <span>{wsConnected ? "Connected" : wsConnecting ? "Connecting..." : "Disconnected"}</span>
+            <div className={styles.connectionStatusContainer}>
+              <div className={styles.connectionStatus}>
+                <div
+                  className={`${styles.statusIndicator} ${wsConnected ? styles.connected : wsConnecting ? styles.syncing : styles.disconnected}`}
+                ></div>
+                <span>{wsConnected ? "Connected" : wsConnecting ? "Connecting..." : "Disconnected"}</span>
+              </div>
+              {wsConnected && ping !== null && (
+                <div className={styles.pingIndicator}>
+                  <span className={styles.wifiIcon}>📶</span>
+                  <span className={styles.pingValue}>{ping}ms</span>
+                </div>
+              )}
             </div>
           </div>
           <p className={styles.subtitle}>
@@ -711,49 +731,51 @@ const CopyTradingPage = () => {
 
                 <div className={styles.formGroup}>
                   <label>Copy Mode</label>
-                  <div className={styles.modeSelector}>
-                    {userRole === "trader" && (
-                      <button
-                        className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
-                        onClick={() => setCopyMode("demo-to-demo")}
-                      >
-                        📋 Demo-to-Demo
-                      </button>
-                    )}
-
-                    {userRole === "follower" && (
-                      <>
+                  <div className={styles.modeSelectorWrapper}>
+                    <div className={styles.modeSelector}>
+                      {userRole === "trader" && (
                         <button
                           className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
                           onClick={() => setCopyMode("demo-to-demo")}
                         >
                           📋 Demo-to-Demo
                         </button>
-                        <button
-                          className={`${styles.modeButton} ${copyMode === "real-to-real" ? styles.active : ""}`}
-                          onClick={() => setCopyMode("real-to-real")}
-                        >
-                          💰 Real-to-Real
-                        </button>
-                      </>
-                    )}
+                      )}
 
-                    {userRole === "personal" && (
-                      <>
-                        <button
-                          className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
-                          onClick={() => setCopyMode("demo-to-demo")}
-                        >
-                          📋 Demo-to-Demo
-                        </button>
-                        <button
-                          className={`${styles.modeButton} ${copyMode === "demo-to-real" ? styles.active : ""}`}
-                          onClick={() => setCopyMode("demo-to-real")}
-                        >
-                          💰 Demo-to-Real
-                        </button>
-                      </>
-                    )}
+                      {userRole === "follower" && (
+                        <>
+                          <button
+                            className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
+                            onClick={() => setCopyMode("demo-to-demo")}
+                          >
+                            📋 Demo-to-Demo
+                          </button>
+                          <button
+                            className={`${styles.modeButton} ${copyMode === "real-to-real" ? styles.active : ""}`}
+                            onClick={() => setCopyMode("real-to-real")}
+                          >
+                            💰 Real-to-Real
+                          </button>
+                        </>
+                      )}
+
+                      {userRole === "personal" && (
+                        <>
+                          <button
+                            className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
+                            onClick={() => setCopyMode("demo-to-demo")}
+                          >
+                            📋 Demo-to-Demo
+                          </button>
+                          <button
+                            className={`${styles.modeButton} ${copyMode === "demo-to-real" ? styles.active : ""}`}
+                            onClick={() => setCopyMode("demo-to-real")}
+                          >
+                            💰 Demo-to-Real
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                   <p className={styles.helperText}>
                     {copyMode === "demo-to-demo"
