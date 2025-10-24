@@ -1,6 +1,6 @@
 {
-"name":"OSAMTRADING HUB",
-"short_name":"OSAMTRADINGHUB",
+"name":"MESOFLIX",
+"short_name":"MESOFLIX",
 "theme_color":"#414652",
 "description":"Trade on your finger prints.",
 "background_color":"#414652",
@@ -8,9 +8,10 @@
 "start_url":"/",
 "icons": [
  {
-"src":"osamlogo.jpg",
+"src":"deriv-logo.jpeg",
 "sizes":"512x512",
-"type":"image/jpg"
+"type":"image/jpeg"
  }
    ]
 }
+
