@@ -177,13 +177,14 @@ const CopyTradingPage = () => {
 
   const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
     return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
-      let authReceived = false
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+      let authData: any = null
+      let settingsData: any = null
 
       const timeout = setTimeout(() => {
         tempWs.close()
         reject(new Error("Account details fetch timeout"))
-      }, 8000)
+      }, 4000)
 
       tempWs.onopen = () => {
         tempWs.send(JSON.stringify({ authorize: token }))
@@ -193,28 +194,38 @@ const CopyTradingPage = () => {
         const data: ResponseData = JSON.parse(event.data)
 
         if (data.msg_type === "authorize") {
-          clearTimeout(timeout)
           if (data.error) {
+            clearTimeout(timeout)
             reject(new Error(data.error.message))
+            tempWs.close()
           } else {
-            authReceived = true
-            // Request account settings to get real name
+            authData = data.authorize
             tempWs.send(JSON.stringify({ get_account_settings: 1 }))
           }
         }
 
-        if (data.msg_type === "get_account_settings" && authReceived) {
+        if (data.msg_type === "get_account_settings") {
+          clearTimeout(timeout)
+          settingsData = data.get_account_settings
+
+          const loginid = authData?.loginid || "Account"
+
+          // Extract real name from first_name and last_name, fallback to loginid
+          let realName = loginid
+          if (settingsData?.first_name) {
+            realName = settingsData.first_name
+            if (settingsData.last_name) {
+              realName += ` ${settingsData.last_name}`
+            }
+          } else if (settingsData?.salutation) {
+            realName = settingsData.salutation
+          }
+
           // Mock wallet data - in real app, fetch from API
           const mockWallets: Wallet[] = [
             { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
             { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
           ]
-
-          const loginid = data.authorize?.loginid || data.get_account_settings?.loginid || "Account"
-          // Extract real name from account settings or use loginid as fallback
-          const realName = data.get_account_settings?.first_name
-            ? `${data.get_account_settings.first_name} ${data.get_account_settings.last_name || ""}`.trim()
-            : loginid
 
           resolve({ name: loginid, realName: realName, wallets: mockWallets })
           tempWs.close()
@@ -234,15 +245,14 @@ const CopyTradingPage = () => {
       return
     }
 
-    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
 
     wsRef.current.onopen = () => {
       setIsConnected(true)
       wsRef.current?.send(JSON.stringify({ authorize: token }))
-      // Fetch balance immediately after authorization
       setTimeout(() => {
         wsRef.current?.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
-      }, 500)
+      }, 100)
       onOpenCallback?.()
     }
 
@@ -264,6 +274,14 @@ const CopyTradingPage = () => {
           showNotification("error", `Authorization failed: ${data.error.message}`)
         } else {
           showNotification("success", "Account authorized successfully")
+          if (data.authorize?.loginid) {
+            setAccountName(data.authorize.loginid)
+            // Try to get real name from localStorage or API
+            const storedRealName = localStorage.getItem(`realname_${data.authorize.loginid}`)
+            if (storedRealName) {
+              setAccountRealName(storedRealName)
+            }
+          }
           if (data.authorize?.balance !== undefined) {
             setAccountBalance(data.authorize.balance)
           }
@@ -306,6 +324,8 @@ const CopyTradingPage = () => {
     setIsLoading(true)
     try {
       const { name, realName, wallets } = await fetchAccountDetails(newFollowerToken.trim())
+
+      localStorage.setItem(`realname_${name}`, realName)
 
       // Auto-select demo wallet if demo-to-demo mode
       const selectedWalletId = copyMode === "demo-to-demo" ? wallets.find((w) => w.type === "demo")?.id : wallets[0]?.id
@@ -362,7 +382,6 @@ const CopyTradingPage = () => {
     setFollowers(
       followers.map((f) => {
         if (f.loginid === loginid) {
-          // Auto-switch wallet based on mode
           let newWalletId = f.selectedWallet
           if (mode === "demo-to-demo") {
             newWalletId = f.wallets?.find((w) => w.type === "demo")?.id || f.selectedWallet
@@ -405,6 +424,7 @@ const CopyTradingPage = () => {
         const { name, realName } = await fetchAccountDetails(traderToken.trim())
         setTraderName(name)
         setTraderRealName(realName)
+        localStorage.setItem(`realname_${name}`, realName)
       }
 
       connectWebSocket(activeAccount.token, () => {
@@ -417,9 +437,8 @@ const CopyTradingPage = () => {
         wsRef.current?.send(JSON.stringify(request))
       })
 
-      // Start faster balance check interval (2 seconds instead of 5)
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
-      balanceCheckIntervalRef.current = setInterval(fetchBalance, 2000)
+      balanceCheckIntervalRef.current = setInterval(fetchBalance, 1000)
     } finally {
       setIsLoading(false)
     }
