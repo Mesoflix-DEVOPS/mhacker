@@ -175,139 +175,198 @@ const CopyTradingPage = () => {
     localStorage.setItem("copytrading_selected_wallet", selectedWallet)
   }, [selectedWallet])
 
-  const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
-    return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
-      let authData: any = null
-      let settingsData: any = null
-
-      const timeout = setTimeout(() => {
-        tempWs.close()
-        reject(new Error("Account details fetch timeout"))
-      }, 4000)
-
-      tempWs.onopen = () => {
-        tempWs.send(JSON.stringify({ authorize: token }))
-      }
-
-      tempWs.onmessage = (event) => {
-        const data: ResponseData = JSON.parse(event.data)
-
-        if (data.msg_type === "authorize") {
-          if (data.error) {
-            clearTimeout(timeout)
-            reject(new Error(data.error.message))
-            tempWs.close()
-          } else {
-            authData = data.authorize
-            tempWs.send(JSON.stringify({ get_account_settings: 1 }))
-          }
-        }
-
-        if (data.msg_type === "get_account_settings") {
-          clearTimeout(timeout)
-          settingsData = data.get_account_settings
-
-          const loginid = authData?.loginid || "Account"
-
-          // Extract real name from first_name and last_name, fallback to loginid
-          let realName = loginid
-          if (settingsData?.first_name) {
-            realName = settingsData.first_name
-            if (settingsData.last_name) {
-              realName += ` ${settingsData.last_name}`
-            }
-          } else if (settingsData?.salutation) {
-            realName = settingsData.salutation
-          }
-
-          // Mock wallet data - in real app, fetch from API
-          const mockWallets: Wallet[] = [
-            { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
-            { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
-          ]
-
-          resolve({ name: loginid, realName: realName, wallets: mockWallets })
-          tempWs.close()
-        }
-      }
-
-      tempWs.onerror = () => {
-        clearTimeout(timeout)
-        reject(new Error("Failed to fetch account details"))
-      }
-    })
-  }
-
   const connectWebSocket = (token: string, onOpenCallback?: () => void) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       onOpenCallback?.()
       return
     }
 
-    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+    if (wsRef.current) {
+      wsRef.current.close()
+    }
+
+    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+    let isAuthorized = false
 
     wsRef.current.onopen = () => {
-      setIsConnected(true)
+      console.log("[v0] WebSocket opened, sending authorization...")
       wsRef.current?.send(JSON.stringify({ authorize: token }))
-      setTimeout(() => {
-        wsRef.current?.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
-      }, 100)
-      onOpenCallback?.()
     }
 
     wsRef.current.onclose = () => {
+      console.log("[v0] WebSocket closed")
       setIsConnected(false)
-      showNotification("warning", "Connection lost. Attempting to reconnect...")
+      setTimeout(() => {
+        if (!isAuthorized) {
+          console.log("[v0] Attempting to reconnect...")
+          connectWebSocket(token, onOpenCallback)
+        }
+      }, 3000)
     }
 
-    wsRef.current.onerror = () => {
+    wsRef.current.onerror = (error) => {
+      console.error("[v0] WebSocket error:", error)
       showNotification("error", "WebSocket connection error")
     }
 
     wsRef.current.onmessage = (event) => {
-      const data: ResponseData = JSON.parse(event.data)
-      setResponse(data)
+      try {
+        const data: ResponseData = JSON.parse(event.data)
+        console.log("[v0] WebSocket message received:", data.msg_type)
+        setResponse(data)
 
-      if (data.msg_type === "authorize") {
-        if (data.error) {
-          showNotification("error", `Authorization failed: ${data.error.message}`)
-        } else {
-          showNotification("success", "Account authorized successfully")
-          if (data.authorize?.loginid) {
-            setAccountName(data.authorize.loginid)
-            // Try to get real name from localStorage or API
-            const storedRealName = localStorage.getItem(`realname_${data.authorize.loginid}`)
-            if (storedRealName) {
-              setAccountRealName(storedRealName)
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            console.error("[v0] Authorization error:", data.error.message)
+            showNotification("error", `Authorization failed: ${data.error.message}`)
+            wsRef.current?.close()
+          } else {
+            isAuthorized = true
+            setIsConnected(true)
+            console.log("[v0] Authorization successful")
+            showNotification("success", "Account authorized successfully")
+
+            if (data.authorize?.loginid) {
+              setAccountName(data.authorize.loginid)
+              const storedRealName = localStorage.getItem(`realname_${data.authorize.loginid}`)
+              if (storedRealName) {
+                setAccountRealName(storedRealName)
+              }
             }
-          }
-          if (data.authorize?.balance !== undefined) {
-            setAccountBalance(data.authorize.balance)
+            if (data.authorize?.balance !== undefined) {
+              setAccountBalance(data.authorize.balance)
+            }
+
+            setTimeout(() => {
+              console.log("[v0] Requesting balance...")
+              wsRef.current?.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
+            }, 50)
+
+            onOpenCallback?.()
           }
         }
-      }
 
-      if (data.msg_type === "balance" && data.balance) {
-        setAccountBalance(data.balance.balance)
-      }
+        if (data.msg_type === "balance" && data.balance) {
+          console.log("[v0] Balance received:", data.balance.balance)
+          setAccountBalance(data.balance.balance)
+        }
 
-      if (data.msg_type === "copy_start" && !data.error) {
-        setIsCopyingActive(true)
-        showNotification("success", `Copy trading started (${copyMode})`)
-      }
+        if (data.msg_type === "copy_start" && !data.error) {
+          setIsCopyingActive(true)
+          showNotification("success", `Copy trading started (${copyMode})`)
+        }
 
-      if (data.msg_type === "copy_stop" && !data.error) {
-        setIsCopyingActive(false)
-        showNotification("success", "Copy trading stopped")
+        if (data.msg_type === "copy_stop" && !data.error) {
+          setIsCopyingActive(false)
+          showNotification("success", "Copy trading stopped")
+        }
+      } catch (error) {
+        console.error("[v0] Error parsing WebSocket message:", error)
       }
     }
   }
 
   const fetchBalance = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      console.log("[v0] Fetching balance...")
       wsRef.current.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
+    } else {
+      console.warn("[v0] WebSocket not connected, cannot fetch balance")
     }
+  }
+
+  const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
+    return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+      let authData: any = null
+      let settingsData: any = null
+      let isResolved = false
+
+      const timeout = setTimeout(() => {
+        if (!isResolved) {
+          isResolved = true
+          tempWs.close()
+          reject(new Error("Account details fetch timeout"))
+        }
+      }, 6000)
+
+      tempWs.onopen = () => {
+        console.log("[v0] Temp WebSocket opened for account details")
+        tempWs.send(JSON.stringify({ authorize: token }))
+      }
+
+      tempWs.onmessage = (event) => {
+        try {
+          const data: ResponseData = JSON.parse(event.data)
+          console.log("[v0] Temp WebSocket message:", data.msg_type)
+
+          if (data.msg_type === "authorize") {
+            if (data.error) {
+              clearTimeout(timeout)
+              isResolved = true
+              reject(new Error(data.error.message))
+              tempWs.close()
+            } else {
+              authData = data.authorize
+              console.log("[v0] Authorization successful, requesting account settings...")
+              tempWs.send(JSON.stringify({ get_account_settings: 1 }))
+            }
+          }
+
+          if (data.msg_type === "get_account_settings") {
+            clearTimeout(timeout)
+            if (!isResolved) {
+              isResolved = true
+              settingsData = data.get_account_settings
+
+              const loginid = authData?.loginid || "Account"
+
+              let realName = loginid
+              if (settingsData?.first_name && settingsData.first_name.trim()) {
+                realName = settingsData.first_name
+                if (settingsData?.last_name && settingsData.last_name.trim()) {
+                  realName += ` ${settingsData.last_name}`
+                }
+              } else if (settingsData?.salutation && settingsData.salutation.trim()) {
+                realName = settingsData.salutation
+              } else if (settingsData?.name && settingsData.name.trim()) {
+                realName = settingsData.name
+              }
+
+              console.log("[v0] Real name extracted:", realName)
+
+              const mockWallets: Wallet[] = [
+                { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
+                { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
+              ]
+
+              resolve({ name: loginid, realName: realName, wallets: mockWallets })
+              tempWs.close()
+            }
+          }
+        } catch (error) {
+          console.error("[v0] Error parsing temp WebSocket message:", error)
+        }
+      }
+
+      tempWs.onerror = (error) => {
+        console.error("[v0] Temp WebSocket error:", error)
+        clearTimeout(timeout)
+        if (!isResolved) {
+          isResolved = true
+          reject(new Error("Failed to fetch account details"))
+        }
+      }
+
+      tempWs.onclose = () => {
+        console.log("[v0] Temp WebSocket closed")
+        if (!isResolved) {
+          isResolved = true
+          clearTimeout(timeout)
+          reject(new Error("Connection closed before account details received"))
+        }
+      }
+    })
   }
 
   const showNotification = (type: "success" | "error" | "warning", message: string) => {
