@@ -22,12 +22,13 @@ $info: #3498db;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
+    scroll-behavior: smooth;
 }
 
 // Role Selection Screen
 .roleSelectionCard {
     max-width: 900px;
-    margin: 40px auto;
+    margin: 20px auto;
     background-color: $card-bg;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -49,12 +50,12 @@ $info: #3498db;
 
 .roleHeader {
     background: linear-gradient(to right, #1a1a1a, #2a2a2a);
-    padding: 40px 24px;
+    padding: 24px 16px;
     text-align: center;
     border-bottom: 1px solid rgba($green-primary, 0.2);
 
     h1 {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: bold;
         color: $green-primary;
         margin: 0 0 8px 0;
@@ -63,21 +64,21 @@ $info: #3498db;
 
     p {
         color: $green-secondary;
-        font-size: 16px;
+        font-size: 14px;
         margin: 0;
     }
 }
 
 .roleGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    padding: 40px 24px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 24px 16px;
 }
 
 .roleOption {
     background-color: rgba(26, 26, 26, 0.8);
-    padding: 32px 24px;
+    padding: 20px 16px;
     border-radius: 8px;
     border: 1px solid rgba($green-primary, 0.2);
     cursor: pointer;
@@ -91,20 +92,20 @@ $info: #3498db;
     }
 
     .roleIcon {
-        font-size: 48px;
-        margin-bottom: 16px;
+        font-size: 40px;
+        margin-bottom: 12px;
     }
 
     h2 {
-        font-size: 20px;
+        font-size: 18px;
         color: $green-primary;
         margin: 0 0 8px 0;
     }
 
     p {
         color: $text-secondary;
-        margin: 0 0 16px 0;
-        font-size: 14px;
+        margin: 0 0 12px 0;
+        font-size: 13px;
     }
 }
 
@@ -116,8 +117,8 @@ $info: #3498db;
 
     li {
         color: $text-secondary;
-        font-size: 14px;
-        padding: 6px 0;
+        font-size: 12px;
+        padding: 4px 0;
         border-bottom: 1px solid rgba($green-primary, 0.1);
 
         &:last-child {
@@ -139,6 +140,7 @@ $info: #3498db;
     position: relative;
     display: flex;
     flex-direction: column;
+    min-height: auto;
 
     &::before {
         content: '';
@@ -233,6 +235,8 @@ $info: #3498db;
     padding: 24px;
     width: 100%;
     flex: 1;
+    overflow-y: auto;
+    max-height: none;
 }
 
 .tabs {
@@ -862,6 +866,53 @@ $info: #3498db;
         padding: 8px;
     }
 
+    .roleSelectionCard {
+        margin: 16px auto;
+    }
+
+    .roleHeader {
+        padding: 16px 12px;
+
+        h1 {
+            font-size: 22px;
+        }
+
+        p {
+            font-size: 12px;
+        }
+    }
+
+    .roleGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px 12px;
+    }
+
+    .roleOption {
+        padding: 16px 12px;
+
+        .roleIcon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 16px;
+        }
+
+        p {
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+    }
+
+    .roleFeatures {
+        li {
+            font-size: 11px;
+            padding: 3px 0;
+        }
+    }
+
     .card {
         border-radius: 8px;
         margin-bottom: 20px;
@@ -918,17 +969,52 @@ $info: #3498db;
         grid-template-columns: 1fr;
     }
 
-    .roleGrid {
-        grid-template-columns: 1fr;
-    }
-
     .notification {
         right: 10px;
         left: 10px;
         max-width: none;
     }
+}
 
+@media (max-width: 480px) {
     .roleSelectionCard {
-        margin: 20px auto;
+        margin: 12px auto;
+    }
+
+    .roleHeader {
+        padding: 12px 8px;
+
+        h1 {
+            font-size: 18px;
+        }
+    }
+
+    .roleGrid {
+        padding: 12px 8px;
+        gap: 8px;
+    }
+
+    .roleOption {
+        padding: 12px 8px;
+
+        .roleIcon {
+            font-size: 28px;
+        }
+
+        h2 {
+            font-size: 14px;
+        }
+
+        p {
+            font-size: 11px;
+        }
+    }
+
+    .container {
+        padding: 4px;
+    }
+
+    .content {
+        padding: 12px;
     }
 }
