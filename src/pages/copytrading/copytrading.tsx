@@ -177,7 +177,7 @@ const CopyTradingPage = () => {
 
   const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
     return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
       let authReceived = false
 
       const timeout = setTimeout(() => {
