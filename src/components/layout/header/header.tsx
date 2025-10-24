@@ -37,11 +37,11 @@ const OsamLogo = () => (
     <line x1="105" y1="55" x2="105" y2="110" stroke="#00c853" stroke-width="3"/>
     <rect x="99" y="75" width="12" height="25" rx="2" fill="#00c853"/> 
     <text x="80" y="135" text-anchor="middle" font-family="Poppins, Segoe UI, sans-serif" font-weight="700" font-size="10" fill="white" opacity="0.95">
-        freedom
+        MESOFLIX
     </text>
 </svg>
 
-        <span className="osam-logo__text"> freedomhacker </span>
+        <span className="osam-logo__text"> MESOFLIX </span>
     </div>
 );
 
@@ -102,7 +102,7 @@ const AppHeader = observer(() => {
                         tertiary
                         className='login-button'
                         onClick={() => {
-                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=76418&l=EN&brand=freedomhacker');
+                            window.location.replace('https://oauth.deriv.com/oauth2/authorize?app_id=108422&l=EN&brand=MESOFLIX');
                         }}
                     >
                         <Localize i18n_default_text='Log in' />
