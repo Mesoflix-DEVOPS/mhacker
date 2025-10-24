@@ -31,14 +31,6 @@ interface Follower {
   wallets?: Wallet[]
 }
 
-interface Trader {
-  loginid: string
-  token: string
-  name?: string
-  copyMode: "demo-to-demo" | "demo-to-real"
-  selectedWallet?: string
-}
-
 interface ResponseData {
   msg_type?: string
   error?: {
@@ -64,6 +56,9 @@ interface ApiLog {
 }
 
 const CopyTradingPage = () => {
+  const [wsConnected, setWsConnected] = useState(false)
+  const [wsConnecting, setWsConnecting] = useState(false)
+
   // Role and Mode States
   const [userRole, setUserRole] = useState<"trader" | "follower" | null>(null)
   const [demoToRealMode, setDemoToRealMode] = useState(false)
@@ -89,7 +84,6 @@ const CopyTradingPage = () => {
   const [traderCopyMode, setTraderCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
 
   // UI States
-  const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"overview" | "followers" | "settings" | "response">("overview")
   const [apiLogs, setApiLogs] = useState<ApiLog[]>([])
@@ -100,6 +94,7 @@ const CopyTradingPage = () => {
   const wsRef = useRef<WebSocket | null>(null)
   const balanceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const wsConnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const addApiLog = useCallback((type: "request" | "response", data: ResponseData) => {
     const log: ApiLog = {
@@ -108,7 +103,7 @@ const CopyTradingPage = () => {
       type,
       data,
     }
-    setApiLogs((prev) => [log, ...prev.slice(0, 99)]) // Keep last 100 logs
+    setApiLogs((prev) => [log, ...prev.slice(0, 99)])
   }, [])
 
   // Initialize from localStorage
@@ -132,7 +127,6 @@ const CopyTradingPage = () => {
     if (savedWallets) setUserWallets(JSON.parse(savedWallets))
     if (savedSelectedWallet) setSelectedWallet(savedSelectedWallet)
 
-    // Load accounts from localStorage (set by callback)
     const clientAccounts = localStorage.getItem("clientAccounts")
     if (clientAccounts) {
       const parsed = JSON.parse(clientAccounts)
@@ -144,14 +138,17 @@ const CopyTradingPage = () => {
     }
 
     return () => {
-      if (balanceCheckIntervalRef.current) {
-        clearInterval(balanceCheckIntervalRef.current)
-      }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current)
-      }
+      if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+      if (wsConnectTimeoutRef.current) clearTimeout(wsConnectTimeoutRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (activeAccount && userRole) {
+      connectWebSocket(activeAccount.token)
+    }
+  }, [activeAccount, userRole])
 
   // Save state to localStorage
   useEffect(() => {
@@ -189,9 +186,19 @@ const CopyTradingPage = () => {
   const fetchAccountDetails = async (token: string) => {
     return new Promise<{ name: string; wallets: Wallet[] }>((resolve, reject) => {
       const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+      let resolved = false
+
+      const timeout = setTimeout(() => {
+        if (!resolved) {
+          resolved = true
+          tempWs.close()
+          reject(new Error("Account details fetch timeout"))
+        }
+      }, 10000)
 
       tempWs.onopen = () => {
         tempWs.send(JSON.stringify({ authorize: token }))
+        addApiLog("request", { authorize: token })
       }
 
       tempWs.onmessage = (event) => {
@@ -199,65 +206,99 @@ const CopyTradingPage = () => {
         addApiLog("response", data)
 
         if (data.msg_type === "authorize") {
-          if (data.error) {
-            reject(new Error(data.error.message))
-          } else {
-            const accountName = data.authorize?.fullname || data.authorize?.loginid || "Account"
+          if (!resolved) {
+            resolved = true
+            clearTimeout(timeout)
 
-            // Mock wallet data - in real app, fetch from API
-            const mockWallets: Wallet[] = [
-              { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
-              { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
-            ]
-
-            resolve({ name: accountName, wallets: mockWallets })
+            if (data.error) {
+              reject(new Error(data.error.message))
+            } else {
+              const accountName = data.authorize?.fullname || data.authorize?.loginid || "Account"
+              const mockWallets: Wallet[] = [
+                { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
+                { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
+              ]
+              resolve({ name: accountName, wallets: mockWallets })
+            }
+            tempWs.close()
           }
-          tempWs.close()
         }
       }
 
-      tempWs.onerror = () => reject(new Error("Failed to fetch account details"))
+      tempWs.onerror = () => {
+        if (!resolved) {
+          resolved = true
+          clearTimeout(timeout)
+          reject(new Error("Failed to fetch account details"))
+        }
+      }
     })
   }
 
   const connectWebSocket = useCallback(
-    (token: string, onOpenCallback?: () => void) => {
+    (token: string) => {
+      // Don't reconnect if already connected
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        onOpenCallback?.()
+        console.log("[v0] WebSocket already connected")
         return
       }
+
+      // Don't try to connect if already connecting
+      if (wsConnecting) {
+        console.log("[v0] WebSocket connection already in progress")
+        return
+      }
+
+      setWsConnecting(true)
+      console.log("[v0] Starting WebSocket connection...")
 
       wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
 
       wsRef.current.onopen = () => {
-        setIsConnected(true)
+        console.log("[v0] WebSocket opened, sending authorize...")
+        setWsConnecting(false)
+        setWsConnected(true)
         showNotification("success", "WebSocket connected")
+
+        // Send authorize immediately
         wsRef.current?.send(JSON.stringify({ authorize: token }))
         addApiLog("request", { authorize: token })
-        onOpenCallback?.()
       }
 
       wsRef.current.onclose = () => {
-        setIsConnected(false)
-        showNotification("warning", "Connection lost. Attempting to reconnect...")
+        console.log("[v0] WebSocket closed")
+        setWsConnecting(false)
+        setWsConnected(false)
+        showNotification("warning", "Connection lost. Reconnecting in 3 seconds...")
+
+        // Clear any pending timeouts
+        if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+
+        // Attempt reconnect after 3 seconds
         reconnectTimeoutRef.current = setTimeout(() => {
-          connectWebSocket(token, onOpenCallback)
+          connectWebSocket(token)
         }, 3000)
       }
 
-      wsRef.current.onerror = () => {
+      wsRef.current.onerror = (error) => {
+        console.log("[v0] WebSocket error:", error)
+        setWsConnecting(false)
+        setWsConnected(false)
         showNotification("error", "WebSocket connection error")
       }
 
       wsRef.current.onmessage = (event) => {
         const data: ResponseData = JSON.parse(event.data)
         addApiLog("response", data)
+        console.log("[v0] WebSocket message:", data.msg_type)
 
         if (data.msg_type === "authorize") {
           if (data.error) {
+            console.log("[v0] Authorization error:", data.error.message)
             showNotification("error", `Authorization failed: ${data.error.message}`)
           } else {
             const realName = data.authorize?.fullname || data.authorize?.loginid || "Account"
+            console.log("[v0] Authorized as:", realName)
             setAccountName(realName)
             showNotification("success", `Authorized as ${realName}`)
 
@@ -268,6 +309,7 @@ const CopyTradingPage = () => {
         }
 
         if (data.msg_type === "balance" && data.balance) {
+          console.log("[v0] Balance updated:", data.balance.balance)
           setAccountBalance(data.balance.balance)
         }
 
@@ -290,6 +332,8 @@ const CopyTradingPage = () => {
       const request = { balance: 1, req_id: Date.now() }
       wsRef.current.send(JSON.stringify(request))
       addApiLog("request", request)
+    } else {
+      console.log("[v0] WebSocket not ready for balance fetch")
     }
   }, [addApiLog])
 
@@ -354,7 +398,6 @@ const CopyTradingPage = () => {
     showNotification("success", `Copy mode updated to ${mode}`)
   }
 
-  // Start Copy Trading
   const startCopyTrading = async () => {
     if (!activeAccount) {
       showNotification("error", "No active account selected")
@@ -380,19 +423,47 @@ const CopyTradingPage = () => {
         setTraderName(name)
       }
 
-      connectWebSocket(activeAccount.token, () => {
-        const request = {
-          copy_start: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
-          copy_mode: copyMode,
-          selected_wallet: selectedWallet,
-          req_id: Date.now(),
-        }
-        wsRef.current?.send(JSON.stringify(request))
-        addApiLog("request", request)
-      })
+      // Ensure WebSocket is connected before starting copy trading
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        console.log("[v0] WebSocket not ready, connecting...")
+        connectWebSocket(activeAccount.token)
 
+        // Wait for connection
+        await new Promise((resolve) => {
+          const checkConnection = setInterval(() => {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+              clearInterval(checkConnection)
+              resolve(true)
+            }
+          }, 100)
+
+          setTimeout(() => {
+            clearInterval(checkConnection)
+            resolve(false)
+          }, 5000)
+        })
+      }
+
+      // Send copy_start request
+      const request = {
+        copy_start: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
+        copy_mode: copyMode,
+        selected_wallet: selectedWallet,
+        req_id: Date.now(),
+      }
+      wsRef.current?.send(JSON.stringify(request))
+      addApiLog("request", request)
+
+      // Start balance check interval - faster updates
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
-      balanceCheckIntervalRef.current = setInterval(fetchBalance, 2000)
+      balanceCheckIntervalRef.current = setInterval(fetchBalance, 1000)
+
+      showNotification("success", "Copy trading started")
+    } catch (error) {
+      showNotification(
+        "error",
+        `Failed to start copy trading: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
     } finally {
       setIsLoading(false)
     }
@@ -404,17 +475,25 @@ const CopyTradingPage = () => {
 
     setIsLoading(true)
     try {
-      connectWebSocket(activeAccount.token, () => {
-        const request = {
-          copy_stop: 1,
-          trader_loginid: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
-          req_id: Date.now(),
-        }
-        wsRef.current?.send(JSON.stringify(request))
-        addApiLog("request", request)
-      })
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        connectWebSocket(activeAccount.token)
+      }
+
+      const request = {
+        copy_stop: 1,
+        trader_loginid: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
+        req_id: Date.now(),
+      }
+      wsRef.current?.send(JSON.stringify(request))
+      addApiLog("request", request)
 
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
+      showNotification("success", "Copy trading stopped")
+    } catch (error) {
+      showNotification(
+        "error",
+        `Failed to stop copy trading: ${error instanceof Error ? error.message : "Unknown error"}`,
+      )
     } finally {
       setIsLoading(false)
     }
@@ -478,9 +557,9 @@ const CopyTradingPage = () => {
             </div>
             <div className={styles.connectionStatus}>
               <div
-                className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`}
+                className={`${styles.statusIndicator} ${wsConnected ? styles.connected : wsConnecting ? styles.syncing : styles.disconnected}`}
               ></div>
-              <span>{isConnected ? "Connected" : "Disconnected"}</span>
+              <span>{wsConnected ? "Connected" : wsConnecting ? "Connecting..." : "Disconnected"}</span>
             </div>
           </div>
           <p className={styles.subtitle}>
@@ -664,11 +743,13 @@ const CopyTradingPage = () => {
                   <div className={styles.statusCard}>
                     <div className={styles.statusRow}>
                       <div
-                        className={`${styles.statusIndicator} ${isConnected ? styles.connected : styles.disconnected}`}
+                        className={`${styles.statusIndicator} ${wsConnected ? styles.connected : wsConnecting ? styles.syncing : styles.disconnected}`}
                       ></div>
                       <span>WebSocket</span>
                     </div>
-                    <p>{isConnected ? "Connected to trading server" : "Disconnected"}</p>
+                    <p>
+                      {wsConnected ? "Connected to trading server" : wsConnecting ? "Connecting..." : "Disconnected"}
+                    </p>
                   </div>
                   <div className={styles.statusCard}>
                     <div className={styles.statusRow}>
@@ -677,7 +758,7 @@ const CopyTradingPage = () => {
                       ></div>
                       <span>Account Auth</span>
                     </div>
-                    <p>{activeAccount ? "Authorized" : "Not authorized"}</p>
+                    <p>{activeAccount ? `Authorized as ${accountName}` : "Not authorized"}</p>
                   </div>
                   <div className={styles.statusCard}>
                     <div className={styles.statusRow}>
@@ -871,6 +952,7 @@ const CopyTradingPage = () => {
             </div>
           )}
 
+          {/* API Response Tab */}
           {activeTab === "response" && (
             <div className={styles.responseContainer}>
               <div className={styles.responseHeader}>
