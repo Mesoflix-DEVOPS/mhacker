@@ -27,7 +27,7 @@ interface Follower {
   balance?: number
   lastSync?: string
   selectedWallet?: string
-  copyMode?: "demo-to-demo" | "demo-to-real"
+  copyMode?: "demo-to-demo" | "real-to-real"
   wallets?: Wallet[]
 }
 
@@ -59,11 +59,10 @@ const CopyTradingPage = () => {
   const [wsConnected, setWsConnected] = useState(false)
   const [wsConnecting, setWsConnecting] = useState(false)
 
-  // Role and Mode States
-  const [userRole, setUserRole] = useState<"trader" | "follower" | null>(null)
+  const [userRole, setUserRole] = useState<"trader" | "follower" | "personal" | null>(null)
   const [demoToRealMode, setDemoToRealMode] = useState(false)
   const [isCopyingActive, setIsCopyingActive] = useState(false)
-  const [copyMode, setCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
+  const [copyMode, setCopyMode] = useState<"demo-to-demo" | "demo-to-real" | "real-to-real">("demo-to-demo")
 
   // Account States
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -81,7 +80,7 @@ const CopyTradingPage = () => {
   // Trader Connection (Follower Mode)
   const [traderToken, setTraderToken] = useState("")
   const [traderName, setTraderName] = useState("")
-  const [traderCopyMode, setTraderCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
+  const [traderCopyMode, setTraderCopyMode] = useState<"demo-to-demo" | "real-to-real">("demo-to-demo")
 
   // UI States
   const [isLoading, setIsLoading] = useState(false)
@@ -108,9 +107,10 @@ const CopyTradingPage = () => {
 
   // Initialize from localStorage
   useEffect(() => {
-    const savedRole = localStorage.getItem("copytrading_role") as "trader" | "follower" | null
+    const savedRole = localStorage.getItem("copytrading_role") as "trader" | "follower" | "personal" | null
     const savedCopyMode =
-      (localStorage.getItem("copytrading_copy_mode") as "demo-to-demo" | "demo-to-real") || "demo-to-demo"
+      (localStorage.getItem("copytrading_copy_mode") as "demo-to-demo" | "demo-to-real" | "real-to-real") ||
+      "demo-to-demo"
     const savedDemoMode = localStorage.getItem("copytrading_demo_mode") === "true"
     const savedCopyingActive = localStorage.getItem("copytrading_active") === "true"
     const savedFollowers = localStorage.getItem("copytrading_followers")
@@ -146,6 +146,8 @@ const CopyTradingPage = () => {
 
   useEffect(() => {
     if (activeAccount && userRole) {
+      setAccountBalance(null)
+      setAccountName("")
       connectWebSocket(activeAccount.token)
     }
   }, [activeAccount, userRole])
@@ -237,13 +239,11 @@ const CopyTradingPage = () => {
 
   const connectWebSocket = useCallback(
     (token: string) => {
-      // Don't reconnect if already connected
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         console.log("[v0] WebSocket already connected")
         return
       }
 
-      // Don't try to connect if already connecting
       if (wsConnecting) {
         console.log("[v0] WebSocket connection already in progress")
         return
@@ -260,7 +260,6 @@ const CopyTradingPage = () => {
         setWsConnected(true)
         showNotification("success", "WebSocket connected")
 
-        // Send authorize immediately
         wsRef.current?.send(JSON.stringify({ authorize: token }))
         addApiLog("request", { authorize: token })
       }
@@ -271,10 +270,8 @@ const CopyTradingPage = () => {
         setWsConnected(false)
         showNotification("warning", "Connection lost. Reconnecting in 3 seconds...")
 
-        // Clear any pending timeouts
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
 
-        // Attempt reconnect after 3 seconds
         reconnectTimeoutRef.current = setTimeout(() => {
           connectWebSocket(token)
         }, 3000)
@@ -366,7 +363,7 @@ const CopyTradingPage = () => {
         balance: wallets[0]?.balance,
         lastSync: new Date().toISOString(),
         selectedWallet: wallets[0]?.id,
-        copyMode: copyMode,
+        copyMode: copyMode as "demo-to-demo" | "real-to-real",
         wallets: wallets,
       }
 
@@ -393,7 +390,7 @@ const CopyTradingPage = () => {
     setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, selectedWallet: walletId } : f)))
   }
 
-  const updateFollowerCopyMode = (loginid: string, mode: "demo-to-demo" | "demo-to-real") => {
+  const updateFollowerCopyMode = (loginid: string, mode: "demo-to-demo" | "real-to-real") => {
     setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, copyMode: mode } : f)))
     showNotification("success", `Copy mode updated to ${mode}`)
   }
@@ -411,7 +408,14 @@ const CopyTradingPage = () => {
 
     if (copyMode === "demo-to-real") {
       const confirmed = confirm(
-        "⚠️ WARNING: You are about to enable Demo-to-Real copy mode. Trades in demo will affect REAL accounts. Continue?",
+        "WARNING: You are about to enable Demo-to-Real copy mode. Trades in demo will affect REAL accounts. Continue?",
+      )
+      if (!confirmed) return
+    }
+
+    if (copyMode === "real-to-real") {
+      const confirmed = confirm(
+        "WARNING: You are about to enable Real-to-Real copy mode. Real trades will be copied to your real account. Continue?",
       )
       if (!confirmed) return
     }
@@ -423,12 +427,10 @@ const CopyTradingPage = () => {
         setTraderName(name)
       }
 
-      // Ensure WebSocket is connected before starting copy trading
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
         console.log("[v0] WebSocket not ready, connecting...")
         connectWebSocket(activeAccount.token)
 
-        // Wait for connection
         await new Promise((resolve) => {
           const checkConnection = setInterval(() => {
             if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -444,7 +446,6 @@ const CopyTradingPage = () => {
         })
       }
 
-      // Send copy_start request
       const request = {
         copy_start: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
         copy_mode: copyMode,
@@ -454,7 +455,6 @@ const CopyTradingPage = () => {
       wsRef.current?.send(JSON.stringify(request))
       addApiLog("request", request)
 
-      // Start balance check interval - faster updates
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
       balanceCheckIntervalRef.current = setInterval(fetchBalance, 1000)
 
@@ -516,7 +516,7 @@ const CopyTradingPage = () => {
               <p>Broadcast your trades to followers</p>
               <ul className={styles.roleFeatures}>
                 <li>✓ Manage multiple followers</li>
-                <li>✓ Demo-to-Demo & Demo-to-Real</li>
+                <li>✓ Demo-to-Demo only</li>
                 <li>✓ Wallet selection per follower</li>
               </ul>
             </div>
@@ -527,8 +527,19 @@ const CopyTradingPage = () => {
               <p>Copy trades from expert traders</p>
               <ul className={styles.roleFeatures}>
                 <li>✓ Automatic trade mirroring</li>
-                <li>✓ Multi-wallet support</li>
+                <li>✓ Demo-to-Demo & Real-to-Real</li>
                 <li>✓ Real-time synchronization</li>
+              </ul>
+            </div>
+
+            <div className={styles.roleOption} onClick={() => setUserRole("personal")}>
+              <div className={styles.roleIcon}>💼</div>
+              <h2>Personal Account</h2>
+              <p>Manage your own account trading</p>
+              <ul className={styles.roleFeatures}>
+                <li>✓ Demo-to-Real mirroring</li>
+                <li>✓ Full account control</li>
+                <li>✓ Real-time balance updates</li>
               </ul>
             </div>
           </div>
@@ -552,7 +563,13 @@ const CopyTradingPage = () => {
           <div className={styles.headerContent}>
             <div>
               <h1>Copy Trading Dashboard</h1>
-              <p className={styles.roleLabel}>{userRole === "trader" ? "👨‍💼 Trader Mode" : "📊 Follower Mode"}</p>
+              <p className={styles.roleLabel}>
+                {userRole === "trader"
+                  ? "👨‍💼 Trader Mode"
+                  : userRole === "follower"
+                    ? "📊 Follower Mode"
+                    : "💼 Personal Account"}
+              </p>
               {accountName && <p className={styles.accountNameDisplay}>Account: {accountName}</p>}
             </div>
             <div className={styles.connectionStatus}>
@@ -565,7 +582,9 @@ const CopyTradingPage = () => {
           <p className={styles.subtitle}>
             {userRole === "trader"
               ? "Manage followers and broadcast trades in real-time"
-              : "Automatically copy trades from expert traders"}
+              : userRole === "follower"
+                ? "Automatically copy trades from expert traders"
+                : "Control your personal account trading"}
           </p>
         </div>
 
@@ -650,7 +669,7 @@ const CopyTradingPage = () => {
                 )}
               </div>
 
-              {userRole === "follower" && userWallets.length > 0 && (
+              {(userRole === "follower" || userRole === "personal") && userWallets.length > 0 && (
                 <div className={styles.section}>
                   <h2>Select Wallet</h2>
                   <div className={styles.walletGrid}>
@@ -677,23 +696,55 @@ const CopyTradingPage = () => {
                 <div className={styles.formGroup}>
                   <label>Copy Mode</label>
                   <div className={styles.modeSelector}>
-                    <button
-                      className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
-                      onClick={() => setCopyMode("demo-to-demo")}
-                    >
-                      📋 Demo-to-Demo
-                    </button>
-                    <button
-                      className={`${styles.modeButton} ${copyMode === "demo-to-real" ? styles.active : ""}`}
-                      onClick={() => setCopyMode("demo-to-real")}
-                    >
-                      💰 Demo-to-Real
-                    </button>
+                    {userRole === "trader" && (
+                      <button
+                        className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
+                        onClick={() => setCopyMode("demo-to-demo")}
+                      >
+                        📋 Demo-to-Demo
+                      </button>
+                    )}
+
+                    {userRole === "follower" && (
+                      <>
+                        <button
+                          className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
+                          onClick={() => setCopyMode("demo-to-demo")}
+                        >
+                          📋 Demo-to-Demo
+                        </button>
+                        <button
+                          className={`${styles.modeButton} ${copyMode === "real-to-real" ? styles.active : ""}`}
+                          onClick={() => setCopyMode("real-to-real")}
+                        >
+                          💰 Real-to-Real
+                        </button>
+                      </>
+                    )}
+
+                    {userRole === "personal" && (
+                      <>
+                        <button
+                          className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
+                          onClick={() => setCopyMode("demo-to-demo")}
+                        >
+                          📋 Demo-to-Demo
+                        </button>
+                        <button
+                          className={`${styles.modeButton} ${copyMode === "demo-to-real" ? styles.active : ""}`}
+                          onClick={() => setCopyMode("demo-to-real")}
+                        >
+                          💰 Demo-to-Real
+                        </button>
+                      </>
+                    )}
                   </div>
                   <p className={styles.helperText}>
                     {copyMode === "demo-to-demo"
-                      ? "Trades in demo will be copied to follower's demo"
-                      : "Trades in demo will be copied to follower's real account"}
+                      ? "Trades in demo will be copied to demo account"
+                      : copyMode === "demo-to-real"
+                        ? "Trades in demo will be copied to your real account"
+                        : "Real trades will be copied to your real account"}
                   </p>
                 </div>
 
@@ -857,14 +908,6 @@ const CopyTradingPage = () => {
                             >
                               📋 Demo-to-Demo
                             </button>
-                            <button
-                              className={`${styles.modeOption} ${
-                                follower.copyMode === "demo-to-real" ? styles.selected : ""
-                              }`}
-                              onClick={() => updateFollowerCopyMode(follower.loginid, "demo-to-real")}
-                            >
-                              💰 Demo-to-Real
-                            </button>
                           </div>
                         </div>
 
@@ -895,29 +938,31 @@ const CopyTradingPage = () => {
             <div className={styles.controlsContainer}>
               <div className={styles.section}>
                 <h2>Copy Trading Settings</h2>
-                <div className={styles.settingItem}>
-                  <div className={styles.settingLabel}>
-                    <h3>Demo-to-Real Mode</h3>
-                    <p>Mirror trades from demo to real account</p>
+                {userRole === "personal" && (
+                  <div className={styles.settingItem}>
+                    <div className={styles.settingLabel}>
+                      <h3>Demo-to-Real Mode</h3>
+                      <p>Mirror trades from demo to real account</p>
+                    </div>
+                    <label className={styles.toggle}>
+                      <input
+                        type="checkbox"
+                        checked={demoToRealMode}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            const confirmed = confirm(
+                              "WARNING: Enabling Demo-to-Real mode will mirror trades to your REAL account. This involves real money. Continue?",
+                            )
+                            if (confirmed) setDemoToRealMode(true)
+                          } else {
+                            setDemoToRealMode(false)
+                          }
+                        }}
+                      />
+                      <span className={styles.toggleSlider}></span>
+                    </label>
                   </div>
-                  <label className={styles.toggle}>
-                    <input
-                      type="checkbox"
-                      checked={demoToRealMode}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          const confirmed = confirm(
-                            "⚠️ WARNING: Enabling Demo-to-Real mode will mirror trades to your REAL account. This involves real money. Continue?",
-                          )
-                          if (confirmed) setDemoToRealMode(true)
-                        } else {
-                          setDemoToRealMode(false)
-                        }
-                      }}
-                    />
-                    <span className={styles.toggleSlider}></span>
-                  </label>
-                </div>
+                )}
 
                 <div className={styles.settingItem}>
                   <div className={styles.settingLabel}>
