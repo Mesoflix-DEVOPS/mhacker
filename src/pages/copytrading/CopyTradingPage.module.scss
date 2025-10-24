@@ -18,7 +18,6 @@ $info: #3498db;
     color: $text-primary;
     padding: 16px;
     font-family: 'Arial', sans-serif;
-    overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
@@ -134,13 +133,13 @@ $info: #3498db;
     background-color: $card-bg;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    overflow: visible;
+    overflow: hidden;
     width: 100%;
     border: 1px solid rgba($green-primary, 0.3);
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: auto;
+    max-height: 90vh;
 
     &::before {
         content: '';
@@ -236,7 +235,9 @@ $info: #3498db;
     width: 100%;
     flex: 1;
     overflow-y: auto;
-    max-height: none;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tabs {
@@ -430,7 +431,7 @@ $info: #3498db;
 
 .button {
     flex: 1;
-    min-width: 200px;
+    min-width: 160px;
     color: #000;
     font-weight: 600;
     padding: 14px 24px;
@@ -749,23 +750,138 @@ $info: #3498db;
     background-color: rgba(10, 10, 10, 0.8);
     padding: 20px;
     border-radius: 8px;
-    overflow: auto;
+    overflow: hidden;
     width: 100%;
     border: 1px solid rgba($green-primary, 0.2);
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
 }
 
-.responseContent {
+.responseHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    h2 {
+        margin: 0;
+        color: $green-primary;
+        font-size: 20px;
+        font-weight: 600;
+
+        &::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: $green-primary;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+    }
+}
+
+.apiLogsList {
+    display: grid;
+    gap: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+.apiLogItem {
+    background-color: rgba(18, 18, 18, 0.8);
+    border-radius: 8px;
+    border-left: 4px solid $green-primary;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba($green-primary, 0.1);
+    }
+
+    &.log-request {
+        border-left-color: $info;
+
+        .logType {
+            background-color: rgba($info, 0.2);
+            color: $info;
+        }
+    }
+
+    &.log-response {
+        border-left-color: $success;
+
+        .logType {
+            background-color: rgba($success, 0.2);
+            color: $success;
+        }
+    }
+}
+
+.logHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: rgba(10, 10, 10, 0.6);
+    border-bottom: 1px solid rgba($green-primary, 0.1);
+    flex-wrap: wrap;
+}
+
+.logType {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.logTime {
+    color: $text-secondary;
     font-size: 12px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.copyButton {
+    background: none;
+    border: 1px solid rgba($green-primary, 0.3);
+    color: $green-primary;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+
+    &:hover {
+        background-color: rgba($green-primary, 0.1);
+        border-color: $green-primary;
+    }
+}
+
+.logContent {
+    padding: 12px 16px;
+    margin: 0;
+    font-size: 11px;
     color: $text-primary;
     background-color: rgba(26, 26, 26, 0.6);
-    padding: 16px;
-    border-radius: 6px;
     overflow-x: auto;
+    overflow-y: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-family: 'Courier New', monospace;
-    border-left: 3px solid $green-primary;
-    margin: 0;
+    border: none;
+    max-height: 250px;
+    -webkit-overflow-scrolling: touch;
 }
 
 // Notifications
@@ -861,59 +977,33 @@ $info: #3498db;
 }
 
 // Responsive Design
+@media (max-width: 1024px) {
+    .card {
+        max-height: 85vh;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .section {
+        padding: 16px;
+    }
+
+    .button {
+        min-width: 140px;
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 8px;
     }
 
-    .roleSelectionCard {
-        margin: 16px auto;
-    }
-
-    .roleHeader {
-        padding: 16px 12px;
-
-        h1 {
-            font-size: 22px;
-        }
-
-        p {
-            font-size: 12px;
-        }
-    }
-
-    .roleGrid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 16px 12px;
-    }
-
-    .roleOption {
-        padding: 16px 12px;
-
-        .roleIcon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        h2 {
-            font-size: 16px;
-        }
-
-        p {
-            font-size: 12px;
-            margin-bottom: 8px;
-        }
-    }
-
-    .roleFeatures {
-        li {
-            font-size: 11px;
-            padding: 3px 0;
-        }
-    }
-
     .card {
+        max-height: 80vh;
         border-radius: 8px;
         margin-bottom: 20px;
     }
@@ -931,10 +1021,23 @@ $info: #3498db;
         font-size: 20px;
     }
 
+    .content {
+        padding: 16px;
+    }
+
+    .section {
+        padding: 14px;
+    }
+
+    .section h2 {
+        font-size: 18px;
+    }
+
     .tabs {
         gap: 4px;
         overflow-x: auto;
         padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
     }
 
     .tabButton {
@@ -949,34 +1052,198 @@ $info: #3498db;
         width: 100%;
     }
 
-    .content {
-        padding: 16px;
-    }
-
-    .section {
-        padding: 16px;
-    }
-
     .actionButtons {
         flex-direction: column;
     }
 
     .button {
         min-width: 100%;
+        padding: 12px 16px;
+        font-size: 13px;
     }
 
     .statusGrid {
         grid-template-columns: 1fr;
     }
 
+    .walletGrid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .walletCard {
+        padding: 12px;
+
+        .walletType {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        h3 {
+            font-size: 13px;
+        }
+
+        .walletBalance {
+            font-size: 14px;
+        }
+
+        p {
+            font-size: 11px;
+        }
+    }
+
+    .modeSelector {
+        gap: 8px;
+    }
+
+    .modeButton {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
     .notification {
         right: 10px;
         left: 10px;
         max-width: none;
+        top: 10px;
+    }
+
+    .apiLogsList {
+        max-height: 400px;
+    }
+
+    .logContent {
+        max-height: 200px;
+        font-size: 10px;
+    }
+
+    .responseHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .responseHeader h2 {
+        width: 100%;
     }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 4px;
+    }
+
+    .card {
+        max-height: 75vh;
+        border-radius: 6px;
+    }
+
+    .header {
+        padding: 12px;
+    }
+
+    .header h1 {
+        font-size: 18px;
+    }
+
+    .content {
+        padding: 12px;
+    }
+
+    .section {
+        padding: 12px;
+    }
+
+    .section h2 {
+        font-size: 16px;
+    }
+
+    .button {
+        min-width: 100%;
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .tabs {
+        gap: 2px;
+    }
+
+    .tabButton {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    .walletGrid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
+    .walletCard {
+        padding: 10px;
+
+        .walletType {
+            font-size: 18px;
+        }
+
+        h3 {
+            font-size: 12px;
+        }
+
+        .walletBalance {
+            font-size: 13px;
+        }
+    }
+
+    .modeSelector {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .modeButton {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .statusGrid {
+        gap: 8px;
+    }
+
+    .statusCard {
+        padding: 12px;
+
+        p {
+            font-size: 12px;
+        }
+    }
+
+    .apiLogsList {
+        max-height: 300px;
+    }
+
+    .logHeader {
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    .logType {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .logTime {
+        font-size: 11px;
+    }
+
+    .copyButton {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+
+    .logContent {
+        padding: 10px 12px;
+        max-height: 150px;
+        font-size: 9px;
+    }
+
     .roleSelectionCard {
         margin: 12px auto;
     }
@@ -990,8 +1257,9 @@ $info: #3498db;
     }
 
     .roleGrid {
-        padding: 12px 8px;
+        grid-template-columns: 1fr;
         gap: 8px;
+        padding: 12px 8px;
     }
 
     .roleOption {
@@ -1008,14 +1276,6 @@ $info: #3498db;
         p {
             font-size: 11px;
         }
-    }
-
-    .container {
-        padding: 4px;
-    }
-
-    .content {
-        padding: 12px;
     }
 }
 
@@ -1194,122 +1454,4 @@ $info: #3498db;
     color: $green-primary;
     font-weight: 600;
   }
-}
-
-.responseHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  gap: 16px;
-
-  h2 {
-    margin: 0;
-    color: $green-primary;
-    font-size: 20px;
-    font-weight: 600;
-
-    &::before {
-      content: '';
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background-color: $green-primary;
-      border-radius: 50%;
-      margin-right: 12px;
-    }
-  }
-}
-
-.apiLogsList {
-  display: grid;
-  gap: 12px;
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.apiLogItem {
-  background-color: rgba(18, 18, 18, 0.8);
-  border-radius: 8px;
-  border-left: 4px solid $green-primary;
-  overflow: hidden;
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba($green-primary, 0.1);
-  }
-
-  &.log-request {
-    border-left-color: $info;
-
-    .logType {
-      background-color: rgba($info, 0.2);
-      color: $info;
-    }
-  }
-
-  &.log-response {
-    border-left-color: $success;
-
-    .logType {
-      background-color: rgba($success, 0.2);
-      color: $success;
-    }
-  }
-}
-
-.logHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: rgba(10, 10, 10, 0.6);
-  border-bottom: 1px solid rgba($green-primary, 0.1);
-}
-
-.logType {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.logTime {
-  color: $text-secondary;
-  font-size: 12px;
-  margin-left: auto;
-}
-
-.copyButton {
-  background: none;
-  border: 1px solid rgba($green-primary, 0.3);
-  color: $green-primary;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-
-  &:hover {
-    background-color: rgba($green-primary, 0.1);
-    border-color: $green-primary;
-  }
-}
-
-.logContent {
-  padding: 12px 16px;
-  margin: 0;
-  font-size: 11px;
-  color: $text-primary;
-  background-color: rgba(26, 26, 26, 0.6);
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-family: 'Courier New', monospace;
-  border: none;
-  max-height: 300px;
-  overflow-y: auto;
 }
