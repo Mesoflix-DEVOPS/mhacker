@@ -58,6 +58,13 @@ interface ResponseData {
   [key: string]: any
 }
 
+interface ApiLog {
+  timestamp: string
+  type: "info" | "error" | "success" | "warning"
+  message: string
+  data?: any
+}
+
 const CopyTradingPage = () => {
   // Role and Mode States
   const [userRole, setUserRole] = useState<"trader" | "follower" | null>(null)
@@ -90,12 +97,14 @@ const CopyTradingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"overview" | "followers" | "settings" | "response">("overview")
   const [response, setResponse] = useState<ResponseData | null>(null)
+  const [apiLogs, setApiLogs] = useState<ApiLog[]>([])
   const [notification, setNotification] = useState<{ type: "success" | "error" | "warning"; message: string } | null>(
     null,
   )
 
   const wsRef = useRef<WebSocket | null>(null)
   const balanceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const apiLogsEndRef = useRef<HTMLDivElement>(null)
 
   // Initialize from localStorage
   useEffect(() => {
@@ -175,6 +184,15 @@ const CopyTradingPage = () => {
     localStorage.setItem("copytrading_selected_wallet", selectedWallet)
   }, [selectedWallet])
 
+  const addApiLog = (type: "info" | "error" | "success" | "warning", message: string, data?: any) => {
+    const timestamp = new Date().toLocaleTimeString()
+    setApiLogs((prev) => [...prev, { timestamp, type, message, data }])
+    // Auto-scroll to bottom
+    setTimeout(() => {
+      apiLogsEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, 0)
+  }
+
   const connectWebSocket = (token: string, onOpenCallback?: () => void) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       onOpenCallback?.()
@@ -189,41 +207,41 @@ const CopyTradingPage = () => {
     let isAuthorized = false
 
     wsRef.current.onopen = () => {
-      console.log("[v0] WebSocket opened, sending authorization...")
+      addApiLog("info", "WebSocket opened, sending authorization...")
       wsRef.current?.send(JSON.stringify({ authorize: token }))
     }
 
     wsRef.current.onclose = () => {
-      console.log("[v0] WebSocket closed")
+      addApiLog("warning", "WebSocket closed")
       setIsConnected(false)
       setTimeout(() => {
         if (!isAuthorized) {
-          console.log("[v0] Attempting to reconnect...")
+          addApiLog("info", "Attempting to reconnect...")
           connectWebSocket(token, onOpenCallback)
         }
       }, 3000)
     }
 
     wsRef.current.onerror = (error) => {
-      console.error("[v0] WebSocket error:", error)
+      addApiLog("error", "WebSocket error", error)
       showNotification("error", "WebSocket connection error")
     }
 
     wsRef.current.onmessage = (event) => {
       try {
         const data: ResponseData = JSON.parse(event.data)
-        console.log("[v0] WebSocket message received:", data.msg_type)
+        addApiLog("info", `WebSocket message received: ${data.msg_type}`, data)
         setResponse(data)
 
         if (data.msg_type === "authorize") {
           if (data.error) {
-            console.error("[v0] Authorization error:", data.error.message)
+            addApiLog("error", `Authorization error: ${data.error.message}`, data.error)
             showNotification("error", `Authorization failed: ${data.error.message}`)
             wsRef.current?.close()
           } else {
             isAuthorized = true
             setIsConnected(true)
-            console.log("[v0] Authorization successful")
+            addApiLog("success", "Authorization successful", data.authorize)
             showNotification("success", "Account authorized successfully")
 
             if (data.authorize?.loginid) {
@@ -238,7 +256,7 @@ const CopyTradingPage = () => {
             }
 
             setTimeout(() => {
-              console.log("[v0] Requesting balance...")
+              addApiLog("info", "Requesting balance...")
               wsRef.current?.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
             }, 50)
 
@@ -247,37 +265,39 @@ const CopyTradingPage = () => {
         }
 
         if (data.msg_type === "balance" && data.balance) {
-          console.log("[v0] Balance received:", data.balance.balance)
+          addApiLog("success", `Balance received: ${data.balance.balance}`, data.balance)
           setAccountBalance(data.balance.balance)
         }
 
         if (data.msg_type === "copy_start" && !data.error) {
           setIsCopyingActive(true)
+          addApiLog("success", `Copy trading started (${copyMode})`, data)
           showNotification("success", `Copy trading started (${copyMode})`)
         }
 
         if (data.msg_type === "copy_stop" && !data.error) {
           setIsCopyingActive(false)
+          addApiLog("success", "Copy trading stopped", data)
           showNotification("success", "Copy trading stopped")
         }
       } catch (error) {
-        console.error("[v0] Error parsing WebSocket message:", error)
+        addApiLog("error", "Error parsing WebSocket message", error)
       }
     }
   }
 
   const fetchBalance = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      console.log("[v0] Fetching balance...")
+      addApiLog("info", "Fetching balance...")
       wsRef.current.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
     } else {
-      console.warn("[v0] WebSocket not connected, cannot fetch balance")
+      addApiLog("warning", "WebSocket not connected, cannot fetch balance")
     }
   }
 
   const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
     return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
       let authData: any = null
       let settingsData: any = null
       let isResolved = false
@@ -286,29 +306,31 @@ const CopyTradingPage = () => {
         if (!isResolved) {
           isResolved = true
           tempWs.close()
+          addApiLog("error", "Account details fetch timeout")
           reject(new Error("Account details fetch timeout"))
         }
       }, 6000)
 
       tempWs.onopen = () => {
-        console.log("[v0] Temp WebSocket opened for account details")
+        addApiLog("info", "Temp WebSocket opened for account details")
         tempWs.send(JSON.stringify({ authorize: token }))
       }
 
       tempWs.onmessage = (event) => {
         try {
           const data: ResponseData = JSON.parse(event.data)
-          console.log("[v0] Temp WebSocket message:", data.msg_type)
+          addApiLog("info", `Temp WebSocket message: ${data.msg_type}`, data)
 
           if (data.msg_type === "authorize") {
             if (data.error) {
               clearTimeout(timeout)
               isResolved = true
+              addApiLog("error", `Authorization failed: ${data.error.message}`, data.error)
               reject(new Error(data.error.message))
               tempWs.close()
             } else {
               authData = data.authorize
-              console.log("[v0] Authorization successful, requesting account settings...")
+              addApiLog("info", "Authorization successful, requesting account settings...")
               tempWs.send(JSON.stringify({ get_account_settings: 1 }))
             }
           }
@@ -333,7 +355,7 @@ const CopyTradingPage = () => {
                 realName = settingsData.name
               }
 
-              console.log("[v0] Real name extracted:", realName)
+              addApiLog("success", `Real name extracted: ${realName}`, { loginid, realName })
 
               const mockWallets: Wallet[] = [
                 { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
@@ -345,12 +367,12 @@ const CopyTradingPage = () => {
             }
           }
         } catch (error) {
-          console.error("[v0] Error parsing temp WebSocket message:", error)
+          addApiLog("error", "Error parsing temp WebSocket message", error)
         }
       }
 
       tempWs.onerror = (error) => {
-        console.error("[v0] Temp WebSocket error:", error)
+        addApiLog("error", "Temp WebSocket error", error)
         clearTimeout(timeout)
         if (!isResolved) {
           isResolved = true
@@ -359,7 +381,7 @@ const CopyTradingPage = () => {
       }
 
       tempWs.onclose = () => {
-        console.log("[v0] Temp WebSocket closed")
+        addApiLog("warning", "Temp WebSocket closed")
         if (!isResolved) {
           isResolved = true
           clearTimeout(timeout)
@@ -381,12 +403,12 @@ const CopyTradingPage = () => {
     }
 
     setIsLoading(true)
+    addApiLog("info", "Adding new follower...")
     try {
       const { name, realName, wallets } = await fetchAccountDetails(newFollowerToken.trim())
 
       localStorage.setItem(`realname_${name}`, realName)
 
-      // Auto-select demo wallet if demo-to-demo mode
       const selectedWalletId = copyMode === "demo-to-demo" ? wallets.find((w) => w.type === "demo")?.id : wallets[0]?.id
 
       const newFollower: Follower = {
@@ -405,8 +427,10 @@ const CopyTradingPage = () => {
       setFollowers([...followers, newFollower])
       setNewFollowerToken("")
       setNewFollowerName("")
+      addApiLog("success", `Follower ${newFollower.realName} added successfully`, newFollower)
       showNotification("success", `Follower ${newFollower.realName} added successfully`)
     } catch (error) {
+      addApiLog("error", `Failed to add follower: ${error instanceof Error ? error.message : "Unknown error"}`, error)
       showNotification("error", `Failed to add follower: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsLoading(false)
@@ -478,6 +502,7 @@ const CopyTradingPage = () => {
     }
 
     setIsLoading(true)
+    addApiLog("info", `Starting copy trading in ${copyMode} mode...`)
     try {
       if (userRole === "follower") {
         const { name, realName } = await fetchAccountDetails(traderToken.trim())
@@ -493,6 +518,7 @@ const CopyTradingPage = () => {
           selected_wallet: selectedWallet,
           req_id: Date.now(),
         }
+        addApiLog("info", "Sending copy_start request", request)
         wsRef.current?.send(JSON.stringify(request))
       })
 
@@ -507,6 +533,7 @@ const CopyTradingPage = () => {
     if (!activeAccount) return
 
     setIsLoading(true)
+    addApiLog("info", "Stopping copy trading...")
     try {
       connectWebSocket(activeAccount.token, () => {
         const request = {
@@ -514,6 +541,7 @@ const CopyTradingPage = () => {
           trader_loginid: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
           req_id: Date.now(),
         }
+        addApiLog("info", "Sending copy_stop request", request)
         wsRef.current?.send(JSON.stringify(request))
       })
 
@@ -975,10 +1003,28 @@ const CopyTradingPage = () => {
           )}
 
           {/* Response Tab */}
-          {activeTab === "response" && response && (
+          {activeTab === "response" && (
             <div className={styles.responseContainer}>
-              <h2>API Response</h2>
-              <pre className={styles.responseContent}>{JSON.stringify(response, null, 2)}</pre>
+              <h2>API Response & Logs</h2>
+              <div className={styles.apiLogsWrapper}>
+                {apiLogs.length > 0 ? (
+                  <div className={styles.apiLogsList}>
+                    {apiLogs.map((log, index) => (
+                      <div key={index} className={`${styles.apiLogItem} ${styles[`log-${log.type}`]}`}>
+                        <div className={styles.logHeader}>
+                          <span className={styles.logTimestamp}>{log.timestamp}</span>
+                          <span className={styles.logType}>{log.type.toUpperCase()}</span>
+                        </div>
+                        <div className={styles.logMessage}>{log.message}</div>
+                        {log.data && <pre className={styles.logData}>{JSON.stringify(log.data, null, 2)}</pre>}
+                      </div>
+                    ))}
+                    <div ref={apiLogsEndRef} />
+                  </div>
+                ) : (
+                  <p className={styles.noData}>No API logs yet. Start by connecting your account.</p>
+                )}
+              </div>
             </div>
           )}
         </div>
