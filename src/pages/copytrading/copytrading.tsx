@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import styles from "./CopyTradingPage.module.scss"
 
 interface Account {
@@ -48,11 +48,19 @@ interface ResponseData {
     loginid: string
     balance?: number
     account_type?: string
+    fullname?: string
   }
   balance?: {
     balance: number
   }
   [key: string]: any
+}
+
+interface ApiLog {
+  id: string
+  timestamp: string
+  type: "request" | "response"
+  data: ResponseData
 }
 
 const CopyTradingPage = () => {
@@ -84,13 +92,24 @@ const CopyTradingPage = () => {
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"overview" | "followers" | "settings" | "response">("overview")
-  const [response, setResponse] = useState<ResponseData | null>(null)
+  const [apiLogs, setApiLogs] = useState<ApiLog[]>([])
   const [notification, setNotification] = useState<{ type: "success" | "error" | "warning"; message: string } | null>(
     null,
   )
 
   const wsRef = useRef<WebSocket | null>(null)
   const balanceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const addApiLog = useCallback((type: "request" | "response", data: ResponseData) => {
+    const log: ApiLog = {
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: new Date().toLocaleTimeString(),
+      type,
+      data,
+    }
+    setApiLogs((prev) => [log, ...prev.slice(0, 99)]) // Keep last 100 logs
+  }, [])
 
   // Initialize from localStorage
   useEffect(() => {
@@ -127,6 +146,9 @@ const CopyTradingPage = () => {
     return () => {
       if (balanceCheckIntervalRef.current) {
         clearInterval(balanceCheckIntervalRef.current)
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
       }
     }
   }, [])
@@ -174,18 +196,20 @@ const CopyTradingPage = () => {
 
       tempWs.onmessage = (event) => {
         const data: ResponseData = JSON.parse(event.data)
+        addApiLog("response", data)
 
         if (data.msg_type === "authorize") {
           if (data.error) {
             reject(new Error(data.error.message))
           } else {
+            const accountName = data.authorize?.fullname || data.authorize?.loginid || "Account"
+
             // Mock wallet data - in real app, fetch from API
             const mockWallets: Wallet[] = [
               { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
               { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
             ]
 
-            const accountName = data.authorize?.loginid || "Account"
             resolve({ name: accountName, wallets: mockWallets })
           }
           tempWs.close()
@@ -196,69 +220,87 @@ const CopyTradingPage = () => {
     })
   }
 
-  const connectWebSocket = (token: string, onOpenCallback?: () => void) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      onOpenCallback?.()
-      return
-    }
+  const connectWebSocket = useCallback(
+    (token: string, onOpenCallback?: () => void) => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        onOpenCallback?.()
+        return
+      }
 
-    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+      wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
 
-    wsRef.current.onopen = () => {
-      setIsConnected(true)
-      wsRef.current?.send(JSON.stringify({ authorize: token }))
-      onOpenCallback?.()
-    }
+      wsRef.current.onopen = () => {
+        setIsConnected(true)
+        showNotification("success", "WebSocket connected")
+        wsRef.current?.send(JSON.stringify({ authorize: token }))
+        addApiLog("request", { authorize: token })
+        onOpenCallback?.()
+      }
 
-    wsRef.current.onclose = () => {
-      setIsConnected(false)
-      showNotification("warning", "Connection lost. Attempting to reconnect...")
-    }
+      wsRef.current.onclose = () => {
+        setIsConnected(false)
+        showNotification("warning", "Connection lost. Attempting to reconnect...")
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connectWebSocket(token, onOpenCallback)
+        }, 3000)
+      }
 
-    wsRef.current.onerror = () => {
-      showNotification("error", "WebSocket connection error")
-    }
+      wsRef.current.onerror = () => {
+        showNotification("error", "WebSocket connection error")
+      }
 
-    wsRef.current.onmessage = (event) => {
-      const data: ResponseData = JSON.parse(event.data)
-      setResponse(data)
+      wsRef.current.onmessage = (event) => {
+        const data: ResponseData = JSON.parse(event.data)
+        addApiLog("response", data)
 
-      if (data.msg_type === "authorize") {
-        if (data.error) {
-          showNotification("error", `Authorization failed: ${data.error.message}`)
-        } else {
-          showNotification("success", "Account authorized successfully")
-          if (data.authorize?.balance !== undefined) {
-            setAccountBalance(data.authorize.balance)
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            showNotification("error", `Authorization failed: ${data.error.message}`)
+          } else {
+            const realName = data.authorize?.fullname || data.authorize?.loginid || "Account"
+            setAccountName(realName)
+            showNotification("success", `Authorized as ${realName}`)
+
+            if (data.authorize?.balance !== undefined) {
+              setAccountBalance(data.authorize.balance)
+            }
           }
         }
-      }
 
-      if (data.msg_type === "balance" && data.balance) {
-        setAccountBalance(data.balance.balance)
-      }
+        if (data.msg_type === "balance" && data.balance) {
+          setAccountBalance(data.balance.balance)
+        }
 
-      if (data.msg_type === "copy_start" && !data.error) {
-        setIsCopyingActive(true)
-        showNotification("success", `Copy trading started (${copyMode})`)
-      }
+        if (data.msg_type === "copy_start" && !data.error) {
+          setIsCopyingActive(true)
+          showNotification("success", `Copy trading started (${copyMode})`)
+        }
 
-      if (data.msg_type === "copy_stop" && !data.error) {
-        setIsCopyingActive(false)
-        showNotification("success", "Copy trading stopped")
+        if (data.msg_type === "copy_stop" && !data.error) {
+          setIsCopyingActive(false)
+          showNotification("success", "Copy trading stopped")
+        }
       }
-    }
-  }
+    },
+    [addApiLog],
+  )
 
-  const fetchBalance = () => {
+  const fetchBalance = useCallback(() => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
+      const request = { balance: 1, req_id: Date.now() }
+      wsRef.current.send(JSON.stringify(request))
+      addApiLog("request", request)
     }
-  }
+  }, [addApiLog])
 
   const showNotification = (type: "success" | "error" | "warning", message: string) => {
     setNotification({ type, message })
     setTimeout(() => setNotification(null), 4000)
+  }
+
+  const copyToClipboard = (data: ResponseData) => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2))
+    showNotification("success", "Copied to clipboard!")
   }
 
   // Trader Mode: Add Follower
@@ -309,6 +351,7 @@ const CopyTradingPage = () => {
 
   const updateFollowerCopyMode = (loginid: string, mode: "demo-to-demo" | "demo-to-real") => {
     setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, copyMode: mode } : f)))
+    showNotification("success", `Copy mode updated to ${mode}`)
   }
 
   // Start Copy Trading
@@ -345,11 +388,11 @@ const CopyTradingPage = () => {
           req_id: Date.now(),
         }
         wsRef.current?.send(JSON.stringify(request))
+        addApiLog("request", request)
       })
 
-      // Start balance check interval
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
-      balanceCheckIntervalRef.current = setInterval(fetchBalance, 5000)
+      balanceCheckIntervalRef.current = setInterval(fetchBalance, 2000)
     } finally {
       setIsLoading(false)
     }
@@ -368,6 +411,7 @@ const CopyTradingPage = () => {
           req_id: Date.now(),
         }
         wsRef.current?.send(JSON.stringify(request))
+        addApiLog("request", request)
       })
 
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
@@ -472,7 +516,7 @@ const CopyTradingPage = () => {
             onClick={() => setActiveTab("response")}
             className={`${styles.tabButton} ${activeTab === "response" ? styles.activeTab : ""}`}
           >
-            API Response
+            API Response ({apiLogs.length})
           </button>
           <button onClick={() => setUserRole(null)} className={`${styles.tabButton} ${styles.switchRoleButton}`}>
             Switch Role
@@ -827,11 +871,41 @@ const CopyTradingPage = () => {
             </div>
           )}
 
-          {/* Response Tab */}
-          {activeTab === "response" && response && (
+          {activeTab === "response" && (
             <div className={styles.responseContainer}>
-              <h2>API Response</h2>
-              <pre className={styles.responseContent}>{JSON.stringify(response, null, 2)}</pre>
+              <div className={styles.responseHeader}>
+                <h2>API Response Log ({apiLogs.length})</h2>
+                <button
+                  onClick={() => setApiLogs([])}
+                  className={`${styles.button} ${styles.primaryButton}`}
+                  style={{ minWidth: "auto", padding: "8px 16px", fontSize: "12px" }}
+                >
+                  Clear Logs
+                </button>
+              </div>
+
+              {apiLogs.length > 0 ? (
+                <div className={styles.apiLogsList}>
+                  {apiLogs.map((log) => (
+                    <div key={log.id} className={`${styles.apiLogItem} ${styles[`log-${log.type}`]}`}>
+                      <div className={styles.logHeader}>
+                        <span className={styles.logType}>{log.type.toUpperCase()}</span>
+                        <span className={styles.logTime}>{log.timestamp}</span>
+                        <button
+                          onClick={() => copyToClipboard(log.data)}
+                          className={styles.copyButton}
+                          title="Copy to clipboard"
+                        >
+                          📋 Copy
+                        </button>
+                      </div>
+                      <pre className={styles.logContent}>{JSON.stringify(log.data, null, 2)}</pre>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.noData}>No API calls yet. Start copy trading to see logs.</p>
+              )}
             </div>
           )}
         </div>
