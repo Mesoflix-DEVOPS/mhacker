@@ -95,6 +95,9 @@ const CopyTradingPage = () => {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const wsConnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  const accountDetailsCache = useRef<Map<string, { name: string; wallets: Wallet[] }>>(new Map())
+  const balanceFetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
   const addApiLog = useCallback((type: "request" | "response", data: ResponseData) => {
     const log: ApiLog = {
       id: `${Date.now()}-${Math.random()}`,
@@ -185,57 +188,68 @@ const CopyTradingPage = () => {
     localStorage.setItem("copytrading_selected_wallet", selectedWallet)
   }, [selectedWallet])
 
-  const fetchAccountDetails = async (token: string) => {
-    return new Promise<{ name: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
-      let resolved = false
-
-      const timeout = setTimeout(() => {
-        if (!resolved) {
-          resolved = true
-          tempWs.close()
-          reject(new Error("Account details fetch timeout"))
-        }
-      }, 10000)
-
-      tempWs.onopen = () => {
-        tempWs.send(JSON.stringify({ authorize: token }))
-        addApiLog("request", { authorize: token })
+  const fetchAccountDetails = useCallback(
+    async (token: string): Promise<{ name: string; wallets: Wallet[] }> => {
+      // Check cache first
+      if (accountDetailsCache.current.has(token)) {
+        console.log("[v0] Using cached account details")
+        return accountDetailsCache.current.get(token)!
       }
 
-      tempWs.onmessage = (event) => {
-        const data: ResponseData = JSON.parse(event.data)
-        addApiLog("response", data)
+      return new Promise<{ name: string; wallets: Wallet[] }>((resolve, reject) => {
+        const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+        let resolved = false
 
-        if (data.msg_type === "authorize") {
+        const timeout = setTimeout(() => {
+          if (!resolved) {
+            resolved = true
+            tempWs.close()
+            reject(new Error("Account details fetch timeout"))
+          }
+        }, 5000)
+
+        tempWs.onopen = () => {
+          tempWs.send(JSON.stringify({ authorize: token }))
+          addApiLog("request", { authorize: token })
+        }
+
+        tempWs.onmessage = (event) => {
+          const data: ResponseData = JSON.parse(event.data)
+          addApiLog("response", data)
+
+          if (data.msg_type === "authorize") {
+            if (!resolved) {
+              resolved = true
+              clearTimeout(timeout)
+
+              if (data.error) {
+                reject(new Error(data.error.message))
+              } else {
+                const accountName = data.authorize?.fullname || data.authorize?.loginid || "Account"
+                const mockWallets: Wallet[] = [
+                  { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
+                  { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
+                ]
+                const result = { name: accountName, wallets: mockWallets }
+                accountDetailsCache.current.set(token, result)
+                resolve(result)
+              }
+              tempWs.close()
+            }
+          }
+        }
+
+        tempWs.onerror = () => {
           if (!resolved) {
             resolved = true
             clearTimeout(timeout)
-
-            if (data.error) {
-              reject(new Error(data.error.message))
-            } else {
-              const accountName = data.authorize?.fullname || data.authorize?.loginid || "Account"
-              const mockWallets: Wallet[] = [
-                { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
-                { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
-              ]
-              resolve({ name: accountName, wallets: mockWallets })
-            }
-            tempWs.close()
+            reject(new Error("Failed to fetch account details"))
           }
         }
-      }
-
-      tempWs.onerror = () => {
-        if (!resolved) {
-          resolved = true
-          clearTimeout(timeout)
-          reject(new Error("Failed to fetch account details"))
-        }
-      }
-    })
-  }
+      })
+    },
+    [addApiLog],
+  )
 
   const connectWebSocket = useCallback(
     (token: string) => {
@@ -325,13 +339,15 @@ const CopyTradingPage = () => {
   )
 
   const fetchBalance = useCallback(() => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      const request = { balance: 1, req_id: Date.now() }
-      wsRef.current.send(JSON.stringify(request))
-      addApiLog("request", request)
-    } else {
-      console.log("[v0] WebSocket not ready for balance fetch")
-    }
+    if (balanceFetchTimeoutRef.current) clearTimeout(balanceFetchTimeoutRef.current)
+
+    balanceFetchTimeoutRef.current = setTimeout(() => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        const request = { balance: 1, req_id: Date.now() }
+        wsRef.current.send(JSON.stringify(request))
+        addApiLog("request", request)
+      }
+    }, 100)
   }, [addApiLog])
 
   const showNotification = (type: "success" | "error" | "warning", message: string) => {
@@ -456,7 +472,7 @@ const CopyTradingPage = () => {
       addApiLog("request", request)
 
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
-      balanceCheckIntervalRef.current = setInterval(fetchBalance, 1000)
+      balanceCheckIntervalRef.current = setInterval(fetchBalance, 2000)
 
       showNotification("success", "Copy trading started")
     } catch (error) {
