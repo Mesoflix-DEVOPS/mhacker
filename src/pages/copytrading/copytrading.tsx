@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import styles from "./CopyTradingPage.module.scss"
+import styles from "./copytrading.tsx"
 
 interface Account {
   loginid: string
@@ -10,6 +10,7 @@ interface Account {
   balance?: number
   accountType?: string
   name?: string
+  realName?: string
 }
 
 interface Wallet {
@@ -23,6 +24,7 @@ interface Follower {
   loginid: string
   token: string
   name?: string
+  realName?: string
   status: "connected" | "syncing" | "disconnected"
   balance?: number
   lastSync?: string
@@ -35,6 +37,7 @@ interface Trader {
   loginid: string
   token: string
   name?: string
+  realName?: string
   copyMode: "demo-to-demo" | "demo-to-real"
   selectedWallet?: string
 }
@@ -67,6 +70,7 @@ const CopyTradingPage = () => {
   const [activeAccount, setActiveAccount] = useState<Account | null>(null)
   const [accountBalance, setAccountBalance] = useState<number | null>(null)
   const [accountName, setAccountName] = useState<string>("")
+  const [accountRealName, setAccountRealName] = useState<string>("")
   const [userWallets, setUserWallets] = useState<Wallet[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string>("")
 
@@ -78,6 +82,7 @@ const CopyTradingPage = () => {
   // Trader Connection (Follower Mode)
   const [traderToken, setTraderToken] = useState("")
   const [traderName, setTraderName] = useState("")
+  const [traderRealName, setTraderRealName] = useState("")
   const [traderCopyMode, setTraderCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
 
   // UI States
@@ -101,6 +106,7 @@ const CopyTradingPage = () => {
     const savedCopyingActive = localStorage.getItem("copytrading_active") === "true"
     const savedFollowers = localStorage.getItem("copytrading_followers")
     const savedAccountName = localStorage.getItem("copytrading_account_name")
+    const savedAccountRealName = localStorage.getItem("copytrading_account_real_name")
     const savedWallets = localStorage.getItem("copytrading_wallets")
     const savedSelectedWallet = localStorage.getItem("copytrading_selected_wallet")
 
@@ -110,6 +116,7 @@ const CopyTradingPage = () => {
     setIsCopyingActive(savedCopyingActive)
     if (savedFollowers) setFollowers(JSON.parse(savedFollowers))
     if (savedAccountName) setAccountName(savedAccountName)
+    if (savedAccountRealName) setAccountRealName(savedAccountRealName)
     if (savedWallets) setUserWallets(JSON.parse(savedWallets))
     if (savedSelectedWallet) setSelectedWallet(savedSelectedWallet)
 
@@ -157,6 +164,10 @@ const CopyTradingPage = () => {
   }, [accountName])
 
   useEffect(() => {
+    localStorage.setItem("copytrading_account_real_name", accountRealName)
+  }, [accountRealName])
+
+  useEffect(() => {
     localStorage.setItem("copytrading_wallets", JSON.stringify(userWallets))
   }, [userWallets])
 
@@ -164,9 +175,15 @@ const CopyTradingPage = () => {
     localStorage.setItem("copytrading_selected_wallet", selectedWallet)
   }, [selectedWallet])
 
-  const fetchAccountDetails = async (token: string) => {
-    return new Promise<{ name: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+  const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
+    return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+      let authReceived = false
+
+      const timeout = setTimeout(() => {
+        tempWs.close()
+        reject(new Error("Account details fetch timeout"))
+      }, 8000)
 
       tempWs.onopen = () => {
         tempWs.send(JSON.stringify({ authorize: token }))
@@ -176,23 +193,38 @@ const CopyTradingPage = () => {
         const data: ResponseData = JSON.parse(event.data)
 
         if (data.msg_type === "authorize") {
+          clearTimeout(timeout)
           if (data.error) {
             reject(new Error(data.error.message))
           } else {
-            // Mock wallet data - in real app, fetch from API
-            const mockWallets: Wallet[] = [
-              { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
-              { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
-            ]
-
-            const accountName = data.authorize?.loginid || "Account"
-            resolve({ name: accountName, wallets: mockWallets })
+            authReceived = true
+            // Request account settings to get real name
+            tempWs.send(JSON.stringify({ get_account_settings: 1 }))
           }
+        }
+
+        if (data.msg_type === "get_account_settings" && authReceived) {
+          // Mock wallet data - in real app, fetch from API
+          const mockWallets: Wallet[] = [
+            { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
+            { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
+          ]
+
+          const loginid = data.authorize?.loginid || data.get_account_settings?.loginid || "Account"
+          // Extract real name from account settings or use loginid as fallback
+          const realName = data.get_account_settings?.first_name
+            ? `${data.get_account_settings.first_name} ${data.get_account_settings.last_name || ""}`.trim()
+            : loginid
+
+          resolve({ name: loginid, realName: realName, wallets: mockWallets })
           tempWs.close()
         }
       }
 
-      tempWs.onerror = () => reject(new Error("Failed to fetch account details"))
+      tempWs.onerror = () => {
+        clearTimeout(timeout)
+        reject(new Error("Failed to fetch account details"))
+      }
     })
   }
 
@@ -207,6 +239,10 @@ const CopyTradingPage = () => {
     wsRef.current.onopen = () => {
       setIsConnected(true)
       wsRef.current?.send(JSON.stringify({ authorize: token }))
+      // Fetch balance immediately after authorization
+      setTimeout(() => {
+        wsRef.current?.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
+      }, 500)
       onOpenCallback?.()
     }
 
@@ -261,7 +297,6 @@ const CopyTradingPage = () => {
     setTimeout(() => setNotification(null), 4000)
   }
 
-  // Trader Mode: Add Follower
   const addFollower = async () => {
     if (!newFollowerToken.trim()) {
       showNotification("error", "Please enter a follower token")
@@ -270,16 +305,20 @@ const CopyTradingPage = () => {
 
     setIsLoading(true)
     try {
-      const { name, wallets } = await fetchAccountDetails(newFollowerToken.trim())
+      const { name, realName, wallets } = await fetchAccountDetails(newFollowerToken.trim())
+
+      // Auto-select demo wallet if demo-to-demo mode
+      const selectedWalletId = copyMode === "demo-to-demo" ? wallets.find((w) => w.type === "demo")?.id : wallets[0]?.id
 
       const newFollower: Follower = {
         loginid: name,
         token: newFollowerToken.trim(),
-        name: newFollowerName || name,
+        name: newFollowerName || realName,
+        realName: realName,
         status: "connected",
-        balance: wallets[0]?.balance,
+        balance: wallets.find((w) => w.id === selectedWalletId)?.balance,
         lastSync: new Date().toISOString(),
-        selectedWallet: wallets[0]?.id,
+        selectedWallet: selectedWalletId,
         copyMode: copyMode,
         wallets: wallets,
       }
@@ -287,7 +326,7 @@ const CopyTradingPage = () => {
       setFollowers([...followers, newFollower])
       setNewFollowerToken("")
       setNewFollowerName("")
-      showNotification("success", `Follower ${newFollower.name} added successfully`)
+      showNotification("success", `Follower ${newFollower.realName} added successfully`)
     } catch (error) {
       showNotification("error", `Failed to add follower: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
@@ -295,23 +334,53 @@ const CopyTradingPage = () => {
     }
   }
 
-  // Trader Mode: Remove Follower
   const removeFollower = (loginid: string) => {
-    if (confirm(`Remove follower ${loginid}?`)) {
+    const follower = followers.find((f) => f.loginid === loginid)
+    if (confirm(`Remove follower ${follower?.realName || loginid}?`)) {
       setFollowers(followers.filter((f) => f.loginid !== loginid))
       showNotification("success", "Follower removed")
     }
   }
 
   const updateFollowerWallet = (loginid: string, walletId: string) => {
-    setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, selectedWallet: walletId } : f)))
+    setFollowers(
+      followers.map((f) => {
+        if (f.loginid === loginid) {
+          const selectedWallet = f.wallets?.find((w) => w.id === walletId)
+          return {
+            ...f,
+            selectedWallet: walletId,
+            balance: selectedWallet?.balance,
+          }
+        }
+        return f
+      }),
+    )
   }
 
   const updateFollowerCopyMode = (loginid: string, mode: "demo-to-demo" | "demo-to-real") => {
-    setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, copyMode: mode } : f)))
+    setFollowers(
+      followers.map((f) => {
+        if (f.loginid === loginid) {
+          // Auto-switch wallet based on mode
+          let newWalletId = f.selectedWallet
+          if (mode === "demo-to-demo") {
+            newWalletId = f.wallets?.find((w) => w.type === "demo")?.id || f.selectedWallet
+          } else if (mode === "demo-to-real") {
+            newWalletId = f.wallets?.find((w) => w.type === "real")?.id || f.selectedWallet
+          }
+
+          return {
+            ...f,
+            copyMode: mode,
+            selectedWallet: newWalletId,
+          }
+        }
+        return f
+      }),
+    )
   }
 
-  // Start Copy Trading
   const startCopyTrading = async () => {
     if (!activeAccount) {
       showNotification("error", "No active account selected")
@@ -333,8 +402,9 @@ const CopyTradingPage = () => {
     setIsLoading(true)
     try {
       if (userRole === "follower") {
-        const { name } = await fetchAccountDetails(traderToken.trim())
+        const { name, realName } = await fetchAccountDetails(traderToken.trim())
         setTraderName(name)
+        setTraderRealName(realName)
       }
 
       connectWebSocket(activeAccount.token, () => {
@@ -347,15 +417,14 @@ const CopyTradingPage = () => {
         wsRef.current?.send(JSON.stringify(request))
       })
 
-      // Start balance check interval
+      // Start faster balance check interval (2 seconds instead of 5)
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
-      balanceCheckIntervalRef.current = setInterval(fetchBalance, 5000)
+      balanceCheckIntervalRef.current = setInterval(fetchBalance, 2000)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Stop Copy Trading
   const stopCopyTrading = async () => {
     if (!activeAccount) return
 
@@ -430,7 +499,7 @@ const CopyTradingPage = () => {
             <div>
               <h1>Copy Trading Dashboard</h1>
               <p className={styles.roleLabel}>{userRole === "trader" ? "👨‍💼 Trader Mode" : "📊 Follower Mode"}</p>
-              {accountName && <p className={styles.accountNameDisplay}>Account: {accountName}</p>}
+              {accountRealName && <p className={styles.accountNameDisplay}>Account: {accountRealName}</p>}
             </div>
             <div className={styles.connectionStatus}>
               <div
@@ -491,7 +560,7 @@ const CopyTradingPage = () => {
                   <div className={styles.accountCard}>
                     <div className={styles.accountRow}>
                       <span className={styles.label}>Account Name:</span>
-                      <span className={styles.value}>{accountName || activeAccount.loginid}</span>
+                      <span className={styles.value}>{accountRealName || accountName || activeAccount.loginid}</span>
                     </div>
                     <div className={styles.accountRow}>
                       <span className={styles.label}>Login ID:</span>
@@ -584,7 +653,7 @@ const CopyTradingPage = () => {
                       value={traderToken}
                       onChange={(e) => setTraderToken(e.target.value)}
                     />
-                    {traderName && <p className={styles.helperText}>Trader: {traderName}</p>}
+                    {traderRealName && <p className={styles.helperText}>Trader: {traderRealName}</p>}
                   </div>
                 )}
 
@@ -691,7 +760,7 @@ const CopyTradingPage = () => {
                       <div key={follower.loginid} className={styles.followerCard}>
                         <div className={styles.followerHeader}>
                           <div>
-                            <h3>{follower.name || follower.loginid}</h3>
+                            <h3>{follower.realName || follower.name || follower.loginid}</h3>
                             <p className={styles.followerStatus}>
                               <span className={`${styles.statusIndicator} ${styles[follower.status]}`}></span>
                               {follower.status.charAt(0).toUpperCase() + follower.status.slice(1)}
