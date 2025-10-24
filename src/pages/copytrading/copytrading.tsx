@@ -10,7 +10,6 @@ interface Account {
   balance?: number
   accountType?: string
   name?: string
-  realName?: string
 }
 
 interface Wallet {
@@ -24,7 +23,6 @@ interface Follower {
   loginid: string
   token: string
   name?: string
-  realName?: string
   status: "connected" | "syncing" | "disconnected"
   balance?: number
   lastSync?: string
@@ -37,7 +35,6 @@ interface Trader {
   loginid: string
   token: string
   name?: string
-  realName?: string
   copyMode: "demo-to-demo" | "demo-to-real"
   selectedWallet?: string
 }
@@ -58,13 +55,6 @@ interface ResponseData {
   [key: string]: any
 }
 
-interface ApiLog {
-  timestamp: string
-  type: "info" | "error" | "success" | "warning"
-  message: string
-  data?: any
-}
-
 const CopyTradingPage = () => {
   // Role and Mode States
   const [userRole, setUserRole] = useState<"trader" | "follower" | null>(null)
@@ -77,7 +67,6 @@ const CopyTradingPage = () => {
   const [activeAccount, setActiveAccount] = useState<Account | null>(null)
   const [accountBalance, setAccountBalance] = useState<number | null>(null)
   const [accountName, setAccountName] = useState<string>("")
-  const [accountRealName, setAccountRealName] = useState<string>("")
   const [userWallets, setUserWallets] = useState<Wallet[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string>("")
 
@@ -89,7 +78,6 @@ const CopyTradingPage = () => {
   // Trader Connection (Follower Mode)
   const [traderToken, setTraderToken] = useState("")
   const [traderName, setTraderName] = useState("")
-  const [traderRealName, setTraderRealName] = useState("")
   const [traderCopyMode, setTraderCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
 
   // UI States
@@ -97,14 +85,12 @@ const CopyTradingPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"overview" | "followers" | "settings" | "response">("overview")
   const [response, setResponse] = useState<ResponseData | null>(null)
-  const [apiLogs, setApiLogs] = useState<ApiLog[]>([])
   const [notification, setNotification] = useState<{ type: "success" | "error" | "warning"; message: string } | null>(
     null,
   )
 
   const wsRef = useRef<WebSocket | null>(null)
   const balanceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const apiLogsEndRef = useRef<HTMLDivElement>(null)
 
   // Initialize from localStorage
   useEffect(() => {
@@ -115,7 +101,6 @@ const CopyTradingPage = () => {
     const savedCopyingActive = localStorage.getItem("copytrading_active") === "true"
     const savedFollowers = localStorage.getItem("copytrading_followers")
     const savedAccountName = localStorage.getItem("copytrading_account_name")
-    const savedAccountRealName = localStorage.getItem("copytrading_account_real_name")
     const savedWallets = localStorage.getItem("copytrading_wallets")
     const savedSelectedWallet = localStorage.getItem("copytrading_selected_wallet")
 
@@ -125,7 +110,6 @@ const CopyTradingPage = () => {
     setIsCopyingActive(savedCopyingActive)
     if (savedFollowers) setFollowers(JSON.parse(savedFollowers))
     if (savedAccountName) setAccountName(savedAccountName)
-    if (savedAccountRealName) setAccountRealName(savedAccountRealName)
     if (savedWallets) setUserWallets(JSON.parse(savedWallets))
     if (savedSelectedWallet) setSelectedWallet(savedSelectedWallet)
 
@@ -173,10 +157,6 @@ const CopyTradingPage = () => {
   }, [accountName])
 
   useEffect(() => {
-    localStorage.setItem("copytrading_account_real_name", accountRealName)
-  }, [accountRealName])
-
-  useEffect(() => {
     localStorage.setItem("copytrading_wallets", JSON.stringify(userWallets))
   }, [userWallets])
 
@@ -184,13 +164,36 @@ const CopyTradingPage = () => {
     localStorage.setItem("copytrading_selected_wallet", selectedWallet)
   }, [selectedWallet])
 
-  const addApiLog = (type: "info" | "error" | "success" | "warning", message: string, data?: any) => {
-    const timestamp = new Date().toLocaleTimeString()
-    setApiLogs((prev) => [...prev, { timestamp, type, message, data }])
-    // Auto-scroll to bottom
-    setTimeout(() => {
-      apiLogsEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, 0)
+  const fetchAccountDetails = async (token: string) => {
+    return new Promise<{ name: string; wallets: Wallet[] }>((resolve, reject) => {
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
+
+      tempWs.onopen = () => {
+        tempWs.send(JSON.stringify({ authorize: token }))
+      }
+
+      tempWs.onmessage = (event) => {
+        const data: ResponseData = JSON.parse(event.data)
+
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            reject(new Error(data.error.message))
+          } else {
+            // Mock wallet data - in real app, fetch from API
+            const mockWallets: Wallet[] = [
+              { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
+              { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
+            ]
+
+            const accountName = data.authorize?.loginid || "Account"
+            resolve({ name: accountName, wallets: mockWallets })
+          }
+          tempWs.close()
+        }
+      }
+
+      tempWs.onerror = () => reject(new Error("Failed to fetch account details"))
+    })
   }
 
   const connectWebSocket = (token: string, onOpenCallback?: () => void) => {
@@ -199,196 +202,58 @@ const CopyTradingPage = () => {
       return
     }
 
-    if (wsRef.current) {
-      wsRef.current.close()
-    }
-
     wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
-    let isAuthorized = false
 
     wsRef.current.onopen = () => {
-      addApiLog("info", "WebSocket opened, sending authorization...")
+      setIsConnected(true)
       wsRef.current?.send(JSON.stringify({ authorize: token }))
+      onOpenCallback?.()
     }
 
     wsRef.current.onclose = () => {
-      addApiLog("warning", "WebSocket closed")
       setIsConnected(false)
-      setTimeout(() => {
-        if (!isAuthorized) {
-          addApiLog("info", "Attempting to reconnect...")
-          connectWebSocket(token, onOpenCallback)
-        }
-      }, 3000)
+      showNotification("warning", "Connection lost. Attempting to reconnect...")
     }
 
-    wsRef.current.onerror = (error) => {
-      addApiLog("error", "WebSocket error", error)
+    wsRef.current.onerror = () => {
       showNotification("error", "WebSocket connection error")
     }
 
     wsRef.current.onmessage = (event) => {
-      try {
-        const data: ResponseData = JSON.parse(event.data)
-        addApiLog("info", `WebSocket message received: ${data.msg_type}`, data)
-        setResponse(data)
+      const data: ResponseData = JSON.parse(event.data)
+      setResponse(data)
 
-        if (data.msg_type === "authorize") {
-          if (data.error) {
-            addApiLog("error", `Authorization error: ${data.error.message}`, data.error)
-            showNotification("error", `Authorization failed: ${data.error.message}`)
-            wsRef.current?.close()
-          } else {
-            isAuthorized = true
-            setIsConnected(true)
-            addApiLog("success", "Authorization successful", data.authorize)
-            showNotification("success", "Account authorized successfully")
-
-            if (data.authorize?.loginid) {
-              setAccountName(data.authorize.loginid)
-              const storedRealName = localStorage.getItem(`realname_${data.authorize.loginid}`)
-              if (storedRealName) {
-                setAccountRealName(storedRealName)
-              }
-            }
-            if (data.authorize?.balance !== undefined) {
-              setAccountBalance(data.authorize.balance)
-            }
-
-            setTimeout(() => {
-              addApiLog("info", "Requesting balance...")
-              wsRef.current?.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
-            }, 50)
-
-            onOpenCallback?.()
+      if (data.msg_type === "authorize") {
+        if (data.error) {
+          showNotification("error", `Authorization failed: ${data.error.message}`)
+        } else {
+          showNotification("success", "Account authorized successfully")
+          if (data.authorize?.balance !== undefined) {
+            setAccountBalance(data.authorize.balance)
           }
         }
+      }
 
-        if (data.msg_type === "balance" && data.balance) {
-          addApiLog("success", `Balance received: ${data.balance.balance}`, data.balance)
-          setAccountBalance(data.balance.balance)
-        }
+      if (data.msg_type === "balance" && data.balance) {
+        setAccountBalance(data.balance.balance)
+      }
 
-        if (data.msg_type === "copy_start" && !data.error) {
-          setIsCopyingActive(true)
-          addApiLog("success", `Copy trading started (${copyMode})`, data)
-          showNotification("success", `Copy trading started (${copyMode})`)
-        }
+      if (data.msg_type === "copy_start" && !data.error) {
+        setIsCopyingActive(true)
+        showNotification("success", `Copy trading started (${copyMode})`)
+      }
 
-        if (data.msg_type === "copy_stop" && !data.error) {
-          setIsCopyingActive(false)
-          addApiLog("success", "Copy trading stopped", data)
-          showNotification("success", "Copy trading stopped")
-        }
-      } catch (error) {
-        addApiLog("error", "Error parsing WebSocket message", error)
+      if (data.msg_type === "copy_stop" && !data.error) {
+        setIsCopyingActive(false)
+        showNotification("success", "Copy trading stopped")
       }
     }
   }
 
   const fetchBalance = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      addApiLog("info", "Fetching balance...")
       wsRef.current.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
-    } else {
-      addApiLog("warning", "WebSocket not connected, cannot fetch balance")
     }
-  }
-
-  const fetchAccountDetails = async (token: string): Promise<{ name: string; realName: string; wallets: Wallet[] }> => {
-    return new Promise<{ name: string; realName: string; wallets: Wallet[] }>((resolve, reject) => {
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
-      let authData: any = null
-      let settingsData: any = null
-      let isResolved = false
-
-      const timeout = setTimeout(() => {
-        if (!isResolved) {
-          isResolved = true
-          tempWs.close()
-          addApiLog("error", "Account details fetch timeout")
-          reject(new Error("Account details fetch timeout"))
-        }
-      }, 6000)
-
-      tempWs.onopen = () => {
-        addApiLog("info", "Temp WebSocket opened for account details")
-        tempWs.send(JSON.stringify({ authorize: token }))
-      }
-
-      tempWs.onmessage = (event) => {
-        try {
-          const data: ResponseData = JSON.parse(event.data)
-          addApiLog("info", `Temp WebSocket message: ${data.msg_type}`, data)
-
-          if (data.msg_type === "authorize") {
-            if (data.error) {
-              clearTimeout(timeout)
-              isResolved = true
-              addApiLog("error", `Authorization failed: ${data.error.message}`, data.error)
-              reject(new Error(data.error.message))
-              tempWs.close()
-            } else {
-              authData = data.authorize
-              addApiLog("info", "Authorization successful, requesting account settings...")
-              tempWs.send(JSON.stringify({ get_account_settings: 1 }))
-            }
-          }
-
-          if (data.msg_type === "get_account_settings") {
-            clearTimeout(timeout)
-            if (!isResolved) {
-              isResolved = true
-              settingsData = data.get_account_settings
-
-              const loginid = authData?.loginid || "Account"
-
-              let realName = loginid
-              if (settingsData?.first_name && settingsData.first_name.trim()) {
-                realName = settingsData.first_name
-                if (settingsData?.last_name && settingsData.last_name.trim()) {
-                  realName += ` ${settingsData.last_name}`
-                }
-              } else if (settingsData?.salutation && settingsData.salutation.trim()) {
-                realName = settingsData.salutation
-              } else if (settingsData?.name && settingsData.name.trim()) {
-                realName = settingsData.name
-              }
-
-              addApiLog("success", `Real name extracted: ${realName}`, { loginid, realName })
-
-              const mockWallets: Wallet[] = [
-                { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
-                { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
-              ]
-
-              resolve({ name: loginid, realName: realName, wallets: mockWallets })
-              tempWs.close()
-            }
-          }
-        } catch (error) {
-          addApiLog("error", "Error parsing temp WebSocket message", error)
-        }
-      }
-
-      tempWs.onerror = (error) => {
-        addApiLog("error", "Temp WebSocket error", error)
-        clearTimeout(timeout)
-        if (!isResolved) {
-          isResolved = true
-          reject(new Error("Failed to fetch account details"))
-        }
-      }
-
-      tempWs.onclose = () => {
-        addApiLog("warning", "Temp WebSocket closed")
-        if (!isResolved) {
-          isResolved = true
-          clearTimeout(timeout)
-          reject(new Error("Connection closed before account details received"))
-        }
-      }
-    })
   }
 
   const showNotification = (type: "success" | "error" | "warning", message: string) => {
@@ -396,6 +261,7 @@ const CopyTradingPage = () => {
     setTimeout(() => setNotification(null), 4000)
   }
 
+  // Trader Mode: Add Follower
   const addFollower = async () => {
     if (!newFollowerToken.trim()) {
       showNotification("error", "Please enter a follower token")
@@ -403,23 +269,17 @@ const CopyTradingPage = () => {
     }
 
     setIsLoading(true)
-    addApiLog("info", "Adding new follower...")
     try {
-      const { name, realName, wallets } = await fetchAccountDetails(newFollowerToken.trim())
-
-      localStorage.setItem(`realname_${name}`, realName)
-
-      const selectedWalletId = copyMode === "demo-to-demo" ? wallets.find((w) => w.type === "demo")?.id : wallets[0]?.id
+      const { name, wallets } = await fetchAccountDetails(newFollowerToken.trim())
 
       const newFollower: Follower = {
         loginid: name,
         token: newFollowerToken.trim(),
-        name: newFollowerName || realName,
-        realName: realName,
+        name: newFollowerName || name,
         status: "connected",
-        balance: wallets.find((w) => w.id === selectedWalletId)?.balance,
+        balance: wallets[0]?.balance,
         lastSync: new Date().toISOString(),
-        selectedWallet: selectedWalletId,
+        selectedWallet: wallets[0]?.id,
         copyMode: copyMode,
         wallets: wallets,
       }
@@ -427,62 +287,31 @@ const CopyTradingPage = () => {
       setFollowers([...followers, newFollower])
       setNewFollowerToken("")
       setNewFollowerName("")
-      addApiLog("success", `Follower ${newFollower.realName} added successfully`, newFollower)
-      showNotification("success", `Follower ${newFollower.realName} added successfully`)
+      showNotification("success", `Follower ${newFollower.name} added successfully`)
     } catch (error) {
-      addApiLog("error", `Failed to add follower: ${error instanceof Error ? error.message : "Unknown error"}`, error)
       showNotification("error", `Failed to add follower: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsLoading(false)
     }
   }
 
+  // Trader Mode: Remove Follower
   const removeFollower = (loginid: string) => {
-    const follower = followers.find((f) => f.loginid === loginid)
-    if (confirm(`Remove follower ${follower?.realName || loginid}?`)) {
+    if (confirm(`Remove follower ${loginid}?`)) {
       setFollowers(followers.filter((f) => f.loginid !== loginid))
       showNotification("success", "Follower removed")
     }
   }
 
   const updateFollowerWallet = (loginid: string, walletId: string) => {
-    setFollowers(
-      followers.map((f) => {
-        if (f.loginid === loginid) {
-          const selectedWallet = f.wallets?.find((w) => w.id === walletId)
-          return {
-            ...f,
-            selectedWallet: walletId,
-            balance: selectedWallet?.balance,
-          }
-        }
-        return f
-      }),
-    )
+    setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, selectedWallet: walletId } : f)))
   }
 
   const updateFollowerCopyMode = (loginid: string, mode: "demo-to-demo" | "demo-to-real") => {
-    setFollowers(
-      followers.map((f) => {
-        if (f.loginid === loginid) {
-          let newWalletId = f.selectedWallet
-          if (mode === "demo-to-demo") {
-            newWalletId = f.wallets?.find((w) => w.type === "demo")?.id || f.selectedWallet
-          } else if (mode === "demo-to-real") {
-            newWalletId = f.wallets?.find((w) => w.type === "real")?.id || f.selectedWallet
-          }
-
-          return {
-            ...f,
-            copyMode: mode,
-            selectedWallet: newWalletId,
-          }
-        }
-        return f
-      }),
-    )
+    setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, copyMode: mode } : f)))
   }
 
+  // Start Copy Trading
   const startCopyTrading = async () => {
     if (!activeAccount) {
       showNotification("error", "No active account selected")
@@ -502,13 +331,10 @@ const CopyTradingPage = () => {
     }
 
     setIsLoading(true)
-    addApiLog("info", `Starting copy trading in ${copyMode} mode...`)
     try {
       if (userRole === "follower") {
-        const { name, realName } = await fetchAccountDetails(traderToken.trim())
+        const { name } = await fetchAccountDetails(traderToken.trim())
         setTraderName(name)
-        setTraderRealName(realName)
-        localStorage.setItem(`realname_${name}`, realName)
       }
 
       connectWebSocket(activeAccount.token, () => {
@@ -518,22 +344,22 @@ const CopyTradingPage = () => {
           selected_wallet: selectedWallet,
           req_id: Date.now(),
         }
-        addApiLog("info", "Sending copy_start request", request)
         wsRef.current?.send(JSON.stringify(request))
       })
 
+      // Start balance check interval
       if (balanceCheckIntervalRef.current) clearInterval(balanceCheckIntervalRef.current)
-      balanceCheckIntervalRef.current = setInterval(fetchBalance, 1000)
+      balanceCheckIntervalRef.current = setInterval(fetchBalance, 5000)
     } finally {
       setIsLoading(false)
     }
   }
 
+  // Stop Copy Trading
   const stopCopyTrading = async () => {
     if (!activeAccount) return
 
     setIsLoading(true)
-    addApiLog("info", "Stopping copy trading...")
     try {
       connectWebSocket(activeAccount.token, () => {
         const request = {
@@ -541,7 +367,6 @@ const CopyTradingPage = () => {
           trader_loginid: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
           req_id: Date.now(),
         }
-        addApiLog("info", "Sending copy_stop request", request)
         wsRef.current?.send(JSON.stringify(request))
       })
 
@@ -605,7 +430,7 @@ const CopyTradingPage = () => {
             <div>
               <h1>Copy Trading Dashboard</h1>
               <p className={styles.roleLabel}>{userRole === "trader" ? "👨‍💼 Trader Mode" : "📊 Follower Mode"}</p>
-              {accountRealName && <p className={styles.accountNameDisplay}>Account: {accountRealName}</p>}
+              {accountName && <p className={styles.accountNameDisplay}>Account: {accountName}</p>}
             </div>
             <div className={styles.connectionStatus}>
               <div
@@ -666,7 +491,7 @@ const CopyTradingPage = () => {
                   <div className={styles.accountCard}>
                     <div className={styles.accountRow}>
                       <span className={styles.label}>Account Name:</span>
-                      <span className={styles.value}>{accountRealName || accountName || activeAccount.loginid}</span>
+                      <span className={styles.value}>{accountName || activeAccount.loginid}</span>
                     </div>
                     <div className={styles.accountRow}>
                       <span className={styles.label}>Login ID:</span>
@@ -759,7 +584,7 @@ const CopyTradingPage = () => {
                       value={traderToken}
                       onChange={(e) => setTraderToken(e.target.value)}
                     />
-                    {traderRealName && <p className={styles.helperText}>Trader: {traderRealName}</p>}
+                    {traderName && <p className={styles.helperText}>Trader: {traderName}</p>}
                   </div>
                 )}
 
@@ -866,7 +691,7 @@ const CopyTradingPage = () => {
                       <div key={follower.loginid} className={styles.followerCard}>
                         <div className={styles.followerHeader}>
                           <div>
-                            <h3>{follower.realName || follower.name || follower.loginid}</h3>
+                            <h3>{follower.name || follower.loginid}</h3>
                             <p className={styles.followerStatus}>
                               <span className={`${styles.statusIndicator} ${styles[follower.status]}`}></span>
                               {follower.status.charAt(0).toUpperCase() + follower.status.slice(1)}
@@ -1003,28 +828,10 @@ const CopyTradingPage = () => {
           )}
 
           {/* Response Tab */}
-          {activeTab === "response" && (
+          {activeTab === "response" && response && (
             <div className={styles.responseContainer}>
-              <h2>API Response & Logs</h2>
-              <div className={styles.apiLogsWrapper}>
-                {apiLogs.length > 0 ? (
-                  <div className={styles.apiLogsList}>
-                    {apiLogs.map((log, index) => (
-                      <div key={index} className={`${styles.apiLogItem} ${styles[`log-${log.type}`]}`}>
-                        <div className={styles.logHeader}>
-                          <span className={styles.logTimestamp}>{log.timestamp}</span>
-                          <span className={styles.logType}>{log.type.toUpperCase()}</span>
-                        </div>
-                        <div className={styles.logMessage}>{log.message}</div>
-                        {log.data && <pre className={styles.logData}>{JSON.stringify(log.data, null, 2)}</pre>}
-                      </div>
-                    ))}
-                    <div ref={apiLogsEndRef} />
-                  </div>
-                ) : (
-                  <p className={styles.noData}>No API logs yet. Start by connecting your account.</p>
-                )}
-              </div>
+              <h2>API Response</h2>
+              <pre className={styles.responseContent}>{JSON.stringify(response, null, 2)}</pre>
             </div>
           )}
         </div>
