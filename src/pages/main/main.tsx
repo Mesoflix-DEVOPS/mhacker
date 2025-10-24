@@ -3,6 +3,7 @@
 import React, { lazy, Suspense, useEffect, useState, useCallback } from "react"
 import classNames from "classnames"
 import { observer } from "mobx-react-lite"
+import { useRouter, useSearchParams } from "next/navigation"
 import ChunkLoader from "@/components/loader/chunk-loader"
 import DesktopWrapper from "@/components/shared_ui/desktop-wrapper"
 import Dialog from "@/components/shared_ui/dialog"
@@ -26,6 +27,8 @@ const Tutorial = lazy(() => import("../tutorials"))
 const Copytrading = lazy(() => import("../copytrading"))
 const Dcircles = lazy(() => import("../analysis"))
 const Advanced = lazy(() => import("../advanced"))
+
+const TAB_LETTERS = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"]
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
@@ -280,6 +283,8 @@ const TelegramIcon = () => (
 )
 
 const AppWrapper = observer(() => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const { connectionStatus } = useApiBase()
   const { dashboard, load_modal, run_panel, summary_card } = useStore()
   const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard
@@ -299,9 +304,17 @@ const AppWrapper = observer(() => {
   const [bots, setBots] = useState([])
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const analysisUrl = "https://mesoflixldpnew.vercel.app/"
-  const mtoolUrl = "https://your-mtool-url.com/" // Replace with your MTool URL
+  const mtoolUrl = "https://your-mtool-url.com/"
   const strategyUrl = "https://mesoflixstrategies.netlify.app/"
   const toolsUrl = "https://alltools-ten.vercel.app/"
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab")
+    if (tabParam && TAB_LETTERS.includes(tabParam)) {
+      const tabIndex = TAB_LETTERS.indexOf(tabParam)
+      setActiveTab(tabIndex)
+    }
+  }, [searchParams, setActiveTab])
 
   useEffect(() => {
     if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -350,7 +363,14 @@ const AppWrapper = observer(() => {
 
   const formatBotName = (name: string) => name.replace(/\.xml$/, "")
 
-  const handleTabChange = useCallback((tab_index: number) => setActiveTab(tab_index), [setActiveTab])
+  const handleTabChange = useCallback(
+    (tab_index: number) => {
+      setActiveTab(tab_index)
+      const tabLetter = TAB_LETTERS[tab_index] || "a"
+      router.push(`?tab=${tabLetter}`, { scroll: false })
+    },
+    [setActiveTab, router],
+  )
 
   const handleBotClick = useCallback(
     async (bot: { filePath: string; xmlContent: string }) => {
@@ -376,15 +396,16 @@ const AppWrapper = observer(() => {
 
   const showRunPanel = [1, 2, 3, 4].includes(active_tab)
 
-  // Responsive style for full height/width and scroll for tab panels
   const fullPanelStyle: React.CSSProperties = {
     width: "100%",
-    height: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
-    minHeight: isMobile ? "calc(100vh - 54px)" : "calc(100vh - 60px)",
-    maxHeight: "100vh",
+    height: "100%",
+    minHeight: "100%",
+    maxHeight: "100%",
     overflowY: "auto",
     overflowX: "hidden",
     background: "#f0fdf4",
+    display: "flex",
+    flexDirection: "column",
   }
 
   return (
@@ -398,7 +419,7 @@ const AppWrapper = observer(() => {
             onTabItemClick={handleTabChange}
             top
           >
-            {/* 1. Free Bots */}
+            {/* 1. Free Bots - Tab A */}
             <div
               label={
                 <>
@@ -476,7 +497,7 @@ const AppWrapper = observer(() => {
               </div>
             </div>
 
-            {/* 2. Bot Settings */}
+            {/* 2. Bot Settings - Tab B */}
             <div
               label={
                 <>
@@ -486,11 +507,13 @@ const AppWrapper = observer(() => {
               }
               id="id-bot-settings"
             >
-              <Dashboard handleTabChange={handleTabChange} />
-              <button onClick={handleOpen}>Load Bot</button>
+              <div style={fullPanelStyle}>
+                <Dashboard handleTabChange={handleTabChange} />
+                <button onClick={handleOpen}>Load Bot</button>
+              </div>
             </div>
 
-            {/* 3. Charts */}
+            {/* 3. Charts - Tab C */}
             <div
               label={
                 <>
@@ -500,12 +523,14 @@ const AppWrapper = observer(() => {
               }
               id="id-charts"
             >
-              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
-                <Chart show_digits_stats={false} />
-              </Suspense>
+              <div style={fullPanelStyle}>
+                <Suspense fallback={<ChunkLoader message={localize("Please wait, loading chart...")} />}>
+                  <Chart show_digits_stats={false} />
+                </Suspense>
+              </div>
             </div>
 
-            {/* 4. Dcircles */}
+            {/* 4. Dcircles - Tab D */}
             <div
               label={
                 <>
@@ -522,7 +547,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 5. MTool */}
+            {/* 5. MTool - Tab E */}
             <div
               label={
                 <>
@@ -539,7 +564,7 @@ const AppWrapper = observer(() => {
               </Suspense>
             </div>
 
-            {/* 6. Analysis */}
+            {/* 6. Analysis - Tab F */}
             <div
               label={
                 <>
@@ -559,13 +584,14 @@ const AppWrapper = observer(() => {
                     border: "none",
                     display: "block",
                     background: "#f0f9ff",
+                    flex: 1,
                   }}
                   scrolling="yes"
                 />
               </div>
             </div>
 
-            {/* 7. Tools */}
+            {/* 7. Tools - Tab G */}
             <div
               label={
                 <>
@@ -585,13 +611,14 @@ const AppWrapper = observer(() => {
                     border: "none",
                     display: "block",
                     background: "#f0fdf4",
+                    flex: 1,
                   }}
                   scrolling="yes"
                 />
               </div>
             </div>
 
-            {/* 8. Copytrading */}
+            {/* 8. Copytrading - Tab H */}
             <div
               label={
                 <>
@@ -601,12 +628,14 @@ const AppWrapper = observer(() => {
               }
               id="id-copytrading"
             >
-              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
-                <Copytrading />
-              </Suspense>
+              <div style={fullPanelStyle}>
+                <Suspense fallback={<ChunkLoader message={localize("Please wait, loading copytrading...")} />}>
+                  <Copytrading />
+                </Suspense>
+              </div>
             </div>
 
-            {/* 9. Strategies */}
+            {/* 9. Strategies - Tab I */}
             <div
               label={
                 <>
@@ -626,13 +655,14 @@ const AppWrapper = observer(() => {
                     border: "none",
                     display: "block",
                     background: "#f0f9ff",
+                    flex: 1,
                   }}
                   scrolling="yes"
                 />
               </div>
             </div>
 
-            {/* 10. Signals */}
+            {/* 10. Signals - Tab J */}
             <div
               label={
                 <>
@@ -657,13 +687,14 @@ const AppWrapper = observer(() => {
                     border: "none",
                     display: "block",
                     background: "#f0fdf4",
+                    flex: 1,
                   }}
                   scrolling="yes"
                 />
               </div>
             </div>
 
-            {/* 11. Tutorials */}
+            {/* 11. Tutorials - Tab K */}
             <div
               label={
                 <>
@@ -673,9 +704,11 @@ const AppWrapper = observer(() => {
               }
               id="id-tutorials"
             >
-              <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
-                <Tutorial handleTabChange={handleTabChange} />
-              </Suspense>
+              <div style={fullPanelStyle}>
+                <Suspense fallback={<ChunkLoader message={localize("Please wait, loading tutorials...")} />}>
+                  <Tutorial handleTabChange={handleTabChange} />
+                </Suspense>
+              </div>
             </div>
           </Tabs>
         </div>
