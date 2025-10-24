@@ -6,6 +6,14 @@
         "node": "22.x"
     },
     "scripts": {
+
+        "dev": "next dev",
+         "build": "next build",
+         "start": "next start"
+
+
+
+        
         "start": "rsbuild dev",
         "build": "rsbuild build",
         "watch": "rsbuild build --watch",
