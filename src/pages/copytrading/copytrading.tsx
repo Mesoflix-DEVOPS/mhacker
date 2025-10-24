@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import styles from "./CopyTradingPage.module.scss"
+import styles from "./copy-trading-page.module.scss"
 
 interface Account {
   loginid: string
@@ -9,14 +9,34 @@ interface Account {
   currency: string
   balance?: number
   accountType?: string
+  name?: string
+}
+
+interface Wallet {
+  id: string
+  name: string
+  balance: number
+  type: "demo" | "real"
 }
 
 interface Follower {
   loginid: string
   token: string
+  name?: string
   status: "connected" | "syncing" | "disconnected"
   balance?: number
   lastSync?: string
+  selectedWallet?: string
+  copyMode?: "demo-to-demo" | "demo-to-real"
+  wallets?: Wallet[]
+}
+
+interface Trader {
+  loginid: string
+  token: string
+  name?: string
+  copyMode: "demo-to-demo" | "demo-to-real"
+  selectedWallet?: string
 }
 
 interface ResponseData {
@@ -40,18 +60,25 @@ const CopyTradingPage = () => {
   const [userRole, setUserRole] = useState<"trader" | "follower" | null>(null)
   const [demoToRealMode, setDemoToRealMode] = useState(false)
   const [isCopyingActive, setIsCopyingActive] = useState(false)
+  const [copyMode, setCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
 
   // Account States
   const [accounts, setAccounts] = useState<Account[]>([])
   const [activeAccount, setActiveAccount] = useState<Account | null>(null)
   const [accountBalance, setAccountBalance] = useState<number | null>(null)
+  const [accountName, setAccountName] = useState<string>("")
+  const [userWallets, setUserWallets] = useState<Wallet[]>([])
+  const [selectedWallet, setSelectedWallet] = useState<string>("")
 
   // Follower Management (Trader Mode)
   const [followers, setFollowers] = useState<Follower[]>([])
   const [newFollowerToken, setNewFollowerToken] = useState("")
+  const [newFollowerName, setNewFollowerName] = useState("")
 
   // Trader Connection (Follower Mode)
   const [traderToken, setTraderToken] = useState("")
+  const [traderName, setTraderName] = useState("")
+  const [traderCopyMode, setTraderCopyMode] = useState<"demo-to-demo" | "demo-to-real">("demo-to-demo")
 
   // UI States
   const [isConnected, setIsConnected] = useState(false)
@@ -68,14 +95,23 @@ const CopyTradingPage = () => {
   // Initialize from localStorage
   useEffect(() => {
     const savedRole = localStorage.getItem("copytrading_role") as "trader" | "follower" | null
+    const savedCopyMode =
+      (localStorage.getItem("copytrading_copy_mode") as "demo-to-demo" | "demo-to-real") || "demo-to-demo"
     const savedDemoMode = localStorage.getItem("copytrading_demo_mode") === "true"
     const savedCopyingActive = localStorage.getItem("copytrading_active") === "true"
     const savedFollowers = localStorage.getItem("copytrading_followers")
+    const savedAccountName = localStorage.getItem("copytrading_account_name")
+    const savedWallets = localStorage.getItem("copytrading_wallets")
+    const savedSelectedWallet = localStorage.getItem("copytrading_selected_wallet")
 
     if (savedRole) setUserRole(savedRole)
+    setCopyMode(savedCopyMode)
     setDemoToRealMode(savedDemoMode)
     setIsCopyingActive(savedCopyingActive)
     if (savedFollowers) setFollowers(JSON.parse(savedFollowers))
+    if (savedAccountName) setAccountName(savedAccountName)
+    if (savedWallets) setUserWallets(JSON.parse(savedWallets))
+    if (savedSelectedWallet) setSelectedWallet(savedSelectedWallet)
 
     // Load accounts from localStorage (set by callback)
     const clientAccounts = localStorage.getItem("clientAccounts")
@@ -101,6 +137,10 @@ const CopyTradingPage = () => {
   }, [userRole])
 
   useEffect(() => {
+    localStorage.setItem("copytrading_copy_mode", copyMode)
+  }, [copyMode])
+
+  useEffect(() => {
     localStorage.setItem("copytrading_demo_mode", demoToRealMode.toString())
   }, [demoToRealMode])
 
@@ -112,14 +152,57 @@ const CopyTradingPage = () => {
     localStorage.setItem("copytrading_followers", JSON.stringify(followers))
   }, [followers])
 
-  // WebSocket Connection
+  useEffect(() => {
+    localStorage.setItem("copytrading_account_name", accountName)
+  }, [accountName])
+
+  useEffect(() => {
+    localStorage.setItem("copytrading_wallets", JSON.stringify(userWallets))
+  }, [userWallets])
+
+  useEffect(() => {
+    localStorage.setItem("copytrading_selected_wallet", selectedWallet)
+  }, [selectedWallet])
+
+  const fetchAccountDetails = async (token: string) => {
+    return new Promise<{ name: string; wallets: Wallet[] }>((resolve, reject) => {
+      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+
+      tempWs.onopen = () => {
+        tempWs.send(JSON.stringify({ authorize: token }))
+      }
+
+      tempWs.onmessage = (event) => {
+        const data: ResponseData = JSON.parse(event.data)
+
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            reject(new Error(data.error.message))
+          } else {
+            // Mock wallet data - in real app, fetch from API
+            const mockWallets: Wallet[] = [
+              { id: "demo_1", name: "Demo Wallet", balance: 10000, type: "demo" },
+              { id: "real_1", name: "Real Wallet", balance: 5000, type: "real" },
+            ]
+
+            const accountName = data.authorize?.loginid || "Account"
+            resolve({ name: accountName, wallets: mockWallets })
+          }
+          tempWs.close()
+        }
+      }
+
+      tempWs.onerror = () => reject(new Error("Failed to fetch account details"))
+    })
+  }
+
   const connectWebSocket = (token: string, onOpenCallback?: () => void) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       onOpenCallback?.()
       return
     }
 
-    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=108422")
+    wsRef.current = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
 
     wsRef.current.onopen = () => {
       setIsConnected(true)
@@ -157,7 +240,7 @@ const CopyTradingPage = () => {
 
       if (data.msg_type === "copy_start" && !data.error) {
         setIsCopyingActive(true)
-        showNotification("success", "Copy trading started")
+        showNotification("success", `Copy trading started (${copyMode})`)
       }
 
       if (data.msg_type === "copy_stop" && !data.error) {
@@ -167,14 +250,12 @@ const CopyTradingPage = () => {
     }
   }
 
-  // Fetch Balance
   const fetchBalance = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ balance: 1, req_id: Date.now() }))
     }
   }
 
-  // Show Notification
   const showNotification = (type: "success" | "error" | "warning", message: string) => {
     setNotification({ type, message })
     setTimeout(() => setNotification(null), 4000)
@@ -189,37 +270,24 @@ const CopyTradingPage = () => {
 
     setIsLoading(true)
     try {
-      // Validate token
-      const tempWs = new WebSocket("wss://ws.derivws.com/websockets/v3?app_id=70344")
-      await new Promise((resolve, reject) => {
-        tempWs.onopen = () => {
-          tempWs.send(JSON.stringify({ authorize: newFollowerToken.trim() }))
-        }
+      const { name, wallets } = await fetchAccountDetails(newFollowerToken.trim())
 
-        tempWs.onmessage = (event) => {
-          const data: ResponseData = JSON.parse(event.data)
-          if (data.msg_type === "authorize") {
-            if (data.error) {
-              reject(new Error(data.error.message))
-            } else {
-              const newFollower: Follower = {
-                loginid: data.authorize?.loginid || "Unknown",
-                token: newFollowerToken.trim(),
-                status: "connected",
-                balance: data.authorize?.balance,
-                lastSync: new Date().toISOString(),
-              }
-              setFollowers([...followers, newFollower])
-              setNewFollowerToken("")
-              showNotification("success", `Follower ${newFollower.loginid} added successfully`)
-              resolve(null)
-            }
-            tempWs.close()
-          }
-        }
+      const newFollower: Follower = {
+        loginid: name,
+        token: newFollowerToken.trim(),
+        name: newFollowerName || name,
+        status: "connected",
+        balance: wallets[0]?.balance,
+        lastSync: new Date().toISOString(),
+        selectedWallet: wallets[0]?.id,
+        copyMode: copyMode,
+        wallets: wallets,
+      }
 
-        tempWs.onerror = () => reject(new Error("Token validation failed"))
-      })
+      setFollowers([...followers, newFollower])
+      setNewFollowerToken("")
+      setNewFollowerName("")
+      showNotification("success", `Follower ${newFollower.name} added successfully`)
     } catch (error) {
       showNotification("error", `Failed to add follower: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
@@ -235,6 +303,14 @@ const CopyTradingPage = () => {
     }
   }
 
+  const updateFollowerWallet = (loginid: string, walletId: string) => {
+    setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, selectedWallet: walletId } : f)))
+  }
+
+  const updateFollowerCopyMode = (loginid: string, mode: "demo-to-demo" | "demo-to-real") => {
+    setFollowers(followers.map((f) => (f.loginid === loginid ? { ...f, copyMode: mode } : f)))
+  }
+
   // Start Copy Trading
   const startCopyTrading = async () => {
     if (!activeAccount) {
@@ -247,18 +323,25 @@ const CopyTradingPage = () => {
       return
     }
 
-    if (demoToRealMode) {
+    if (copyMode === "demo-to-real") {
       const confirmed = confirm(
-        "⚠️ WARNING: You are about to enable Demo-to-Real copy mode. This will mirror trades to your REAL account. Continue?",
+        "⚠️ WARNING: You are about to enable Demo-to-Real copy mode. Trades in demo will affect REAL accounts. Continue?",
       )
       if (!confirmed) return
     }
 
     setIsLoading(true)
     try {
+      if (userRole === "follower") {
+        const { name } = await fetchAccountDetails(traderToken.trim())
+        setTraderName(name)
+      }
+
       connectWebSocket(activeAccount.token, () => {
         const request = {
           copy_start: userRole === "trader" ? activeAccount.loginid : traderToken.trim(),
+          copy_mode: copyMode,
+          selected_wallet: selectedWallet,
           req_id: Date.now(),
         }
         wsRef.current?.send(JSON.stringify(request))
@@ -310,8 +393,8 @@ const CopyTradingPage = () => {
               <p>Broadcast your trades to followers</p>
               <ul className={styles.roleFeatures}>
                 <li>✓ Manage multiple followers</li>
-                <li>✓ Real-time trade broadcasting</li>
-                <li>✓ Monitor follower activity</li>
+                <li>✓ Demo-to-Demo & Demo-to-Real</li>
+                <li>✓ Wallet selection per follower</li>
               </ul>
             </div>
 
@@ -321,7 +404,7 @@ const CopyTradingPage = () => {
               <p>Copy trades from expert traders</p>
               <ul className={styles.roleFeatures}>
                 <li>✓ Automatic trade mirroring</li>
-                <li>✓ Demo-to-Real mode</li>
+                <li>✓ Multi-wallet support</li>
                 <li>✓ Real-time synchronization</li>
               </ul>
             </div>
@@ -347,6 +430,7 @@ const CopyTradingPage = () => {
             <div>
               <h1>Copy Trading Dashboard</h1>
               <p className={styles.roleLabel}>{userRole === "trader" ? "👨‍💼 Trader Mode" : "📊 Follower Mode"}</p>
+              {accountName && <p className={styles.accountNameDisplay}>Account: {accountName}</p>}
             </div>
             <div className={styles.connectionStatus}>
               <div
@@ -406,6 +490,10 @@ const CopyTradingPage = () => {
                 {activeAccount ? (
                   <div className={styles.accountCard}>
                     <div className={styles.accountRow}>
+                      <span className={styles.label}>Account Name:</span>
+                      <span className={styles.value}>{accountName || activeAccount.loginid}</span>
+                    </div>
+                    <div className={styles.accountRow}>
                       <span className={styles.label}>Login ID:</span>
                       <span className={styles.value}>{activeAccount.loginid}</span>
                     </div>
@@ -427,15 +515,65 @@ const CopyTradingPage = () => {
                         {isCopyingActive ? "🟢 Active" : "🔴 Inactive"}
                       </span>
                     </div>
+                    {isCopyingActive && (
+                      <div className={styles.accountRow}>
+                        <span className={styles.label}>Copy Mode:</span>
+                        <span className={styles.value}>{copyMode}</span>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <p className={styles.noData}>No account available. Please authorize first.</p>
                 )}
               </div>
 
+              {userRole === "follower" && userWallets.length > 0 && (
+                <div className={styles.section}>
+                  <h2>Select Wallet</h2>
+                  <div className={styles.walletGrid}>
+                    {userWallets.map((wallet) => (
+                      <div
+                        key={wallet.id}
+                        className={`${styles.walletCard} ${selectedWallet === wallet.id ? styles.selected : ""}`}
+                        onClick={() => setSelectedWallet(wallet.id)}
+                      >
+                        <div className={styles.walletType}>{wallet.type === "demo" ? "📋" : "💰"}</div>
+                        <h3>{wallet.name}</h3>
+                        <p className={styles.walletBalance}>{wallet.balance.toFixed(2)}</p>
+                        <p className={styles.walletType}>{wallet.type}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Copy Trading Controls */}
               <div className={styles.section}>
                 <h2>Copy Trading Controls</h2>
+
+                <div className={styles.formGroup}>
+                  <label>Copy Mode</label>
+                  <div className={styles.modeSelector}>
+                    <button
+                      className={`${styles.modeButton} ${copyMode === "demo-to-demo" ? styles.active : ""}`}
+                      onClick={() => setCopyMode("demo-to-demo")}
+                    >
+                      📋 Demo-to-Demo
+                    </button>
+                    <button
+                      className={`${styles.modeButton} ${copyMode === "demo-to-real" ? styles.active : ""}`}
+                      onClick={() => setCopyMode("demo-to-real")}
+                    >
+                      💰 Demo-to-Real
+                    </button>
+                  </div>
+                  <p className={styles.helperText}>
+                    {copyMode === "demo-to-demo"
+                      ? "Trades in demo will be copied to follower's demo"
+                      : "Trades in demo will be copied to follower's real account"}
+                  </p>
+                </div>
+
                 {userRole === "follower" && (
                   <div className={styles.formGroup}>
                     <label>Trader Token</label>
@@ -446,7 +584,7 @@ const CopyTradingPage = () => {
                       value={traderToken}
                       onChange={(e) => setTraderToken(e.target.value)}
                     />
-                    <p className={styles.helperText}>Enter the token of the trader you want to copy</p>
+                    {traderName && <p className={styles.helperText}>Trader: {traderName}</p>}
                   </div>
                 )}
 
@@ -525,7 +663,16 @@ const CopyTradingPage = () => {
                     value={newFollowerToken}
                     onChange={(e) => setNewFollowerToken(e.target.value)}
                   />
-                  <p className={styles.helperText}>Paste the follower's Deriv API token to add them</p>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Follower Name (Optional)</label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    placeholder="Enter a name for this follower"
+                    value={newFollowerName}
+                    onChange={(e) => setNewFollowerName(e.target.value)}
+                  />
                 </div>
                 <button
                   onClick={addFollower}
@@ -544,7 +691,7 @@ const CopyTradingPage = () => {
                       <div key={follower.loginid} className={styles.followerCard}>
                         <div className={styles.followerHeader}>
                           <div>
-                            <h3>{follower.loginid}</h3>
+                            <h3>{follower.name || follower.loginid}</h3>
                             <p className={styles.followerStatus}>
                               <span className={`${styles.statusIndicator} ${styles[follower.status]}`}></span>
                               {follower.status.charAt(0).toUpperCase() + follower.status.slice(1)}
@@ -554,6 +701,48 @@ const CopyTradingPage = () => {
                             ✕
                           </button>
                         </div>
+
+                        {follower.wallets && follower.wallets.length > 0 && (
+                          <div className={styles.followerWallets}>
+                            <label>Select Wallet:</label>
+                            <div className={styles.walletOptions}>
+                              {follower.wallets.map((wallet) => (
+                                <button
+                                  key={wallet.id}
+                                  className={`${styles.walletOption} ${
+                                    follower.selectedWallet === wallet.id ? styles.selected : ""
+                                  }`}
+                                  onClick={() => updateFollowerWallet(follower.loginid, wallet.id)}
+                                >
+                                  {wallet.type === "demo" ? "📋" : "💰"} {wallet.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className={styles.followerMode}>
+                          <label>Copy Mode:</label>
+                          <div className={styles.modeOptions}>
+                            <button
+                              className={`${styles.modeOption} ${
+                                follower.copyMode === "demo-to-demo" ? styles.selected : ""
+                              }`}
+                              onClick={() => updateFollowerCopyMode(follower.loginid, "demo-to-demo")}
+                            >
+                              📋 Demo-to-Demo
+                            </button>
+                            <button
+                              className={`${styles.modeOption} ${
+                                follower.copyMode === "demo-to-real" ? styles.selected : ""
+                              }`}
+                              onClick={() => updateFollowerCopyMode(follower.loginid, "demo-to-real")}
+                            >
+                              💰 Demo-to-Real
+                            </button>
+                          </div>
+                        </div>
+
                         <div className={styles.followerDetails}>
                           <div>
                             <span className={styles.label}>Balance:</span>
