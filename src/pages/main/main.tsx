@@ -3,7 +3,6 @@
 import React, { lazy, Suspense, useEffect, useState, useCallback } from "react"
 import classNames from "classnames"
 import { observer } from "mobx-react-lite"
-import { useRouter, useSearchParams } from "next/navigation"
 import ChunkLoader from "@/components/loader/chunk-loader"
 import DesktopWrapper from "@/components/shared_ui/desktop-wrapper"
 import Dialog from "@/components/shared_ui/dialog"
@@ -29,6 +28,19 @@ const Dcircles = lazy(() => import("../analysis"))
 const Advanced = lazy(() => import("../advanced"))
 
 const TAB_LETTERS = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"]
+
+const getTabLetterFromUrl = (): string | null => {
+  if (typeof window === "undefined") return null
+  const params = new URLSearchParams(window.location.search)
+  return params.get("tab")
+}
+
+const updateUrlWithTab = (tabLetter: string) => {
+  if (typeof window === "undefined") return
+  const url = new URL(window.location.href)
+  url.searchParams.set("tab", tabLetter)
+  window.history.replaceState({}, "", url.toString())
+}
 
 /** BEAUTIFUL MODERN ICONS **/
 const FreeBotsIcon = () => (
@@ -283,8 +295,6 @@ const TelegramIcon = () => (
 )
 
 const AppWrapper = observer(() => {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const { connectionStatus } = useApiBase()
   const { dashboard, load_modal, run_panel, summary_card } = useStore()
   const { active_tab, is_chart_modal_visible, is_trading_view_modal_visible, setActiveTab } = dashboard
@@ -309,12 +319,12 @@ const AppWrapper = observer(() => {
   const toolsUrl = "https://alltools-ten.vercel.app/"
 
   useEffect(() => {
-    const tabParam = searchParams.get("tab")
-    if (tabParam && TAB_LETTERS.includes(tabParam)) {
-      const tabIndex = TAB_LETTERS.indexOf(tabParam)
+    const tabLetter = getTabLetterFromUrl()
+    if (tabLetter && TAB_LETTERS.includes(tabLetter)) {
+      const tabIndex = TAB_LETTERS.indexOf(tabLetter)
       setActiveTab(tabIndex)
     }
-  }, [searchParams, setActiveTab])
+  }, [setActiveTab])
 
   useEffect(() => {
     if (connectionStatus !== CONNECTION_STATUS.OPENED) {
@@ -367,9 +377,9 @@ const AppWrapper = observer(() => {
     (tab_index: number) => {
       setActiveTab(tab_index)
       const tabLetter = TAB_LETTERS[tab_index] || "a"
-      router.push(`?tab=${tabLetter}`, { scroll: false })
+      updateUrlWithTab(tabLetter)
     },
-    [setActiveTab, router],
+    [setActiveTab],
   )
 
   const handleBotClick = useCallback(
