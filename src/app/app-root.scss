@@ -117,49 +117,6 @@
     50% { opacity: 0.6; }
 }
 
-@keyframes graphPulse {
-    0% { height: 20px; opacity: 0.1; }
-    25% { height: 45px; opacity: 0.25; }
-    50% { height: 70px; opacity: 0.35; }
-    75% { height: 35px; opacity: 0.2; }
-    100% { height: 20px; opacity: 0.1; }
-}
-
-.graph-bar {
-    flex: 1;
-    min-width: 6px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #00D9FF, #0088CC);
-    opacity: 0.15;
-    animation: graphPulse 4.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
-    box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
-}
-
-.graph-bar-0 { animation-delay: 0.0s; }
-.graph-bar-1 { animation-delay: 0.2s; }
-.graph-bar-2 { animation-delay: 0.4s; }
-.graph-bar-3 { animation-delay: 0.6s; }
-.graph-bar-4 { animation-delay: 0.8s; }
-.graph-bar-5 { animation-delay: 1.0s; }
-.graph-bar-6 { animation-delay: 1.2s; }
-.graph-bar-7 { animation-delay: 1.4s; }
-.graph-bar-8 { animation-delay: 1.6s; }
-.graph-bar-9 { animation-delay: 1.8s; }
-.graph-bar-10 { animation-delay: 2.0s; }
-.graph-bar-11 { animation-delay: 2.2s; }
-.graph-bar-12 { animation-delay: 2.4s; }
-.graph-bar-13 { animation-delay: 2.6s; }
-.graph-bar-14 { animation-delay: 2.8s; }
-.graph-bar-15 { animation-delay: 3.0s; }
-.graph-bar-16 { animation-delay: 3.2s; }
-.graph-bar-17 { animation-delay: 3.4s; }
-.graph-bar-18 { animation-delay: 3.6s; }
-.graph-bar-19 { animation-delay: 3.8s; }
-.graph-bar-20 { animation-delay: 4.0s; }
-.graph-bar-21 { animation-delay: 4.2s; }
-.graph-bar-22 { animation-delay: 4.4s; }
-.graph-bar-23 { animation-delay: 4.6s; }
-
 .graph-lines {
     display: flex;
     align-items: flex-end;
@@ -169,6 +126,49 @@
     margin-bottom: 1.5rem;
     gap: 2px;
 }
+
+.graph-bar {
+    flex: 1;
+    min-width: 6px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #00D9FF, #0088CC);
+    opacity: 0.15;
+    animation: graphPulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
+}
+
+@keyframes graphPulse {
+    0% { height: 20px; opacity: 0.1; }
+    25% { height: 45px; opacity: 0.25; }
+    50% { height: 70px; opacity: 0.35; }
+    75% { height: 35px; opacity: 0.2; }
+    100% { height: 20px; opacity: 0.1; }
+}
+
+.graph-bar-0 { animation-delay: 0.0s; }
+.graph-bar-1 { animation-delay: 0.08s; }
+.graph-bar-2 { animation-delay: 0.16s; }
+.graph-bar-3 { animation-delay: 0.24s; }
+.graph-bar-4 { animation-delay: 0.32s; }
+.graph-bar-5 { animation-delay: 0.4s; }
+.graph-bar-6 { animation-delay: 0.48s; }
+.graph-bar-7 { animation-delay: 0.56s; }
+.graph-bar-8 { animation-delay: 0.64s; }
+.graph-bar-9 { animation-delay: 0.72s; }
+.graph-bar-10 { animation-delay: 0.8s; }
+.graph-bar-11 { animation-delay: 0.88s; }
+.graph-bar-12 { animation-delay: 0.96s; }
+.graph-bar-13 { animation-delay: 1.04s; }
+.graph-bar-14 { animation-delay: 1.12s; }
+.graph-bar-15 { animation-delay: 1.2s; }
+.graph-bar-16 { animation-delay: 1.28s; }
+.graph-bar-17 { animation-delay: 1.36s; }
+.graph-bar-18 { animation-delay: 1.44s; }
+.graph-bar-19 { animation-delay: 1.52s; }
+.graph-bar-20 { animation-delay: 1.6s; }
+.graph-bar-21 { animation-delay: 1.68s; }
+.graph-bar-22 { animation-delay: 1.76s; }
+.graph-bar-23 { animation-delay: 1.84s; }
 
 .graph-polyline {
     position: absolute;
