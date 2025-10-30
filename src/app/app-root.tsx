@@ -9,9 +9,26 @@ import './app-root.scss';
 
 const AppContent = lazy(() => import('./app-content'));
 
+const TypingMesoflix = ({text = "mesoflix", speed = 150}) => {
+    const [displayed, setDisplayed] = useState("");
+    useEffect(() => {
+        let i = 0;
+        const interval = setInterval(() => {
+            setDisplayed((prev) => prev + text[i]);
+            i++;
+            if (i >= text.length) clearInterval(interval);
+        }, speed);
+        return () => clearInterval(interval);
+    }, [text, speed]);
+    return (
+        <div className="typing-mesoflix">{displayed}</div>
+    );
+};
+
 const Spinner = () => (
     <div className="spinner-root">
         <div className="spinner"></div>
+        <TypingMesoflix />
     </div>
 );
 
@@ -51,7 +68,6 @@ const AppRoot = () => {
                 setIsApiInitialized(true);
             }
         };
-
         initializeApi();
     }, []);
 
