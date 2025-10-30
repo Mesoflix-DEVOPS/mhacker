@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { ToastContainer } from 'react-toastify';
 import useLiveChat from '@/components/chat/useLiveChat';
-import ChunkLoader from '@/components/loader/chunk-loader';
+// REMOVED: import ChunkLoader from '@/components/loader/chunk-loader';
 import { getUrlBase } from '@/components/shared';
 import TncStatusUpdateModal from '@/components/tnc-status-update-modal';
 import TransactionDetailsModal from '@/components/transaction-details';
@@ -18,7 +18,6 @@ import initDatadog from '@/utils/datadog';
 import initHotjar from '@/utils/hotjar';
 import { setSmartChartsPublicPath } from '@deriv/deriv-charts';
 import { ThemeProvider } from '@deriv-com/quill-ui';
-import { localize } from '@deriv-com/translations';
 import Audio from '../components/audio';
 import BlocklyLoading from '../components/blockly-loading';
 import BotStopped from '../components/bot-stopped';
@@ -27,6 +26,26 @@ import Main from '../pages/main';
 import './app.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import '../components/bot-notification/bot-notification.scss';
+
+// LoadingDots component
+const LoadingDots = () => {
+    const [dots, setDots] = React.useState('');
+    useEffect(() => {
+        let count = 0;
+        const timer = setInterval(() => {
+            setDots((prev) => (prev.length < 3 ? prev + '.' : ''));
+            count++;
+            if (count > 15) clearInterval(timer); // ~2s max
+        }, 120);
+        return () => clearInterval(timer);
+    }, []);
+    return (
+        <div className="loading-dots-content">
+            <div className="loading-dots-spinner"></div>
+            <div className="loading-dots-text">Loading<span>{dots}</span></div>
+        </div>
+    );
+};
 
 const AppContent = observer(() => {
     const [is_api_initialized, setIsApiInitialized] = React.useState(false);
@@ -146,7 +165,7 @@ const AppContent = observer(() => {
                     clearInterval(intervalId);
                     retrieveActiveSymbols();
                 }
-            }, 1000);
+            }, 500); // Make loading faster
         }
     };
 
@@ -179,7 +198,7 @@ const AppContent = observer(() => {
     if (common?.error) return null;
 
     return is_loading ? (
-        <ChunkLoader message={localize('Initializing your account...')} />
+        <LoadingDots />
     ) : (
         <>
             <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
