@@ -1,7 +1,6 @@
 import { initSurvicate } from '../public-path';
 import { lazy, Suspense, useEffect } from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
-import ChunkLoader from '@/components/loader/chunk-loader';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
 import { StoreProvider } from '@/hooks/useStore';
 import CallbackPage from '@/pages/callback';
@@ -19,12 +18,57 @@ const i18nInstance = initializeI18n({
     cdnUrl: `${TRANSLATIONS_CDN_URL}/${R2_PROJECT_NAME}/${CROWDIN_BRANCH_NAME}`,
 });
 
+// --- NEW ANIMATION COMPONENT ---
+const TraderLoading = () => {
+    // Simulated prices for a ticker
+    const prices = [1.2345, 1.2352, 1.2360, 1.2348, 1.2371, 1.2359, 1.2383, 1.2365, 1.2379, 1.2357];
+    const [priceIndex, setPriceIndex] = React.useState(0);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setPriceIndex((prev) => (prev + 1) % prices.length);
+        }, 350);
+        return () => clearInterval(interval);
+    }, [prices.length]);
+
+    return (
+        <div className="trader-loader-root">
+            <div className="graph-area">
+                <div className="graph-lines">
+                    {/* Animated graph bars */}
+                    {Array.from({ length: 20 }).map((_, i) => (
+                        <div key={i} className={`graph-bar graph-bar-${i}`}></div>
+                    ))}
+                    {/* Animated polyline */}
+                    <svg className="graph-polyline" width="320" height="80" viewBox="0 0 320 80">
+                        <polyline
+                            points="0,60 20,50 40,65 60,45 80,60 100,35 120,55 140,30 160,60 180,50 200,65 220,45 240,60 260,35 280,55 300,30 320,60"
+                            stroke="#38ef7d"
+                            strokeWidth="3"
+                            fill="none"
+                            style={{ filter: 'drop-shadow(0 0 8px #38ef7d)' }}
+                        />
+                    </svg>
+                </div>
+                <div className="graph-footer">
+                    <span className="ticker-label">EUR/USD</span>
+                    <span className="ticker-price">{prices[priceIndex].toFixed(4)}</span>
+                    <span className="ticker-right">Live Market</span>
+                </div>
+            </div>
+            <div className="trader-loader-text">
+                Connecting to trading server...
+            </div>
+        </div>
+    );
+};
+
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route
             path='/'
             element={
-                <Suspense fallback={<ChunkLoader message={localize('Please wait while we connect to the server...')} />}>
+                <Suspense fallback={<TraderLoading />}>
                     <TranslationProvider defaultLang='EN' i18nInstance={i18nInstance}>
                         <StoreProvider>
                             <RoutePromptDialog />
