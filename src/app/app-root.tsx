@@ -2,17 +2,21 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import ErrorBoundary from '@/components/error-component/error-boundary';
 import ErrorComponent from '@/components/error-component/error-component';
-import ChunkLoader from '@/components/loader/chunk-loader';
 import TradingAssesmentModal from '@/components/trading-assesment-modal';
 import { api_base } from '@/external/bot-skeleton';
 import { useStore } from '@/hooks/useStore';
-import { localize } from '@deriv-com/translations';
 import './app-root.scss';
 
 const AppContent = lazy(() => import('./app-content'));
 
+const Spinner = () => (
+    <div className="spinner-root">
+        <div className="spinner"></div>
+    </div>
+);
+
 const AppRootLoader = () => {
-    return <ChunkLoader message={localize('Initializing Deriv Bot...')} />;
+    return <Spinner />;
 };
 
 const ErrorComponentWrapper = observer(() => {
