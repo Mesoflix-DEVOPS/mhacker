@@ -1,12 +1,23 @@
-.app-root {
+.app-root, .spinner-root {
     height: 100vh;
     width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    background: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%);
+}
 
-    .load-message {
-        margin-top: 6rem;
-    }
+.spinner {
+    width: 64px;
+    height: 64px;
+    border: 8px solid #fff;
+    border-top: 8px solid #4a00e0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 32px #8e2de244;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
