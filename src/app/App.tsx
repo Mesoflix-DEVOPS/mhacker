@@ -1,5 +1,6 @@
+import React, { useState, useEffect } from 'react'; // <-- Import React for hooks/components!
 import { initSurvicate } from '../public-path';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
 import { StoreProvider } from '@/hooks/useStore';
@@ -22,9 +23,9 @@ const i18nInstance = initializeI18n({
 const TraderLoading = () => {
     // Simulated prices for a ticker
     const prices = [1.2345, 1.2352, 1.2360, 1.2348, 1.2371, 1.2359, 1.2383, 1.2365, 1.2379, 1.2357];
-    const [priceIndex, setPriceIndex] = React.useState(0);
+    const [priceIndex, setPriceIndex] = useState(0);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const interval = setInterval(() => {
             setPriceIndex((prev) => (prev + 1) % prices.length);
         }, 350);
