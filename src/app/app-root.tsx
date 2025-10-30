@@ -14,9 +14,12 @@ const TypingMesoflix = ({text = "mesoflix", speed = 150}) => {
     useEffect(() => {
         let i = 0;
         const interval = setInterval(() => {
-            setDisplayed((prev) => prev + text[i]);
-            i++;
-            if (i >= text.length) clearInterval(interval);
+            if (i < text.length) {
+                setDisplayed(text.slice(0, i + 1));
+                i++;
+            } else {
+                clearInterval(interval);
+            }
         }, speed);
         return () => clearInterval(interval);
     }, [text, speed]);
