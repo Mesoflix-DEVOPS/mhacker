@@ -5,17 +5,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #4a00e0 0%, #8e2de2 100%);
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
 }
 
 .spinner {
     width: 64px;
     height: 64px;
     border: 8px solid #fff;
-    border-top: 8px solid #4a00e0;
+    border-top: 8px solid #11998e;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    box-shadow: 0 0 32px #8e2de244;
+    box-shadow: 0 0 32px #38ef7d44;
 }
 
 @keyframes spin {
@@ -27,12 +27,11 @@
     margin-top: 2rem;
     font-size: 2.6rem;
     font-family: 'Roboto Mono', monospace;
-    color: #fff;
+    color: #11998e;
     letter-spacing: 0.2rem;
     font-weight: 700;
-    text-shadow: 0 2px 8px #4a00e0cc;
+    text-shadow: 0 2px 8px #11998ecc;
     min-height: 3.4rem;
-    /* Add a blinking cursor effect */
     position: relative;
 }
 
@@ -41,7 +40,7 @@
     display: inline-block;
     width: 1ch;
     height: 1.2em;
-    background: #fff;
+    background: #11998e;
     margin-left: 0.2rem;
     vertical-align: bottom;
     animation: blink-cursor 1s steps(1) infinite;
