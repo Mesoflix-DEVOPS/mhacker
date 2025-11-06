@@ -213,6 +213,7 @@
   height: 100px;
 }
 
+/* Fixed digit circle positioning - digits now perfectly centered inside circles */
 .digitCircle {
   width: 100%;
   height: 100%;
@@ -227,11 +228,16 @@
 }
 
 .digitNumber {
+  position: absolute;
   font-size: 28px;
   font-weight: 900;
   color: var(--text-primary);
   transition: var(--transition-fast);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 1;
 }
 
 .digitNumber.current {
@@ -535,6 +541,7 @@
   gap: 10px;
 }
 
+/* Improved digit styling in Last Digits Stream - better contrast and larger text */
 .digitItem {
   aspect-ratio: 1;
   display: flex;
@@ -542,8 +549,8 @@
   justify-content: center;
   position: relative;
   border-radius: var(--radius-md);
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 18px;
   transition: var(--transition-fast);
   border: 2px solid transparent;
   cursor: default;
@@ -551,54 +558,61 @@
 
 .digitValue {
   z-index: 2;
+  font-size: 18px;
+  font-weight: 900;
 }
 
 .latestIndicator {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  font-size: 16px;
+  top: -6px;
+  right: -6px;
+  font-size: 18px;
   color: var(--accent-primary);
   animation: pulse 1.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8));
 }
 
 .digitItem.evenDigit {
-  background: rgba(16, 185, 129, 0.15);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.15));
   color: var(--accent-success);
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.1);
 }
 
 .digitItem.evenDigit:hover {
-  background: rgba(16, 185, 129, 0.25);
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.25));
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), inset 0 0 8px rgba(16, 185, 129, 0.15);
+  transform: scale(1.08);
 }
 
 .digitItem.oddDigit {
-  background: rgba(239, 68, 68, 0.15);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.15));
   color: var(--accent-danger);
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.1);
 }
 
 .digitItem.oddDigit:hover {
-  background: rgba(239, 68, 68, 0.25);
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(220, 38, 38, 0.25));
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), inset 0 0 8px rgba(239, 68, 68, 0.15);
+  transform: scale(1.08);
 }
 
 .digitItem.latest {
   border-width: 3px;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .digitItem.latest.evenDigit {
   border-color: var(--accent-success);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.2));
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.5), inset 0 0 12px rgba(16, 185, 129, 0.2);
 }
 
 .digitItem.latest.oddDigit {
   border-color: var(--accent-danger);
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(220, 38, 38, 0.2));
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.5), inset 0 0 12px rgba(239, 68, 68, 0.2);
 }
 
 .digitsFooter {
