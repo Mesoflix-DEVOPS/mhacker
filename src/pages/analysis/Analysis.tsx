@@ -40,6 +40,7 @@ const Analysis: React.FC = () => {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
   const [showMore, setShowMore] = useState(false)
+  const [pipSize, setPipSize] = useState(2)
 
   useEffect(() => {
     connectWebSocket()
@@ -109,12 +110,18 @@ const Analysis: React.FC = () => {
         }))
         setTickHistory(newTickHistory)
         detectDecimalPlaces(newTickHistory)
+        if (data.pip_size !== undefined) {
+          setPipSize(data.pip_size)
+        }
       } else if (data.tick) {
         const tickQuote = Number.parseFloat(data.tick.quote)
         setTickHistory((prev) => {
           const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
           return updated.length > tickCount ? updated.slice(-tickCount) : updated
         })
+        if (data.tick.pip_size !== undefined) {
+          setPipSize(data.tick.pip_size)
+        }
       }
     }
 
@@ -149,20 +156,19 @@ const Analysis: React.FC = () => {
   const detectDecimalPlaces = (history: Tick[]) => {
     if (history.length === 0) return
     const decimalCounts = history.map((tick) => {
-      const decimalPart = tick.quote.toString().split(".")[1] || ""
-      return decimalPart.length
+      const priceStr = tick.quote.toFixed(10)
+      const decimalPart = priceStr.split(".")[1] || ""
+      const trimmed = decimalPart.replace(/0+$/, "")
+      return trimmed.length
     })
-    setDecimalPlaces(Math.max(...decimalCounts, 2))
+    const maxDecimals = Math.max(...decimalCounts, 2)
+    setDecimalPlaces(Math.min(maxDecimals, 5))
   }
 
   const getLastDigit = (price: number): number => {
-    const priceStr = price.toString()
-    const priceParts = priceStr.split(".")
-    let decimals = priceParts[1] || ""
-    while (decimals.length < decimalPlaces) {
-      decimals += "0"
-    }
-    return Number(decimals.slice(-1))
+    const priceStr = price.toFixed(pipSize)
+    const lastChar = priceStr.slice(-1)
+    return Number.parseInt(lastChar, 10)
   }
 
   const getDigitAnalysis = () => {
@@ -255,7 +261,7 @@ const Analysis: React.FC = () => {
 
   const allLastDigits = tickHistory.map((tick) => getLastDigit(tick.quote))
   const displayCount = showMore ? 100 : 50
-  const last50Digits = allLastDigits.slice(-displayCount)
+  const lastDisplayedDigits = allLastDigits.slice(-displayCount)
 
   return (
     <div className={styles.analysisContainer}>
@@ -263,7 +269,7 @@ const Analysis: React.FC = () => {
         {/* Current Price with Market Selector */}
         <section className={styles.priceSection}>
           <div className={styles.priceContent}>
-            <div className={styles.currentPrice}>{currentPrice ? currentPrice.toFixed(decimalPlaces) : "N/A"}</div>
+            <div className={styles.currentPrice}>{currentPrice ? currentPrice.toFixed(pipSize) : "N/A"}</div>
             <div className={styles.priceLabel}>Current Price</div>
           </div>
           <div className={styles.marketSelector}>
@@ -279,7 +285,7 @@ const Analysis: React.FC = () => {
                   </option>
                 ))
               ) : (
-                <option value="R_100">Vol 100</option>
+                <option value="R_100">Loading Markets...</option>
               )}
             </select>
             <div className={styles.selectorLabel}>Market</div>
@@ -329,7 +335,9 @@ const Analysis: React.FC = () => {
                     </div>
                   </div>
                   <div
-                    className={`${styles.digitPercentage} ${isLowest ? styles.lowest : isHighest ? styles.highest : ""}`}
+                    className={`${styles.digitPercentage} ${
+                      isLowest ? styles.lowest : isHighest ? styles.highest : ""
+                    }`}
                   >
                     {percentage.toFixed(1)}%
                   </div>
@@ -396,7 +404,7 @@ const Analysis: React.FC = () => {
           <div className={styles.patternSection}>
             <h3 className={styles.patternTitle}>Last 50 Digits Pattern</h3>
             <div className={styles.patternGrid}>
-              {last50Digits.map((digit, index) => (
+              {lastDisplayedDigits.map((digit, index) => (
                 <div key={index} className={`${styles.patternBox} ${digit % 2 === 0 ? styles.even : styles.odd}`}>
                   {digit % 2 === 0 ? "E" : "O"}
                 </div>
@@ -420,6 +428,7 @@ const Analysis: React.FC = () => {
           </div>
         </section>
 
+        {/* Last Digits Stream Table */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Last Digits Stream</h2>
           <div className={styles.lastDigitsContainer}>
@@ -429,23 +438,23 @@ const Analysis: React.FC = () => {
               </div>
               <div className={styles.digitsContent}>
                 <div className={styles.digitsGrid}>
-                  {last50Digits.map((digit, index) => (
+                  {lastDisplayedDigits.map((digit, index) => (
                     <div
                       key={index}
                       className={`${styles.digitItem} ${digit % 2 === 0 ? styles.evenDigit : styles.oddDigit} ${
-                        index === last50Digits.length - 1 ? styles.latest : ""
+                        index === lastDisplayedDigits.length - 1 ? styles.latest : ""
                       }`}
                       title={`Position ${displayCount - index}: ${digit}`}
                     >
                       <span className={styles.digitValue}>{digit}</span>
-                      {index === last50Digits.length - 1 && <span className={styles.latestIndicator}>●</span>}
+                      {index === lastDisplayedDigits.length - 1 && <span className={styles.latestIndicator}>●</span>}
                     </div>
                   ))}
                 </div>
               </div>
               <div className={styles.digitsFooter}>
                 <button className={styles.toggleBtn} onClick={() => setShowMore(!showMore)}>
-                  {showMore ? "← Show Less" : "Show More →"}
+                  {showMore ? "← Show Less (50)" : "Show More (100) →"}
                 </button>
               </div>
             </div>
@@ -461,8 +470,8 @@ const Analysis: React.FC = () => {
               <span className={styles.statData}>{tickHistory.length}</span>
             </div>
             <div className={styles.statRow}>
-              <span className={styles.statName}>Decimal Places:</span>
-              <span className={styles.statData}>{decimalPlaces}</span>
+              <span className={styles.statName}>Pip Size:</span>
+              <span className={styles.statData}>{pipSize}</span>
             </div>
           </div>
         </section>
