@@ -1,105 +1,138 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './analysis.scss';
+"use client"
+
+import type React from "react"
+import { useState, useEffect, useRef } from "react"
+import styles from "./analysis.module.css"
 
 interface Tick {
-  time: number;
-  quote: number;
+  time: number
+  quote: number
 }
 
-const WS_URL = 'wss://ws.binaryws.com/websockets/v3?app_id=82991';
+interface SymbolData {
+  allow_forward_starting: number
+  display_name: string
+  display_order: number
+  exchange_is_open: number
+  is_trading_suspended: number
+  market: string
+  market_display_name: string
+  pip: number
+  subgroup: string
+  subgroup_display_name: string
+  submarket: string
+  submarket_display_name: string
+  symbol: string
+  symbol_type: string
+}
+
+const WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
 
 const Analysis: React.FC = () => {
-  const [tickHistory, setTickHistory] = useState<Tick[]>([]);
-  // Load selected symbol from localStorage, fallback to R_100
-  const getInitialSymbol = () => localStorage.getItem('selectedSymbol') || 'R_100';
-  const [currentSymbol, setCurrentSymbol] = useState(getInitialSymbol());
-  const tickCount = 1000;
-  const [decimalPlaces, setDecimalPlaces] = useState(2);
-  const [selectedDigit, setSelectedDigit] = useState<number | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const derivWsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [tickHistory, setTickHistory] = useState<Tick[]>([])
+  const getInitialSymbol = () => localStorage.getItem("selectedSymbol") || "R_100"
+  const [currentSymbol, setCurrentSymbol] = useState(getInitialSymbol())
+  const tickCount = 1000
+  const [decimalPlaces, setDecimalPlaces] = useState(2)
+  const [selectedDigit, setSelectedDigit] = useState<number | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
+  const derivWsRef = useRef<WebSocket | null>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
+  const [showMore, setShowMore] = useState(false)
 
-  // Symbol options
-  const symbolOptions = [
-    { value: "R_10", label: "Vol 10" },
-    { value: "1HZ10V", label: "Vol 10 (1s)" },
-    { value: "R_25", label: "Vol 25" },
-    { value: "1HZ25V", label: "Vol 25 (1s)" },
-    { value: "R_50", label: "Vol 50" },
-    { value: "1HZ50V", label: "Vol 50 (1s)" },
-    { value: "R_75", label: "Vol 75" },
-    { value: "1HZ75V", label: "Vol 75 (1s)" },
-    { value: "R_100", label: "Vol 100" },
-    { value: "1HZ100V", label: "Vol 100 (1s)" },
-    { value: "JD10", label: "Jump 10" },
-    { value: "JD25", label: "Jump 25" },
-    { value: "JD50", label: "Jump 50" },
-    { value: "JD100", label: "Jump 100" },
-    { value: "RDBEAR", label: "Bear Market" },
-    { value: "RDBULL", label: "Bull Market" }
-  ];
-
-  // Clean up timer on unmount
   useEffect(() => {
+    connectWebSocket()
     return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      if (derivWsRef.current) derivWsRef.current.close();
-    };
-  }, []);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+      if (derivWsRef.current) derivWsRef.current.close()
+    }
+  }, [])
 
-  // WebSocket connection management (with auto-reconnect)
   const connectWebSocket = () => {
     if (derivWsRef.current) {
-      derivWsRef.current.onclose = null; // Remove handler to avoid double reconnect!
-      derivWsRef.current.close();
+      derivWsRef.current.onclose = null
+      derivWsRef.current.close()
     }
 
-    const ws = new window.WebSocket(WS_URL);
-    derivWsRef.current = ws;
+    const ws = new window.WebSocket(WS_URL)
+    derivWsRef.current = ws
 
     ws.onopen = () => {
-      setIsConnected(true);
-      requestTickHistory();
-    };
+      setIsConnected(true)
+      ws.send(
+        JSON.stringify({
+          active_symbols: "brief",
+          product_type: "basic",
+        }),
+      )
+    }
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const data = JSON.parse(event.data)
+
+      if (data.msg_type === "active_symbols") {
+        const { active_symbols } = data
+        const volatilitySymbols = active_symbols.filter(
+          (symbol: SymbolData) => symbol.subgroup === "synthetics" && symbol.market === "synthetic_index",
+        )
+        const otherSymbols = active_symbols.filter(
+          (symbol: SymbolData) => symbol.subgroup === "synthetics" && symbol.market !== "synthetic_index",
+        )
+
+        volatilitySymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
+        otherSymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
+
+        const sortedSymbols = [...volatilitySymbols, ...otherSymbols]
+        setSymbolsList(sortedSymbols)
+
+        if (sortedSymbols.length > 0) {
+          const symbolToUse = sortedSymbols.find((s) => s.symbol === currentSymbol)
+            ? currentSymbol
+            : sortedSymbols[0].symbol
+          ws.send(
+            JSON.stringify({
+              ticks_history: symbolToUse,
+              count: tickCount,
+              end: "latest",
+              style: "ticks",
+              subscribe: 1,
+            }),
+          )
+        }
+      }
 
       if (data.history) {
         const newTickHistory = data.history.prices.map((price: string, index: number) => ({
           time: data.history.times[index],
-          quote: parseFloat(price)
-        }));
-        setTickHistory(newTickHistory);
-        detectDecimalPlaces(newTickHistory);
+          quote: Number.parseFloat(price),
+        }))
+        setTickHistory(newTickHistory)
+        detectDecimalPlaces(newTickHistory)
       } else if (data.tick) {
-        const tickQuote = parseFloat(data.tick.quote);
-        setTickHistory(prev => {
-          const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }];
-          return updated.length > tickCount ? updated.slice(-tickCount) : updated;
-        });
+        const tickQuote = Number.parseFloat(data.tick.quote)
+        setTickHistory((prev) => {
+          const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
+          return updated.length > tickCount ? updated.slice(-tickCount) : updated
+        })
       }
-    };
+    }
 
     ws.onclose = () => {
-      setIsConnected(false);
-      // Try to reconnect after 2 seconds (if component is still mounted)
+      setIsConnected(false)
       reconnectTimeoutRef.current = setTimeout(() => {
-        connectWebSocket();
-      }, 2000);
-    };
+        connectWebSocket()
+      }, 2000)
+    }
 
     ws.onerror = () => {
-      setIsConnected(false);
-      // Try to reconnect after 2 seconds
+      setIsConnected(false)
       reconnectTimeoutRef.current = setTimeout(() => {
-        connectWebSocket();
-      }, 2000);
-    };
-  };
+        connectWebSocket()
+      }, 2000)
+    }
+  }
 
-  // Request tick history for current symbol
   const requestTickHistory = () => {
     if (derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
       const request = {
@@ -107,166 +140,168 @@ const Analysis: React.FC = () => {
         count: tickCount,
         end: "latest",
         style: "ticks",
-        subscribe: 1
-      };
-      derivWsRef.current.send(JSON.stringify(request));
+        subscribe: 1,
+      }
+      derivWsRef.current.send(JSON.stringify(request))
     }
-  };
+  }
 
-  // Detect decimals for price formatting
   const detectDecimalPlaces = (history: Tick[]) => {
-    if (history.length === 0) return;
-    const decimalCounts = history.map(tick => {
-      const decimalPart = tick.quote.toString().split(".")[1] || "";
-      return decimalPart.length;
-    });
-    setDecimalPlaces(Math.max(...decimalCounts, 2));
-  };
+    if (history.length === 0) return
+    const decimalCounts = history.map((tick) => {
+      const decimalPart = tick.quote.toString().split(".")[1] || ""
+      return decimalPart.length
+    })
+    setDecimalPlaces(Math.max(...decimalCounts, 2))
+  }
 
-  // Get last digit helper
   const getLastDigit = (price: number): number => {
-    const priceStr = price.toString();
-    const priceParts = priceStr.split(".");
-    let decimals = priceParts[1] || "";
+    const priceStr = price.toString()
+    const priceParts = priceStr.split(".")
+    let decimals = priceParts[1] || ""
     while (decimals.length < decimalPlaces) {
-      decimals += "0";
+      decimals += "0"
     }
-    return Number(decimals.slice(-1));
-  };
+    return Number(decimals.slice(-1))
+  }
 
-  // Analysis calculations (unchanged)
   const getDigitAnalysis = () => {
-    const digitCounts = new Array(10).fill(0);
-    tickHistory.forEach(tick => {
-      const lastDigit = getLastDigit(tick.quote);
-      digitCounts[lastDigit]++;
-    });
-    return digitCounts.map(count => (count / tickHistory.length) * 100);
-  };
+    const digitCounts = new Array(10).fill(0)
+    tickHistory.forEach((tick) => {
+      const lastDigit = getLastDigit(tick.quote)
+      digitCounts[lastDigit]++
+    })
+    return digitCounts.map((count) => (count / tickHistory.length) * 100)
+  }
 
   const getEvenOddAnalysis = () => {
-    const digitCounts = new Array(10).fill(0);
-    tickHistory.forEach(tick => {
-      const lastDigit = getLastDigit(tick.quote);
-      digitCounts[lastDigit]++;
-    });
-    const evenCount = digitCounts.filter((_, i) => i % 2 === 0).reduce((a, b) => a + b, 0);
-    const oddCount = digitCounts.filter((_, i) => i % 2 !== 0).reduce((a, b) => a + b, 0);
-    const total = evenCount + oddCount;
+    const digitCounts = new Array(10).fill(0)
+    tickHistory.forEach((tick) => {
+      const lastDigit = getLastDigit(tick.quote)
+      digitCounts[lastDigit]++
+    })
+    const evenCount = digitCounts.filter((_, i) => i % 2 === 0).reduce((a, b) => a + b, 0)
+    const oddCount = digitCounts.filter((_, i) => i % 2 !== 0).reduce((a, b) => a + b, 0)
+    const total = evenCount + oddCount
     return {
       even: total > 0 ? (evenCount / total) * 100 : 0,
-      odd: total > 0 ? (oddCount / total) * 100 : 0
-    };
-  };
+      odd: total > 0 ? (oddCount / total) * 100 : 0,
+    }
+  }
 
   const getRiseFallAnalysis = () => {
-    let riseCount = 0, fallCount = 0;
+    let riseCount = 0,
+      fallCount = 0
     for (let i = 1; i < tickHistory.length; i++) {
-      if (tickHistory[i].quote > tickHistory[i - 1].quote) riseCount++;
-      else if (tickHistory[i].quote < tickHistory[i - 1].quote) fallCount++;
+      if (tickHistory[i].quote > tickHistory[i - 1].quote) riseCount++
+      else if (tickHistory[i].quote < tickHistory[i - 1].quote) fallCount++
     }
-    const total = riseCount + fallCount;
+    const total = riseCount + fallCount
     return {
       rise: total > 0 ? (riseCount / total) * 100 : 0,
-      fall: total > 0 ? (fallCount / total) * 100 : 0
-    };
-  };
+      fall: total > 0 ? (fallCount / total) * 100 : 0,
+    }
+  }
 
   const getSelectedDigitAnalysis = () => {
-    if (selectedDigit === null) return { over: 0, under: 0, equal: 0 };
-    let overCount = 0, underCount = 0, equalCount = 0;
-    tickHistory.forEach(tick => {
-      const lastDigit = getLastDigit(tick.quote);
-      if (lastDigit > selectedDigit) overCount++;
-      else if (lastDigit < selectedDigit) underCount++;
-      else equalCount++;
-    });
-    const total = tickHistory.length;
+    if (selectedDigit === null) return { over: 0, under: 0, equal: 0 }
+    let overCount = 0,
+      underCount = 0,
+      equalCount = 0
+    tickHistory.forEach((tick) => {
+      const lastDigit = getLastDigit(tick.quote)
+      if (lastDigit > selectedDigit) overCount++
+      else if (lastDigit < selectedDigit) underCount++
+      else equalCount++
+    })
+    const total = tickHistory.length
     return {
       over: total > 0 ? (overCount / total) * 100 : 0,
       under: total > 0 ? (underCount / total) * 100 : 0,
-      equal: total > 0 ? (equalCount / total) * 100 : 0
-    };
-  };
+      equal: total > 0 ? (equalCount / total) * 100 : 0,
+    }
+  }
 
-  // Symbol change handler (persists to localStorage)
   const handleSymbolChange = (newSymbol: string) => {
-    setCurrentSymbol(newSymbol);
-    localStorage.setItem('selectedSymbol', newSymbol);
-    setTickHistory([]);
-    // When symbol changes, request new tickHistory after connection
+    setCurrentSymbol(newSymbol)
+    localStorage.setItem("selectedSymbol", newSymbol)
+    setTickHistory([])
     setTimeout(() => {
-      requestTickHistory();
-    }, 500);
-  };
+      requestTickHistory()
+    }, 500)
+  }
 
-  // Re-connect websocket when symbol changes
   useEffect(() => {
-    connectWebSocket();
-    // Clean up previous WebSocket and timeout
-    return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      if (derivWsRef.current) derivWsRef.current.close();
-    };
-    // eslint-disable-next-line
-  }, [currentSymbol]);
+    if (currentSymbol && derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
+      derivWsRef.current.send(
+        JSON.stringify({
+          forget_all: "ticks",
+        }),
+      )
+      setTimeout(() => {
+        requestTickHistory()
+      }, 100)
+    }
+  }, [currentSymbol])
 
-  // Render data as before
-  const digitAnalysis = getDigitAnalysis();
-  const evenOddAnalysis = getEvenOddAnalysis();
-  const riseFallAnalysis = getRiseFallAnalysis();
-  const selectedDigitAnalysis = getSelectedDigitAnalysis();
-  const currentPrice = tickHistory.length > 0 ? tickHistory[tickHistory.length - 1].quote : null;
-  const currentDigit = currentPrice ? getLastDigit(currentPrice) : null;
-  const maxPercentage = Math.max(...digitAnalysis);
-  const minPercentage = Math.min(...digitAnalysis.filter(p => p > 0));
-  const last50Digits = tickHistory.slice(-50).map(tick => getLastDigit(tick.quote));
+  const digitAnalysis = getDigitAnalysis()
+  const evenOddAnalysis = getEvenOddAnalysis()
+  const riseFallAnalysis = getRiseFallAnalysis()
+  const selectedDigitAnalysis = getSelectedDigitAnalysis()
+  const currentPrice = tickHistory.length > 0 ? tickHistory[tickHistory.length - 1].quote : null
+  const currentDigit = currentPrice ? getLastDigit(currentPrice) : null
+  const maxPercentage = Math.max(...digitAnalysis)
+  const minPercentage = Math.min(...digitAnalysis.filter((p) => p > 0))
+
+  const allLastDigits = tickHistory.map((tick) => getLastDigit(tick.quote))
+  const displayCount = showMore ? 100 : 50
+  const last50Digits = allLastDigits.slice(-displayCount)
 
   return (
-    <div className="analysis-container">
-      <main className="analysis-main">
+    <div className={styles.analysisContainer}>
+      <main className={styles.analysisMa}>
         {/* Current Price with Market Selector */}
-        <section className="price-section">
-          <div className="price-content">
-            <div className="current-price">
-              {currentPrice ? currentPrice.toFixed(decimalPlaces) : 'N/A'}
-            </div>
-            <div className="price-label">Current Price</div>
+        <section className={styles.priceSection}>
+          <div className={styles.priceContent}>
+            <div className={styles.currentPrice}>{currentPrice ? currentPrice.toFixed(decimalPlaces) : "N/A"}</div>
+            <div className={styles.priceLabel}>Current Price</div>
           </div>
-          <div className="market-selector">
+          <div className={styles.marketSelector}>
             <select
               value={currentSymbol}
               onChange={(e) => handleSymbolChange(e.target.value)}
-              className="symbol-select"
+              className={styles.symbolSelect}
             >
-              {symbolOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              {symbolsList.length > 0 ? (
+                symbolsList.map((option) => (
+                  <option key={option.symbol} value={option.symbol}>
+                    {option.display_name}
+                  </option>
+                ))
+              ) : (
+                <option value="R_100">Vol 100</option>
+              )}
             </select>
-            <div className="selector-label">Market</div>
+            <div className={styles.selectorLabel}>Market</div>
           </div>
         </section>
 
         {/* Digit Analysis */}
-        <section className="analysis-section">
-          <h2 className="section-title">Digit Distribution</h2>
-          <div className="digit-grid">
+        <section className={styles.analysisSection}>
+          <h2 className={styles.sectionTitle}>Digit Distribution</h2>
+          <div className={styles.digitGrid}>
             {digitAnalysis.map((percentage, digit) => {
-              const isLowest = percentage === minPercentage && percentage > 0;
-              const isHighest = percentage === maxPercentage && percentage > 0;
-              const fillPercentage = maxPercentage > 0 ? (percentage / maxPercentage) * 100 : 0;
+              const isLowest = percentage === minPercentage && percentage > 0
+              const isHighest = percentage === maxPercentage && percentage > 0
+              const fillPercentage = maxPercentage > 0 ? (percentage / maxPercentage) * 100 : 0
               return (
-                <div key={digit} className="digit-container">
-                  {digit === currentDigit && (
-                    <div className="current-indicator">▼</div>
-                  )}
-                  <div className="digit-circle-wrapper">
-                    <div className="digit-circle">
-                      <svg className="progress-ring" viewBox="0 0 64 64">
+                <div key={digit} className={styles.digitContainer}>
+                  {digit === currentDigit && <div className={styles.currentIndicator}>▼</div>}
+                  <div className={styles.digitCircleWrapper}>
+                    <div className={styles.digitCircle}>
+                      <svg className={styles.progressRing} viewBox="0 0 64 64">
                         <circle
-                          className="progress-ring-circle"
+                          className={styles.progressRingCircle}
                           cx="32"
                           cy="32"
                           r="26"
@@ -278,41 +313,46 @@ const Analysis: React.FC = () => {
                           transform="rotate(-90 32 32)"
                         />
                       </svg>
-                      <div className={`digit-number ${
-                        digit === currentDigit ? 'current' : 
-                        isLowest ? 'lowest' : 
-                        isHighest ? 'highest' : ''
-                      }`}>
+                      <div
+                        className={`${styles.digitNumber} ${
+                          digit === currentDigit
+                            ? styles.current
+                            : isLowest
+                              ? styles.lowest
+                              : isHighest
+                                ? styles.highest
+                                : ""
+                        }`}
+                      >
                         {digit}
                       </div>
                     </div>
                   </div>
-                  <div className={`digit-percentage ${
-                    isLowest ? 'lowest' : 
-                    isHighest ? 'highest' : ''
-                  }`}>
+                  <div
+                    className={`${styles.digitPercentage} ${isLowest ? styles.lowest : isHighest ? styles.highest : ""}`}
+                  >
                     {percentage.toFixed(1)}%
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
-          <div className="analysis-stats">
-            Highest: <span className="stat-highest">{maxPercentage.toFixed(2)}%</span> | 
-            Lowest: <span className="stat-lowest">{minPercentage.toFixed(2)}%</span>
+          <div className={styles.analysisStats}>
+            Highest: <span className={styles.statHighest}>{maxPercentage.toFixed(2)}%</span> | Lowest:{" "}
+            <span className={styles.statLowest}>{minPercentage.toFixed(2)}%</span>
           </div>
         </section>
 
         {/* Selected Digit Analysis */}
-        <section className="analysis-section">
-          <h2 className="section-title">Digit Comparison</h2>
-          <div className="digit-selector">
-            <div className="selector-label">Select a digit to analyze:</div>
-            <div className="digit-buttons">
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(digit => (
+        <section className={styles.analysisSection}>
+          <h2 className={styles.sectionTitle}>Digit Comparison</h2>
+          <div className={styles.digitSelector}>
+            <div className={styles.selectorLabel}>Select a digit to analyze:</div>
+            <div className={styles.digitButtons}>
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
                 <button
                   key={digit}
-                  className={`digit-btn ${selectedDigit === digit ? 'selected' : ''}`}
+                  className={`${styles.digitBtn} ${selectedDigit === digit ? styles.selected : ""}`}
                   onClick={() => setSelectedDigit(digit)}
                 >
                   {digit}
@@ -321,19 +361,19 @@ const Analysis: React.FC = () => {
             </div>
           </div>
           {selectedDigit !== null && (
-            <div className="comparison-analysis">
-              <div className="comparison-grid">
-                <div className="stat-card over">
-                  <div className="stat-value">{selectedDigitAnalysis.over.toFixed(1)}%</div>
-                  <div className="stat-label">Over {selectedDigit}</div>
+            <div className={styles.comparisonAnalysis}>
+              <div className={styles.comparisonGrid}>
+                <div className={`${styles.statCard} ${styles.over}`}>
+                  <div className={styles.statValue}>{selectedDigitAnalysis.over.toFixed(1)}%</div>
+                  <div className={styles.statLabel}>Over {selectedDigit}</div>
                 </div>
-                <div className="stat-card under">
-                  <div className="stat-value">{selectedDigitAnalysis.under.toFixed(1)}%</div>
-                  <div className="stat-label">Under {selectedDigit}</div>
+                <div className={`${styles.statCard} ${styles.under}`}>
+                  <div className={styles.statValue}>{selectedDigitAnalysis.under.toFixed(1)}%</div>
+                  <div className={styles.statLabel}>Under {selectedDigit}</div>
                 </div>
-                <div className="stat-card equal">
-                  <div className="stat-value">{selectedDigitAnalysis.equal.toFixed(1)}%</div>
-                  <div className="stat-label">Equal {selectedDigit}</div>
+                <div className={`${styles.statCard} ${styles.equal}`}>
+                  <div className={styles.statValue}>{selectedDigitAnalysis.equal.toFixed(1)}%</div>
+                  <div className={styles.statLabel}>Equal {selectedDigit}</div>
                 </div>
               </div>
             </div>
@@ -341,27 +381,24 @@ const Analysis: React.FC = () => {
         </section>
 
         {/* Even/Odd Analysis */}
-        <section className="analysis-section">
-          <h2 className="section-title">Even/Odd Pattern</h2>
-          <div className="eo-grid">
-            <div className="stat-card even">
-              <div className="stat-value">{evenOddAnalysis.even.toFixed(1)}%</div>
-              <div className="stat-label">Even</div>
+        <section className={styles.analysisSection}>
+          <h2 className={styles.sectionTitle}>Even/Odd Pattern</h2>
+          <div className={styles.eoGrid}>
+            <div className={`${styles.statCard} ${styles.even}`}>
+              <div className={styles.statValue}>{evenOddAnalysis.even.toFixed(1)}%</div>
+              <div className={styles.statLabel}>Even</div>
             </div>
-            <div className="stat-card odd">
-              <div className="stat-value">{evenOddAnalysis.odd.toFixed(1)}%</div>
-              <div className="stat-label">Odd</div>
+            <div className={`${styles.statCard} ${styles.odd}`}>
+              <div className={styles.statValue}>{evenOddAnalysis.odd.toFixed(1)}%</div>
+              <div className={styles.statLabel}>Odd</div>
             </div>
           </div>
-          <div className="pattern-section">
-            <h3 className="pattern-title">Last 50 Digits Pattern</h3>
-            <div className="pattern-grid">
+          <div className={styles.patternSection}>
+            <h3 className={styles.patternTitle}>Last 50 Digits Pattern</h3>
+            <div className={styles.patternGrid}>
               {last50Digits.map((digit, index) => (
-                <div
-                  key={index}
-                  className={`pattern-box ${digit % 2 === 0 ? 'even' : 'odd'}`}
-                >
-                  {digit % 2 === 0 ? 'E' : 'O'}
+                <div key={index} className={`${styles.patternBox} ${digit % 2 === 0 ? styles.even : styles.odd}`}>
+                  {digit % 2 === 0 ? "E" : "O"}
                 </div>
               ))}
             </div>
@@ -369,40 +406,69 @@ const Analysis: React.FC = () => {
         </section>
 
         {/* Rise/Fall Analysis */}
-        <section className="analysis-section">
-          <h2 className="section-title">Market Movement</h2>
-          <div className="rf-grid">
-            <div className="stat-card rise">
-              <div className="stat-value">{riseFallAnalysis.rise.toFixed(1)}%</div>
-              <div className="stat-label">Rise</div>
+        <section className={styles.analysisSection}>
+          <h2 className={styles.sectionTitle}>Market Movement</h2>
+          <div className={styles.rfGrid}>
+            <div className={`${styles.statCard} ${styles.rise}`}>
+              <div className={styles.statValue}>{riseFallAnalysis.rise.toFixed(1)}%</div>
+              <div className={styles.statLabel}>Rise</div>
             </div>
-            <div className="stat-card fall">
-              <div className="stat-value">{riseFallAnalysis.fall.toFixed(1)}%</div>
-              <div className="stat-label">Fall</div>
+            <div className={`${styles.statCard} ${styles.fall}`}>
+              <div className={styles.statValue}>{riseFallAnalysis.fall.toFixed(1)}%</div>
+              <div className={styles.statLabel}>Fall</div>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.analysisSection}>
+          <h2 className={styles.sectionTitle}>Last Digits Stream</h2>
+          <div className={styles.lastDigitsContainer}>
+            <div className={styles.lastDigitsTable}>
+              <div className={styles.digitsHeader}>
+                <span className={styles.headerLabel}>Latest digits ({displayCount} showing)</span>
+              </div>
+              <div className={styles.digitsContent}>
+                <div className={styles.digitsGrid}>
+                  {last50Digits.map((digit, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.digitItem} ${digit % 2 === 0 ? styles.evenDigit : styles.oddDigit} ${
+                        index === last50Digits.length - 1 ? styles.latest : ""
+                      }`}
+                      title={`Position ${displayCount - index}: ${digit}`}
+                    >
+                      <span className={styles.digitValue}>{digit}</span>
+                      {index === last50Digits.length - 1 && <span className={styles.latestIndicator}>●</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.digitsFooter}>
+                <button className={styles.toggleBtn} onClick={() => setShowMore(!showMore)}>
+                  {showMore ? "← Show Less" : "Show More →"}
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Advanced Statistics */}
-        <section className="analysis-section">
-          <h2 className="section-title">Statistics</h2>
-          <div className="stats-grid">
-            <div className="stat-row">
-              <span className="stat-name">Total Ticks:</span>
-              <span className="stat-data">{tickHistory.length}</span>
+        <section className={styles.analysisSection}>
+          <h2 className={styles.sectionTitle}>Statistics</h2>
+          <div className={styles.statsGrid}>
+            <div className={styles.statRow}>
+              <span className={styles.statName}>Total Ticks:</span>
+              <span className={styles.statData}>{tickHistory.length}</span>
             </div>
-            <div className="stat-row">
-              <span className="stat-name">Decimal Places:</span>
-              <span className="stat-data">{decimalPlaces}</span>
+            <div className={styles.statRow}>
+              <span className={styles.statName}>Decimal Places:</span>
+              <span className={styles.statData}>{decimalPlaces}</span>
             </div>
           </div>
         </section>
       </main>
-
-      {/* Footer with connection status and tick info */}
-
     </div>
-  );
-};
+  )
+}
 
-export default Analysis;
+export default Analysis
