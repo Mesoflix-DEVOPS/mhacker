@@ -227,25 +227,28 @@
 }
 
 .digitNumber {
-  position: absolute;
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 900;
   color: var(--text-primary);
   transition: var(--transition-fast);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .digitNumber.current {
   color: var(--accent-primary);
-  font-size: 32px;
-  text-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+  font-size: 36px;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.7), 0 2px 8px rgba(0, 0, 0, 0.4);
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.6));
 }
 
 .digitNumber.highest {
   color: var(--accent-success);
+  text-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
 }
 
 .digitNumber.lowest {
   color: var(--accent-danger);
+  text-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
 }
 
 .digitPercentage {
@@ -329,88 +332,105 @@
 }
 
 .statCard {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(55, 65, 81, 0.4));
+  border: 2px solid var(--border-primary);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 24px;
   text-align: center;
-  transition: var(--transition-fast);
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .statCard:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: var(--text-primary);
 }
 
 .statValue {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 900;
   margin-bottom: 8px;
   display: block;
+  letter-spacing: -0.02em;
 }
 
 .statLabel {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
 }
 
 .statCard.even {
-  border-color: var(--accent-success);
+  border-color: rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04));
 }
 
 .statCard.even .statValue {
   color: var(--accent-success);
+  text-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
 }
 
 .statCard.odd {
-  border-color: var(--accent-danger);
+  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.04));
 }
 
 .statCard.odd .statValue {
   color: var(--accent-danger);
+  text-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
 }
 
 .statCard.rise {
-  border-color: var(--accent-info);
+  border-color: rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04));
 }
 
 .statCard.rise .statValue {
-  color: var(--accent-info);
+  color: var(--accent-success);
+  text-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
 }
 
 .statCard.fall {
-  border-color: var(--accent-warning);
+  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.04));
 }
 
 .statCard.fall .statValue {
-  color: var(--accent-warning);
+  color: var(--accent-danger);
+  text-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
 }
 
 .statCard.over {
-  border-color: var(--accent-primary);
+  border-color: rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.04));
 }
 
 .statCard.over .statValue {
   color: var(--accent-primary);
+  text-shadow: 0 0 16px rgba(59, 130, 246, 0.3);
 }
 
 .statCard.under {
-  border-color: var(--accent-info);
+  border-color: rgba(6, 182, 212, 0.5);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(8, 145, 178, 0.04));
 }
 
 .statCard.under .statValue {
   color: var(--accent-info);
+  text-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
 }
 
 .statCard.equal {
-  border-color: var(--accent-secondary);
+  border-color: rgba(139, 92, 246, 0.5);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(124, 58, 255, 0.04));
 }
 
 .statCard.equal .statValue {
   color: var(--accent-secondary);
+  text-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
 }
 
 .eoGrid {
