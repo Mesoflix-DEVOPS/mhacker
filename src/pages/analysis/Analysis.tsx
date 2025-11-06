@@ -26,6 +26,12 @@ interface SymbolData {
   symbol_type: string
 }
 
+interface GroupedSymbols {
+  volatility: SymbolData[]
+  jump: SymbolData[]
+  other: SymbolData[]
+}
+
 const WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
 
 const Analysis: React.FC = () => {
@@ -39,6 +45,11 @@ const Analysis: React.FC = () => {
   const derivWsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
+  const [groupedSymbols, setGroupedSymbols] = useState<GroupedSymbols>({
+    volatility: [],
+    jump: [],
+    other: [],
+  })
   const [showMore, setShowMore] = useState(false)
   const [pipSize, setPipSize] = useState(2)
   const currentlySubscribedSymbolRef = useRef<string | null>(null)
@@ -99,6 +110,27 @@ const Analysis: React.FC = () => {
 
         setSymbolsList(volatilitySymbols)
 
+        const volatilityGroup: SymbolData[] = []
+        const jumpGroup: SymbolData[] = []
+        const otherGroup: SymbolData[] = []
+
+        volatilitySymbols.forEach((symbol) => {
+          const name = symbol.display_name.toLowerCase()
+          if (name.includes("jump")) {
+            jumpGroup.push(symbol)
+          } else if (name.includes("volatility") || name.includes("vol") || symbol.market === "volatility_indices") {
+            volatilityGroup.push(symbol)
+          } else {
+            otherGroup.push(symbol)
+          }
+        })
+
+        setGroupedSymbols({
+          volatility: volatilityGroup,
+          jump: jumpGroup,
+          other: otherGroup,
+        })
+
         if (volatilitySymbols.length > 0 && currentlySubscribedSymbolRef.current === null) {
           const symbolToUse = volatilitySymbols.find((s) => s.symbol === getInitialSymbol())
             ? getInitialSymbol()
@@ -131,7 +163,6 @@ const Analysis: React.FC = () => {
           const tickQuote = Number.parseFloat(data.tick.quote)
           setTickHistory((prev) => {
             const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
-            // Keep the last 1000 ticks
             return updated.length > tickCount ? updated.slice(-tickCount) : updated
           })
           if (data.tick.pip_size !== undefined) {
@@ -291,15 +322,40 @@ const Analysis: React.FC = () => {
               onChange={(e) => handleSymbolChange(e.target.value)}
               className={styles.symbolSelect}
             >
-              {symbolsList.length > 0 ? (
-                symbolsList.map((option) => (
-                  <option key={option.symbol} value={option.symbol}>
-                    {option.display_name}
-                  </option>
-                ))
-              ) : (
-                <option value="R_10">Loading Markets...</option>
+              {groupedSymbols.volatility.length > 0 && (
+                <>
+                  <optgroup label="VOLATILITY MARKETS">
+                    {groupedSymbols.volatility.map((option) => (
+                      <option key={option.symbol} value={option.symbol}>
+                        {option.display_name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
               )}
+              {groupedSymbols.jump.length > 0 && (
+                <>
+                  <optgroup label="JUMP INDICES">
+                    {groupedSymbols.jump.map((option) => (
+                      <option key={option.symbol} value={option.symbol}>
+                        {option.display_name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
+              )}
+              {groupedSymbols.other.length > 0 && (
+                <>
+                  <optgroup label="OTHER MARKETS">
+                    {groupedSymbols.other.map((option) => (
+                      <option key={option.symbol} value={option.symbol}>
+                        {option.display_name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
+              )}
+              {symbolsList.length === 0 && <option value="R_10">Loading Markets...</option>}
             </select>
             <div className={styles.selectorLabel}>Market</div>
           </div>
