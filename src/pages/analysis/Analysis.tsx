@@ -75,22 +75,25 @@ const Analysis: React.FC = () => {
       if (data.msg_type === "active_symbols") {
         const { active_symbols } = data
         const volatilitySymbols = active_symbols.filter(
-          (symbol: SymbolData) => symbol.subgroup === "synthetics" && symbol.market === "synthetic_index",
+          (symbol: SymbolData) =>
+            symbol.subgroup === "synthetics" &&
+            (symbol.market === "synthetic_index" || symbol.market === "volatility_indices"),
         )
-        const otherSymbols = active_symbols.filter(
-          (symbol: SymbolData) => symbol.subgroup === "synthetics" && symbol.market !== "synthetic_index",
-        )
 
-        volatilitySymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
-        otherSymbols.sort((a: SymbolData, b: SymbolData) => a.display_order - b.display_order)
+        volatilitySymbols.sort((a: SymbolData, b: SymbolData) => {
+          // Sort by display order, but ensure proper 1s volatility ordering
+          if (a.display_order !== b.display_order) {
+            return a.display_order - b.display_order
+          }
+          return a.display_name.localeCompare(b.display_name)
+        })
 
-        const sortedSymbols = [...volatilitySymbols, ...otherSymbols]
-        setSymbolsList(sortedSymbols)
+        setSymbolsList(volatilitySymbols)
 
-        if (sortedSymbols.length > 0) {
-          const symbolToUse = sortedSymbols.find((s) => s.symbol === currentSymbol)
+        if (volatilitySymbols.length > 0) {
+          const symbolToUse = volatilitySymbols.find((s) => s.symbol === currentSymbol)
             ? currentSymbol
-            : sortedSymbols[0].symbol
+            : volatilitySymbols[0].symbol
           ws.send(
             JSON.stringify({
               ticks_history: symbolToUse,
