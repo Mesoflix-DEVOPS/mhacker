@@ -213,7 +213,6 @@
   height: 100px;
 }
 
-/* Fixed digit circle positioning - digits now perfectly centered inside circles */
 .digitCircle {
   width: 100%;
   height: 100%;
@@ -541,7 +540,6 @@
   gap: 10px;
 }
 
-/* Improved digit styling in Last Digits Stream - better contrast and larger text */
 .digitItem {
   aspect-ratio: 1;
   display: flex;
