@@ -30,7 +30,7 @@ const WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
 
 const Analysis: React.FC = () => {
   const [tickHistory, setTickHistory] = useState<Tick[]>([])
-  const getInitialSymbol = () => localStorage.getItem("selectedSymbol") || "R_100"
+  const getInitialSymbol = () => localStorage.getItem("selectedSymbol") || "R_10"
   const [currentSymbol, setCurrentSymbol] = useState(getInitialSymbol())
   const tickCount = 1000
   const [decimalPlaces, setDecimalPlaces] = useState(2)
@@ -41,6 +41,7 @@ const Analysis: React.FC = () => {
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
   const [showMore, setShowMore] = useState(false)
   const [pipSize, setPipSize] = useState(2)
+  const [currentlySubscribedSymbol, setCurrentlySubscribedSymbol] = useState<string | null>(null)
 
   useEffect(() => {
     connectWebSocket()
@@ -80,17 +81,20 @@ const Analysis: React.FC = () => {
             (symbol.market === "synthetic_index" || symbol.market === "volatility_indices"),
         )
 
+        const extractVolatilityLevel = (name: string): number => {
+          const match = name.match(/\d+/)
+          return match ? Number.parseInt(match[0], 10) : 0
+        }
+
         volatilitySymbols.sort((a: SymbolData, b: SymbolData) => {
-          // Sort by display order, but ensure proper 1s volatility ordering
-          if (a.display_order !== b.display_order) {
-            return a.display_order - b.display_order
-          }
-          return a.display_name.localeCompare(b.display_name)
+          const levelA = extractVolatilityLevel(a.display_name)
+          const levelB = extractVolatilityLevel(b.display_name)
+          return levelA - levelB
         })
 
         setSymbolsList(volatilitySymbols)
 
-        if (volatilitySymbols.length > 0) {
+        if (volatilitySymbols.length > 0 && currentlySubscribedSymbol === null) {
           const symbolToUse = volatilitySymbols.find((s) => s.symbol === currentSymbol)
             ? currentSymbol
             : volatilitySymbols[0].symbol
@@ -103,6 +107,7 @@ const Analysis: React.FC = () => {
               subscribe: 1,
             }),
           )
+          setCurrentlySubscribedSymbol(symbolToUse)
         }
       }
 
@@ -117,13 +122,15 @@ const Analysis: React.FC = () => {
           setPipSize(data.pip_size)
         }
       } else if (data.tick) {
-        const tickQuote = Number.parseFloat(data.tick.quote)
-        setTickHistory((prev) => {
-          const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
-          return updated.length > tickCount ? updated.slice(-tickCount) : updated
-        })
-        if (data.tick.pip_size !== undefined) {
-          setPipSize(data.tick.pip_size)
+        if (data.tick.symbol === currentlySubscribedSymbol) {
+          const tickQuote = Number.parseFloat(data.tick.quote)
+          setTickHistory((prev) => {
+            const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
+            return updated.length > tickCount ? updated.slice(-tickCount) : updated
+          })
+          if (data.tick.pip_size !== undefined) {
+            setPipSize(data.tick.pip_size)
+          }
         }
       }
     }
@@ -143,16 +150,25 @@ const Analysis: React.FC = () => {
     }
   }
 
-  const requestTickHistory = () => {
+  const requestTickHistory = (symbol: string) => {
     if (derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
+      if (currentlySubscribedSymbol && currentlySubscribedSymbol !== symbol) {
+        derivWsRef.current.send(
+          JSON.stringify({
+            forget: currentlySubscribedSymbol,
+          }),
+        )
+      }
+
       const request = {
-        ticks_history: currentSymbol,
+        ticks_history: symbol,
         count: tickCount,
         end: "latest",
         style: "ticks",
         subscribe: 1,
       }
       derivWsRef.current.send(JSON.stringify(request))
+      setCurrentlySubscribedSymbol(symbol)
     }
   }
 
@@ -236,22 +252,9 @@ const Analysis: React.FC = () => {
     localStorage.setItem("selectedSymbol", newSymbol)
     setTickHistory([])
     setTimeout(() => {
-      requestTickHistory()
-    }, 500)
+      requestTickHistory(newSymbol)
+    }, 300)
   }
-
-  useEffect(() => {
-    if (currentSymbol && derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
-      derivWsRef.current.send(
-        JSON.stringify({
-          forget_all: "ticks",
-        }),
-      )
-      setTimeout(() => {
-        requestTickHistory()
-      }, 100)
-    }
-  }, [currentSymbol])
 
   const digitAnalysis = getDigitAnalysis()
   const evenOddAnalysis = getEvenOddAnalysis()
@@ -288,7 +291,7 @@ const Analysis: React.FC = () => {
                   </option>
                 ))
               ) : (
-                <option value="R_100">Loading Markets...</option>
+                <option value="R_10">Loading Markets...</option>
               )}
             </select>
             <div className={styles.selectorLabel}>Market</div>
