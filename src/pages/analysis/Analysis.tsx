@@ -41,7 +41,8 @@ const Analysis: React.FC = () => {
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
   const [showMore, setShowMore] = useState(false)
   const [pipSize, setPipSize] = useState(2)
-  const [currentlySubscribedSymbol, setCurrentlySubscribedSymbol] = useState<string | null>(null)
+  const currentlySubscribedSymbolRef = useRef<string | null>(null)
+  const tickHistoryRef = useRef<Tick[]>([])
 
   useEffect(() => {
     connectWebSocket()
@@ -50,6 +51,10 @@ const Analysis: React.FC = () => {
       if (derivWsRef.current) derivWsRef.current.close()
     }
   }, [])
+
+  useEffect(() => {
+    tickHistoryRef.current = tickHistory
+  }, [tickHistory])
 
   const connectWebSocket = () => {
     if (derivWsRef.current) {
@@ -94,9 +99,9 @@ const Analysis: React.FC = () => {
 
         setSymbolsList(volatilitySymbols)
 
-        if (volatilitySymbols.length > 0 && currentlySubscribedSymbol === null) {
-          const symbolToUse = volatilitySymbols.find((s) => s.symbol === currentSymbol)
-            ? currentSymbol
+        if (volatilitySymbols.length > 0 && currentlySubscribedSymbolRef.current === null) {
+          const symbolToUse = volatilitySymbols.find((s) => s.symbol === getInitialSymbol())
+            ? getInitialSymbol()
             : volatilitySymbols[0].symbol
           ws.send(
             JSON.stringify({
@@ -107,7 +112,7 @@ const Analysis: React.FC = () => {
               subscribe: 1,
             }),
           )
-          setCurrentlySubscribedSymbol(symbolToUse)
+          currentlySubscribedSymbolRef.current = symbolToUse
         }
       }
 
@@ -122,10 +127,11 @@ const Analysis: React.FC = () => {
           setPipSize(data.pip_size)
         }
       } else if (data.tick) {
-        if (data.tick.symbol === currentlySubscribedSymbol) {
+        if (data.tick.symbol === currentlySubscribedSymbolRef.current) {
           const tickQuote = Number.parseFloat(data.tick.quote)
           setTickHistory((prev) => {
             const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
+            // Keep the last 1000 ticks
             return updated.length > tickCount ? updated.slice(-tickCount) : updated
           })
           if (data.tick.pip_size !== undefined) {
@@ -152,10 +158,10 @@ const Analysis: React.FC = () => {
 
   const requestTickHistory = (symbol: string) => {
     if (derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
-      if (currentlySubscribedSymbol && currentlySubscribedSymbol !== symbol) {
+      if (currentlySubscribedSymbolRef.current && currentlySubscribedSymbolRef.current !== symbol) {
         derivWsRef.current.send(
           JSON.stringify({
-            forget: currentlySubscribedSymbol,
+            forget: currentlySubscribedSymbolRef.current,
           }),
         )
       }
@@ -168,7 +174,8 @@ const Analysis: React.FC = () => {
         subscribe: 1,
       }
       derivWsRef.current.send(JSON.stringify(request))
-      setCurrentlySubscribedSymbol(symbol)
+      currentlySubscribedSymbolRef.current = symbol
+      setTickHistory([])
     }
   }
 
