@@ -1,4 +1,4 @@
 import Analysis from './Analysis';
-import './analysis.scss';
+import './analysis.module.css';
 
 export default Analysis;
