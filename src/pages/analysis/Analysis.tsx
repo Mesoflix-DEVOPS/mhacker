@@ -32,7 +32,16 @@ interface GroupedSymbols {
   other: SymbolData[]
 }
 
+interface PendingRequest {
+  resolve: (value: any) => void
+  reject: (error: any) => void
+  timeout: NodeJS.Timeout
+}
+
 const WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
+const REQUEST_TIMEOUT = 10000
+const RETRY_ATTEMPTS = 3
+const RETRY_DELAY = 1000
 
 const Analysis: React.FC = () => {
   const [tickHistory, setTickHistory] = useState<Tick[]>([])
@@ -42,6 +51,7 @@ const Analysis: React.FC = () => {
   const [decimalPlaces, setDecimalPlaces] = useState(2)
   const [selectedDigit, setSelectedDigit] = useState<number | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+  const [marketsLoaded, setMarketsLoaded] = useState(false)
   const derivWsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
@@ -54,18 +64,66 @@ const Analysis: React.FC = () => {
   const [pipSize, setPipSize] = useState(2)
   const currentlySubscribedSymbolRef = useRef<string | null>(null)
   const tickHistoryRef = useRef<Tick[]>([])
-
-  useEffect(() => {
-    connectWebSocket()
-    return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-      if (derivWsRef.current) derivWsRef.current.close()
-    }
-  }, [])
+  const requestIdRef = useRef(1)
+  const pendingRequestsRef = useRef<Map<number, PendingRequest>>(new Map())
+  const messageQueueRef = useRef<(() => void)[]>([])
+  const isProcessingQueueRef = useRef(false)
+  const subscriptionStateRef = useRef<{
+    symbol: string | null
+    isSubscribed: boolean
+    isUnsubscribing: boolean
+  }>({
+    symbol: null,
+    isSubscribed: false,
+    isUnsubscribing: false,
+  })
 
   useEffect(() => {
     tickHistoryRef.current = tickHistory
   }, [tickHistory])
+
+  const generateRequestId = (): number => {
+    return requestIdRef.current++
+  }
+
+  const queueMessage = (fn: () => void) => {
+    messageQueueRef.current.push(fn)
+    processMessageQueue()
+  }
+
+  const processMessageQueue = async () => {
+    if (isProcessingQueueRef.current || messageQueueRef.current.length === 0) return
+
+    isProcessingQueueRef.current = true
+    while (messageQueueRef.current.length > 0) {
+      const fn = messageQueueRef.current.shift()
+      if (fn) {
+        fn()
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      }
+    }
+    isProcessingQueueRef.current = false
+  }
+
+  const sendRequest = (data: any): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      if (!derivWsRef.current || derivWsRef.current.readyState !== WebSocket.OPEN) {
+        reject(new Error("WebSocket not connected"))
+        return
+      }
+
+      const requestId = generateRequestId()
+      const timeout = setTimeout(() => {
+        pendingRequestsRef.current.delete(requestId)
+        reject(new Error(`Request ${requestId} timed out`))
+      }, REQUEST_TIMEOUT)
+
+      pendingRequestsRef.current.set(requestId, { resolve, reject, timeout })
+
+      const payload = { ...data, req_id: requestId }
+      derivWsRef.current.send(JSON.stringify(payload))
+    })
+  }
 
   const connectWebSocket = () => {
     if (derivWsRef.current) {
@@ -78,16 +136,33 @@ const Analysis: React.FC = () => {
 
     ws.onopen = () => {
       setIsConnected(true)
-      ws.send(
-        JSON.stringify({
+      console.log("[Analysis] WebSocket connected, requesting markets...")
+      queueMessage(() => {
+        sendRequest({
           active_symbols: "brief",
           product_type: "basic",
-        }),
-      )
+        }).catch((err) => {
+          console.error("[Analysis] Market request failed:", err)
+        })
+      })
     }
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
+
+      if (data.req_id && pendingRequestsRef.current.has(data.req_id)) {
+        const pending = pendingRequestsRef.current.get(data.req_id)
+        if (pending) {
+          clearTimeout(pending.timeout)
+          pendingRequestsRef.current.delete(data.req_id)
+
+          if (data.error) {
+            pending.reject(new Error(data.error.message || "Unknown error"))
+          } else {
+            pending.resolve(data)
+          }
+        }
+      }
 
       if (data.msg_type === "active_symbols") {
         const { active_symbols } = data
@@ -131,35 +206,36 @@ const Analysis: React.FC = () => {
           other: otherGroup,
         })
 
-        if (volatilitySymbols.length > 0 && currentlySubscribedSymbolRef.current === null) {
+        setMarketsLoaded(true)
+
+        if (volatilitySymbols.length > 0 && !subscriptionStateRef.current.isSubscribed) {
           const symbolToUse = volatilitySymbols.find((s) => s.symbol === getInitialSymbol())
             ? getInitialSymbol()
             : volatilitySymbols[0].symbol
-          ws.send(
-            JSON.stringify({
-              ticks_history: symbolToUse,
-              count: tickCount,
-              end: "latest",
-              style: "ticks",
-              subscribe: 1,
-            }),
-          )
-          currentlySubscribedSymbolRef.current = symbolToUse
+
+          console.log("[Analysis] Markets loaded, subscribing to:", symbolToUse)
+          queueMessage(() => {
+            subscribeToSymbol(symbolToUse)
+          })
         }
       }
 
       if (data.history) {
-        const newTickHistory = data.history.prices.map((price: string, index: number) => ({
-          time: data.history.times[index],
-          quote: Number.parseFloat(price),
-        }))
-        setTickHistory(newTickHistory)
-        detectDecimalPlaces(newTickHistory)
-        if (data.pip_size !== undefined) {
-          setPipSize(data.pip_size)
+        if (data.history.prices && data.history.times && data.history.prices.length > 0) {
+          const newTickHistory = data.history.prices.map((price: string, index: number) => ({
+            time: data.history.times[index],
+            quote: Number.parseFloat(price),
+          }))
+          console.log("[Analysis] Received tick history:", newTickHistory.length, "ticks")
+          setTickHistory(newTickHistory)
+          detectDecimalPlaces(newTickHistory)
+          if (data.pip_size !== undefined) {
+            setPipSize(data.pip_size)
+          }
+          subscriptionStateRef.current.isSubscribed = true
         }
       } else if (data.tick) {
-        if (data.tick.symbol === currentlySubscribedSymbolRef.current) {
+        if (data.tick.symbol === subscriptionStateRef.current.symbol) {
           const tickQuote = Number.parseFloat(data.tick.quote)
           setTickHistory((prev) => {
             const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
@@ -174,41 +250,95 @@ const Analysis: React.FC = () => {
 
     ws.onclose = () => {
       setIsConnected(false)
+      setMarketsLoaded(false)
+      console.log("[Analysis] WebSocket disconnected, reconnecting...")
       reconnectTimeoutRef.current = setTimeout(() => {
         connectWebSocket()
       }, 2000)
     }
 
-    ws.onerror = () => {
+    ws.onerror = (error) => {
       setIsConnected(false)
+      console.error("[Analysis] WebSocket error:", error)
       reconnectTimeoutRef.current = setTimeout(() => {
         connectWebSocket()
       }, 2000)
     }
   }
 
-  const requestTickHistory = (symbol: string) => {
-    if (derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
-      if (currentlySubscribedSymbolRef.current && currentlySubscribedSymbolRef.current !== symbol) {
-        derivWsRef.current.send(
-          JSON.stringify({
-            forget: currentlySubscribedSymbolRef.current,
-          }),
-        )
-      }
+  const subscribeToSymbol = async (symbol: string) => {
+    if (symbol === subscriptionStateRef.current.symbol && subscriptionStateRef.current.isSubscribed) {
+      console.log("[Analysis] Already subscribed to:", symbol)
+      return
+    }
 
-      const request = {
-        ticks_history: symbol,
-        count: tickCount,
-        end: "latest",
-        style: "ticks",
-        subscribe: 1,
+    if (subscriptionStateRef.current.symbol && subscriptionStateRef.current.isSubscribed) {
+      subscriptionStateRef.current.isUnsubscribing = true
+      try {
+        console.log("[Analysis] Unsubscribing from:", subscriptionStateRef.current.symbol)
+        await sendRequest({
+          forget: subscriptionStateRef.current.symbol,
+        })
+        console.log("[Analysis] Successfully unsubscribed")
+      } catch (error) {
+        console.error("[Analysis] Unsubscribe error:", error)
       }
-      derivWsRef.current.send(JSON.stringify(request))
-      currentlySubscribedSymbolRef.current = symbol
-      setTickHistory([])
+      subscriptionStateRef.current.isUnsubscribing = false
+    }
+
+    subscriptionStateRef.current.symbol = symbol
+    subscriptionStateRef.current.isSubscribed = false
+
+    let retryCount = 0
+    while (retryCount < RETRY_ATTEMPTS) {
+      try {
+        console.log(`[Analysis] Subscribing to ${symbol} (attempt ${retryCount + 1})`)
+        setTickHistory([])
+
+        await sendRequest({
+          ticks_history: symbol,
+          count: tickCount,
+          end: "latest",
+          style: "ticks",
+          subscribe: 1,
+        })
+
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        subscriptionStateRef.current.isSubscribed = true
+        console.log("[Analysis] Successfully subscribed to:", symbol)
+        break
+      } catch (error) {
+        retryCount++
+        console.warn(`[Analysis] Subscription attempt ${retryCount} failed:`, error)
+        if (retryCount < RETRY_ATTEMPTS) {
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
+        }
+      }
+    }
+
+    if (retryCount === RETRY_ATTEMPTS) {
+      console.error("[Analysis] Failed to subscribe after", RETRY_ATTEMPTS, "attempts")
+      subscriptionStateRef.current.isSubscribed = false
     }
   }
+
+  const handleSymbolChange = (newSymbol: string) => {
+    setCurrentSymbol(newSymbol)
+    localStorage.setItem("selectedSymbol", newSymbol)
+    queueMessage(() => {
+      subscribeToSymbol(newSymbol)
+    })
+  }
+
+  useEffect(() => {
+    connectWebSocket()
+    return () => {
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+      if (derivWsRef.current) derivWsRef.current.close()
+      pendingRequestsRef.current.forEach(({ timeout }) => clearTimeout(timeout))
+      pendingRequestsRef.current.clear()
+    }
+  }, [])
 
   const detectDecimalPlaces = (history: Tick[]) => {
     if (history.length === 0) return
@@ -285,15 +415,6 @@ const Analysis: React.FC = () => {
     }
   }
 
-  const handleSymbolChange = (newSymbol: string) => {
-    setCurrentSymbol(newSymbol)
-    localStorage.setItem("selectedSymbol", newSymbol)
-    setTickHistory([])
-    setTimeout(() => {
-      requestTickHistory(newSymbol)
-    }, 300)
-  }
-
   const digitAnalysis = getDigitAnalysis()
   const evenOddAnalysis = getEvenOddAnalysis()
   const riseFallAnalysis = getRiseFallAnalysis()
@@ -310,7 +431,6 @@ const Analysis: React.FC = () => {
   return (
     <div className={styles.analysisContainer}>
       <main className={styles.analysisMa}>
-        {/* Current Price with Market Selector */}
         <section className={styles.priceSection}>
           <div className={styles.priceContent}>
             <div className={styles.currentPrice}>{currentPrice ? currentPrice.toFixed(pipSize) : "N/A"}</div>
@@ -321,6 +441,7 @@ const Analysis: React.FC = () => {
               value={currentSymbol}
               onChange={(e) => handleSymbolChange(e.target.value)}
               className={styles.symbolSelect}
+              disabled={!marketsLoaded}
             >
               {groupedSymbols.volatility.length > 0 && (
                 <>
@@ -355,13 +476,12 @@ const Analysis: React.FC = () => {
                   </optgroup>
                 </>
               )}
-              {symbolsList.length === 0 && <option value="R_10">Loading Markets...</option>}
+              {!marketsLoaded && <option value="">Loading Markets...</option>}
             </select>
             <div className={styles.selectorLabel}>Market</div>
           </div>
         </section>
 
-        {/* Digit Analysis */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Digit Distribution</h2>
           <div className={styles.digitGrid}>
@@ -420,7 +540,6 @@ const Analysis: React.FC = () => {
           </div>
         </section>
 
-        {/* Selected Digit Analysis */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Digit Comparison</h2>
           <div className={styles.digitSelector}>
@@ -457,7 +576,6 @@ const Analysis: React.FC = () => {
           )}
         </section>
 
-        {/* Even/Odd Analysis */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Even/Odd Pattern</h2>
           <div className={styles.eoGrid}>
@@ -482,7 +600,6 @@ const Analysis: React.FC = () => {
           </div>
         </section>
 
-        {/* Rise/Fall Analysis */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Market Movement</h2>
           <div className={styles.rfGrid}>
@@ -497,7 +614,6 @@ const Analysis: React.FC = () => {
           </div>
         </section>
 
-        {/* Last Digits Stream Table */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Last Digits Stream</h2>
           <div className={styles.lastDigitsContainer}>
@@ -530,7 +646,6 @@ const Analysis: React.FC = () => {
           </div>
         </section>
 
-        {/* Advanced Statistics */}
         <section className={styles.analysisSection}>
           <h2 className={styles.sectionTitle}>Statistics</h2>
           <div className={styles.statsGrid}>
