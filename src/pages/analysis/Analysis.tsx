@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import styles from "./analysis.module.css"
 
 interface Tick {
   time: number
@@ -26,104 +25,38 @@ interface SymbolData {
   symbol_type: string
 }
 
-interface GroupedSymbols {
-  volatility: SymbolData[]
-  jump: SymbolData[]
-  other: SymbolData[]
-}
-
-interface PendingRequest {
-  resolve: (value: any) => void
-  reject: (error: any) => void
-  timeout: NodeJS.Timeout
-}
-
 const WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
-const REQUEST_TIMEOUT = 10000
-const RETRY_ATTEMPTS = 3
-const RETRY_DELAY = 1000
 
 const Analysis: React.FC = () => {
   const [tickHistory, setTickHistory] = useState<Tick[]>([])
-  const getInitialSymbol = () => localStorage.getItem("selectedSymbol") || "R_10"
+  const getInitialSymbol = () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem("selectedSymbol") || "R_10"
+    }
+    return "R_10"
+  }
   const [currentSymbol, setCurrentSymbol] = useState(getInitialSymbol())
   const tickCount = 1000
   const [decimalPlaces, setDecimalPlaces] = useState(2)
   const [selectedDigit, setSelectedDigit] = useState<number | null>(null)
   const [isConnected, setIsConnected] = useState(false)
-  const [marketsLoaded, setMarketsLoaded] = useState(false)
   const derivWsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [symbolsList, setSymbolsList] = useState<SymbolData[]>([])
-  const [groupedSymbols, setGroupedSymbols] = useState<GroupedSymbols>({
-    volatility: [],
-    jump: [],
-    other: [],
-  })
   const [showMore, setShowMore] = useState(false)
   const [pipSize, setPipSize] = useState(2)
-  const currentlySubscribedSymbolRef = useRef<string | null>(null)
-  const tickHistoryRef = useRef<Tick[]>([])
-  const requestIdRef = useRef(1)
-  const pendingRequestsRef = useRef<Map<number, PendingRequest>>(new Map())
-  const messageQueueRef = useRef<(() => void)[]>([])
-  const isProcessingQueueRef = useRef(false)
-  const subscriptionStateRef = useRef<{
-    symbol: string | null
-    isSubscribed: boolean
-    isUnsubscribing: boolean
-  }>({
-    symbol: null,
-    isSubscribed: false,
-    isUnsubscribing: false,
-  })
+  const [currentlySubscribedSymbol, setCurrentlySubscribedSymbol] = useState<string | null>(null)
 
   useEffect(() => {
-    tickHistoryRef.current = tickHistory
-  }, [tickHistory])
-
-  const generateRequestId = (): number => {
-    return requestIdRef.current++
-  }
-
-  const queueMessage = (fn: () => void) => {
-    messageQueueRef.current.push(fn)
-    processMessageQueue()
-  }
-
-  const processMessageQueue = async () => {
-    if (isProcessingQueueRef.current || messageQueueRef.current.length === 0) return
-
-    isProcessingQueueRef.current = true
-    while (messageQueueRef.current.length > 0) {
-      const fn = messageQueueRef.current.shift()
-      if (fn) {
-        fn()
-        await new Promise((resolve) => setTimeout(resolve, 50))
+    connectWebSocket()
+    return () => {
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+      if (derivWsRef.current) {
+        derivWsRef.current.onclose = null
+        derivWsRef.current.close()
       }
     }
-    isProcessingQueueRef.current = false
-  }
-
-  const sendRequest = (data: any): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      if (!derivWsRef.current || derivWsRef.current.readyState !== WebSocket.OPEN) {
-        reject(new Error("WebSocket not connected"))
-        return
-      }
-
-      const requestId = generateRequestId()
-      const timeout = setTimeout(() => {
-        pendingRequestsRef.current.delete(requestId)
-        reject(new Error(`Request ${requestId} timed out`))
-      }, REQUEST_TIMEOUT)
-
-      pendingRequestsRef.current.set(requestId, { resolve, reject, timeout })
-
-      const payload = { ...data, req_id: requestId }
-      derivWsRef.current.send(JSON.stringify(payload))
-    })
-  }
+  }, [])
 
   const connectWebSocket = () => {
     if (derivWsRef.current) {
@@ -131,40 +64,26 @@ const Analysis: React.FC = () => {
       derivWsRef.current.close()
     }
 
-    const ws = new window.WebSocket(WS_URL)
+    const ws = new WebSocket(WS_URL)
     derivWsRef.current = ws
 
     ws.onopen = () => {
+      console.log("WebSocket connected")
       setIsConnected(true)
-      console.log("[Analysis] WebSocket connected, requesting markets...")
-      queueMessage(() => {
-        sendRequest({
+      
+      ws.send(
+        JSON.stringify({
           active_symbols: "brief",
           product_type: "basic",
-        }).catch((err) => {
-          console.error("[Analysis] Market request failed:", err)
-        })
-      })
+        }),
+      )
     }
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
 
-      if (data.req_id && pendingRequestsRef.current.has(data.req_id)) {
-        const pending = pendingRequestsRef.current.get(data.req_id)
-        if (pending) {
-          clearTimeout(pending.timeout)
-          pendingRequestsRef.current.delete(data.req_id)
-
-          if (data.error) {
-            pending.reject(new Error(data.error.message || "Unknown error"))
-          } else {
-            pending.resolve(data)
-          }
-        }
-      }
-
       if (data.msg_type === "active_symbols") {
+        console.log("Received active symbols")
         const { active_symbols } = data
         const volatilitySymbols = active_symbols.filter(
           (symbol: SymbolData) =>
@@ -185,57 +104,38 @@ const Analysis: React.FC = () => {
 
         setSymbolsList(volatilitySymbols)
 
-        const volatilityGroup: SymbolData[] = []
-        const jumpGroup: SymbolData[] = []
-        const otherGroup: SymbolData[] = []
-
-        volatilitySymbols.forEach((symbol) => {
-          const name = symbol.display_name.toLowerCase()
-          if (name.includes("jump")) {
-            jumpGroup.push(symbol)
-          } else if (name.includes("volatility") || name.includes("vol") || symbol.market === "volatility_indices") {
-            volatilityGroup.push(symbol)
-          } else {
-            otherGroup.push(symbol)
-          }
-        })
-
-        setGroupedSymbols({
-          volatility: volatilityGroup,
-          jump: jumpGroup,
-          other: otherGroup,
-        })
-
-        setMarketsLoaded(true)
-
-        if (volatilitySymbols.length > 0 && !subscriptionStateRef.current.isSubscribed) {
-          const symbolToUse = volatilitySymbols.find((s) => s.symbol === getInitialSymbol())
-            ? getInitialSymbol()
+        if (volatilitySymbols.length > 0) {
+          const symbolToUse = volatilitySymbols.find((s: SymbolData) => s.symbol === currentSymbol)
+            ? currentSymbol
             : volatilitySymbols[0].symbol
-
-          console.log("[Analysis] Markets loaded, subscribing to:", symbolToUse)
-          queueMessage(() => {
-            subscribeToSymbol(symbolToUse)
-          })
+          
+          console.log("Subscribing to symbol:", symbolToUse)
+          ws.send(
+            JSON.stringify({
+              ticks_history: symbolToUse,
+              count: tickCount,
+              end: "latest",
+              style: "ticks",
+              subscribe: 1,
+            }),
+          )
+          setCurrentlySubscribedSymbol(symbolToUse)
         }
       }
 
-      if (data.history) {
-        if (data.history.prices && data.history.times && data.history.prices.length > 0) {
-          const newTickHistory = data.history.prices.map((price: string, index: number) => ({
-            time: data.history.times[index],
-            quote: Number.parseFloat(price),
-          }))
-          console.log("[Analysis] Received tick history:", newTickHistory.length, "ticks")
-          setTickHistory(newTickHistory)
-          detectDecimalPlaces(newTickHistory)
-          if (data.pip_size !== undefined) {
-            setPipSize(data.pip_size)
-          }
-          subscriptionStateRef.current.isSubscribed = true
+      if (data.msg_type === "history") {
+        console.log("Received tick history, prices count:", data.history?.prices?.length)
+        const newTickHistory = data.history.prices.map((price: string, index: number) => ({
+          time: data.history.times[index],
+          quote: Number.parseFloat(price),
+        }))
+        setTickHistory(newTickHistory)
+        detectDecimalPlaces(newTickHistory)
+        if (data.pip_size !== undefined) {
+          setPipSize(data.pip_size)
         }
-      } else if (data.tick) {
-        if (data.tick.symbol === subscriptionStateRef.current.symbol) {
+      } else if (data.msg_type === "tick") {
+        if (data.tick.symbol === currentlySubscribedSymbol) {
           const tickQuote = Number.parseFloat(data.tick.quote)
           setTickHistory((prev) => {
             const updated = [...prev, { time: data.tick.epoch, quote: tickQuote }]
@@ -246,99 +146,51 @@ const Analysis: React.FC = () => {
           }
         }
       }
+
+      if (data.error) {
+        console.error("WebSocket error:", data.error)
+      }
     }
 
     ws.onclose = () => {
+      console.log("WebSocket disconnected, reconnecting...")
       setIsConnected(false)
-      setMarketsLoaded(false)
-      console.log("[Analysis] WebSocket disconnected, reconnecting...")
+      setCurrentlySubscribedSymbol(null)
+      
       reconnectTimeoutRef.current = setTimeout(() => {
         connectWebSocket()
       }, 2000)
     }
 
     ws.onerror = (error) => {
+      console.error("WebSocket error occurred:", error)
       setIsConnected(false)
-      console.error("[Analysis] WebSocket error:", error)
-      reconnectTimeoutRef.current = setTimeout(() => {
-        connectWebSocket()
-      }, 2000)
     }
   }
 
-  const subscribeToSymbol = async (symbol: string) => {
-    if (symbol === subscriptionStateRef.current.symbol && subscriptionStateRef.current.isSubscribed) {
-      console.log("[Analysis] Already subscribed to:", symbol)
-      return
-    }
-
-    if (subscriptionStateRef.current.symbol && subscriptionStateRef.current.isSubscribed) {
-      subscriptionStateRef.current.isUnsubscribing = true
-      try {
-        console.log("[Analysis] Unsubscribing from:", subscriptionStateRef.current.symbol)
-        await sendRequest({
-          forget: subscriptionStateRef.current.symbol,
-        })
-        console.log("[Analysis] Successfully unsubscribed")
-      } catch (error) {
-        console.error("[Analysis] Unsubscribe error:", error)
+  const requestTickHistory = (symbol: string) => {
+    if (derivWsRef.current && derivWsRef.current.readyState === WebSocket.OPEN) {
+      console.log("Requesting tick history for:", symbol)
+      
+      if (currentlySubscribedSymbol && currentlySubscribedSymbol !== symbol) {
+        derivWsRef.current.send(
+          JSON.stringify({
+            forget_all: "ticks",
+          }),
+        )
       }
-      subscriptionStateRef.current.isUnsubscribing = false
-    }
 
-    subscriptionStateRef.current.symbol = symbol
-    subscriptionStateRef.current.isSubscribed = false
-
-    let retryCount = 0
-    while (retryCount < RETRY_ATTEMPTS) {
-      try {
-        console.log(`[Analysis] Subscribing to ${symbol} (attempt ${retryCount + 1})`)
-        setTickHistory([])
-
-        await sendRequest({
-          ticks_history: symbol,
-          count: tickCount,
-          end: "latest",
-          style: "ticks",
-          subscribe: 1,
-        })
-
-        await new Promise((resolve) => setTimeout(resolve, 100))
-        subscriptionStateRef.current.isSubscribed = true
-        console.log("[Analysis] Successfully subscribed to:", symbol)
-        break
-      } catch (error) {
-        retryCount++
-        console.warn(`[Analysis] Subscription attempt ${retryCount} failed:`, error)
-        if (retryCount < RETRY_ATTEMPTS) {
-          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
-        }
+      const request = {
+        ticks_history: symbol,
+        count: tickCount,
+        end: "latest",
+        style: "ticks",
+        subscribe: 1,
       }
-    }
-
-    if (retryCount === RETRY_ATTEMPTS) {
-      console.error("[Analysis] Failed to subscribe after", RETRY_ATTEMPTS, "attempts")
-      subscriptionStateRef.current.isSubscribed = false
+      derivWsRef.current.send(JSON.stringify(request))
+      setCurrentlySubscribedSymbol(symbol)
     }
   }
-
-  const handleSymbolChange = (newSymbol: string) => {
-    setCurrentSymbol(newSymbol)
-    localStorage.setItem("selectedSymbol", newSymbol)
-    queueMessage(() => {
-      subscribeToSymbol(newSymbol)
-    })
-  }
-
-  useEffect(() => {
-    connectWebSocket()
-    return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-      if (derivWsRef.current) derivWsRef.current.close()
-      pendingRequestsRef.current.forEach(({ timeout }) => clearTimeout(timeout))
-      pendingRequestsRef.current.clear()
-    }
-  }, [])
 
   const detectDecimalPlaces = (history: Tick[]) => {
     if (history.length === 0) return
@@ -359,6 +211,7 @@ const Analysis: React.FC = () => {
   }
 
   const getDigitAnalysis = () => {
+    if (tickHistory.length === 0) return new Array(10).fill(0)
     const digitCounts = new Array(10).fill(0)
     tickHistory.forEach((tick) => {
       const lastDigit = getLastDigit(tick.quote)
@@ -368,6 +221,7 @@ const Analysis: React.FC = () => {
   }
 
   const getEvenOddAnalysis = () => {
+    if (tickHistory.length === 0) return { even: 0, odd: 0 }
     const digitCounts = new Array(10).fill(0)
     tickHistory.forEach((tick) => {
       const lastDigit = getLastDigit(tick.quote)
@@ -383,8 +237,8 @@ const Analysis: React.FC = () => {
   }
 
   const getRiseFallAnalysis = () => {
-    let riseCount = 0,
-      fallCount = 0
+    if (tickHistory.length < 2) return { rise: 0, fall: 0 }
+    let riseCount = 0, fallCount = 0
     for (let i = 1; i < tickHistory.length; i++) {
       if (tickHistory[i].quote > tickHistory[i - 1].quote) riseCount++
       else if (tickHistory[i].quote < tickHistory[i - 1].quote) fallCount++
@@ -397,10 +251,8 @@ const Analysis: React.FC = () => {
   }
 
   const getSelectedDigitAnalysis = () => {
-    if (selectedDigit === null) return { over: 0, under: 0, equal: 0 }
-    let overCount = 0,
-      underCount = 0,
-      equalCount = 0
+    if (selectedDigit === null || tickHistory.length === 0) return { over: 0, under: 0, equal: 0 }
+    let overCount = 0, underCount = 0, equalCount = 0
     tickHistory.forEach((tick) => {
       const lastDigit = getLastDigit(tick.quote)
       if (lastDigit > selectedDigit) overCount++
@@ -413,6 +265,18 @@ const Analysis: React.FC = () => {
       under: total > 0 ? (underCount / total) * 100 : 0,
       equal: total > 0 ? (equalCount / total) * 100 : 0,
     }
+  }
+
+  const handleSymbolChange = (newSymbol: string) => {
+    console.log("Changing symbol to:", newSymbol)
+    setCurrentSymbol(newSymbol)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("selectedSymbol", newSymbol)
+    }
+    setTickHistory([])
+    setTimeout(() => {
+      requestTickHistory(newSymbol)
+    }, 100)
   }
 
   const digitAnalysis = getDigitAnalysis()
@@ -429,239 +293,518 @@ const Analysis: React.FC = () => {
   const lastDisplayedDigits = allLastDigits.slice(-displayCount)
 
   return (
-    <div className={styles.analysisContainer}>
-      <main className={styles.analysisMa}>
-        <section className={styles.priceSection}>
-          <div className={styles.priceContent}>
-            <div className={styles.currentPrice}>{currentPrice ? currentPrice.toFixed(pipSize) : "N/A"}</div>
-            <div className={styles.priceLabel}>Current Price</div>
+    <div style={{
+      minHeight: '100vh',
+      background: 'radial-gradient(ellipse at top, rgba(59, 130, 246, 0.1), transparent 70%), radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.1), transparent 70%), #030712',
+      color: '#f8fafc'
+    }}>
+      <main style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '48px 24px 100px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '32px'
+      }}>
+        {/* Connection Status */}
+        <div style={{
+          textAlign: 'center',
+          padding: '12px',
+          borderRadius: '12px',
+          background: isConnected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+          border: `1px solid ${isConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+          color: isConnected ? '#10b981' : '#ef4444',
+          fontWeight: 600
+        }}>
+          {isConnected ? '● Connected' : '○ Reconnecting...'}
+        </div>
+
+        {/* Price & Market Selector */}
+        <section style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '48px',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              marginBottom: '8px'
+            }}>
+              {currentPrice ? currentPrice.toFixed(pipSize) : "N/A"}
+            </div>
+            <div style={{ color: '#9ca3af' }}>Current Price</div>
           </div>
-          <div className={styles.marketSelector}>
+          <div style={{ textAlign: 'center' }}>
             <select
               value={currentSymbol}
               onChange={(e) => handleSymbolChange(e.target.value)}
-              className={styles.symbolSelect}
-              disabled={!marketsLoaded}
+              style={{
+                background: '#1f2937',
+                border: '1px solid #374151',
+                borderRadius: '12px',
+                color: '#f8fafc',
+                padding: '14px 20px',
+                fontSize: '16px',
+                minWidth: '180px',
+                cursor: 'pointer'
+              }}
             >
-              {groupedSymbols.volatility.length > 0 && (
-                <>
-                  <optgroup label="VOLATILITY MARKETS">
-                    {groupedSymbols.volatility.map((option) => (
-                      <option key={option.symbol} value={option.symbol}>
-                        {option.display_name}
-                      </option>
-                    ))}
-                  </optgroup>
-                </>
+              {symbolsList.length > 0 ? (
+                symbolsList.map((opt) => (
+                  <option key={opt.symbol} value={opt.symbol}>
+                    {opt.display_name}
+                  </option>
+                ))
+              ) : (
+                <option>Loading...</option>
               )}
-              {groupedSymbols.jump.length > 0 && (
-                <>
-                  <optgroup label="JUMP INDICES">
-                    {groupedSymbols.jump.map((option) => (
-                      <option key={option.symbol} value={option.symbol}>
-                        {option.display_name}
-                      </option>
-                    ))}
-                  </optgroup>
-                </>
-              )}
-              {groupedSymbols.other.length > 0 && (
-                <>
-                  <optgroup label="OTHER MARKETS">
-                    {groupedSymbols.other.map((option) => (
-                      <option key={option.symbol} value={option.symbol}>
-                        {option.display_name}
-                      </option>
-                    ))}
-                  </optgroup>
-                </>
-              )}
-              {!marketsLoaded && <option value="">Loading Markets...</option>}
             </select>
-            <div className={styles.selectorLabel}>Market</div>
+            <div style={{ color: '#6b7280', marginTop: '8px', fontSize: '12px' }}>MARKET</div>
           </div>
         </section>
 
-        <section className={styles.analysisSection}>
-          <h2 className={styles.sectionTitle}>Digit Distribution</h2>
-          <div className={styles.digitGrid}>
-            {digitAnalysis.map((percentage, digit) => {
-              const isLowest = percentage === minPercentage && percentage > 0
-              const isHighest = percentage === maxPercentage && percentage > 0
-              const fillPercentage = maxPercentage > 0 ? (percentage / maxPercentage) * 100 : 0
-              return (
-                <div key={digit} className={styles.digitContainer}>
-                  {digit === currentDigit && <div className={styles.currentIndicator}>▼</div>}
-                  <div className={styles.digitCircleWrapper}>
-                    <div className={styles.digitCircle}>
-                      <svg className={styles.progressRing} viewBox="0 0 64 64">
-                        <circle
-                          className={styles.progressRingCircle}
-                          cx="32"
-                          cy="32"
-                          r="26"
-                          fill="none"
-                          stroke={isLowest ? "#ef4444" : isHighest ? "#10b981" : "#374151"}
-                          strokeWidth="4"
-                          strokeDasharray={`${(fillPercentage / 100) * 163.4} 163.4`}
-                          strokeLinecap="round"
-                          transform="rotate(-90 32 32)"
-                        />
-                      </svg>
+        {tickHistory.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px', color: '#9ca3af', fontSize: '18px' }}>
+            {isConnected ? 'Loading market data...' : 'Connecting to market...'}
+          </div>
+        ) : (
+          <>
+            {/* Digit Distribution */}
+            <section style={{
+              background: 'rgba(31, 41, 55, 0.8)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(55, 65, 81, 0.5)',
+              borderRadius: '24px',
+              padding: '40px'
+            }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '24px', textAlign: 'center' }}>
+                Digit Distribution
+              </h2>
+              <div style={{
+                background: '#1f2937',
+                border: '1px solid #374151',
+                borderRadius: '16px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  padding: '16px 20px',
+                  borderBottom: '1px solid #374151'
+                }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#9ca3af' }}>
+                    Latest digits ({displayCount} showing)
+                  </span>
+                </div>
+                <div style={{ padding: '20px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(44px, 1fr))',
+                    gap: '10px'
+                  }}>
+                    {lastDisplayedDigits.map((d, i) => (
                       <div
-                        className={`${styles.digitNumber} ${
-                          digit === currentDigit
-                            ? styles.current
-                            : isLowest
-                              ? styles.lowest
-                              : isHighest
-                                ? styles.highest
-                                : ""
-                        }`}
+                        key={i}
+                        style={{
+                          aspectRatio: '1',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          position: 'relative',
+                          borderRadius: '12px',
+                          fontWeight: 900,
+                          fontSize: '18px',
+                          background: d % 2 === 0 
+                            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.15))'
+                            : 'linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.15))',
+                          color: d % 2 === 0 ? '#10b981' : '#ef4444',
+                          border: `2px solid ${d % 2 === 0 ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)'}`,
+                          borderWidth: i === lastDisplayedDigits.length - 1 ? '3px' : '2px',
+                          boxShadow: i === lastDisplayedDigits.length - 1 
+                            ? (d % 2 === 0 ? '0 0 24px rgba(16, 185, 129, 0.5)' : '0 0 24px rgba(239, 68, 68, 0.5)')
+                            : 'none'
+                        }}
                       >
-                        {digit}
+                        {d}
+                        {i === lastDisplayedDigits.length - 1 && (
+                          <span style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            fontSize: '18px',
+                            color: '#3b82f6'
+                          }}>●</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  padding: '16px 20px',
+                  borderTop: '1px solid #374151',
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}>
+                  <button
+                    onClick={() => setShowMore(!showMore)}
+                    style={{
+                      background: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '12px',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {showMore ? '← Show Less (50)' : 'Show More (100) →'}
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Statistics */}
+            <section style={{
+              background: 'rgba(31, 41, 55, 0.8)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(55, 65, 81, 0.5)',
+              borderRadius: '24px',
+              padding: '40px'
+            }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '24px', textAlign: 'center' }}>
+                Statistics
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: '#1f2937',
+                  padding: '16px 20px',
+                  borderRadius: '12px',
+                  border: '1px solid #374151'
+                }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#9ca3af' }}>
+                    Total Ticks:
+                  </span>
+                  <span style={{ fontSize: '18px', fontWeight: 700, color: '#3b82f6' }}>
+                    {tickHistory.length}
+                  </span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: '#1f2937',
+                  padding: '16px 20px',
+                  borderRadius: '12px',
+                  border: '1px solid #374151'
+                }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#9ca3af' }}>
+                    Pip Size:
+                  </span>
+                  <span style={{ fontSize: '18px', fontWeight: 700, color: '#3b82f6' }}>
+                    {pipSize}
+                  </span>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+      </main>
+    </div> style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))',
+                gap: '24px',
+                marginBottom: '20px'
+              }}>
+                {digitAnalysis.map((pct, digit) => {
+                  const isLowest = pct === minPercentage && pct > 0
+                  const isHighest = pct === maxPercentage && pct > 0
+                  const fillPct = maxPercentage > 0 ? (pct / maxPercentage) * 100 : 0
+                  return (
+                    <div key={digit} style={{ textAlign: 'center', position: 'relative' }}>
+                      {digit === currentDigit && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '-12px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          color: '#3b82f6',
+                          fontSize: '20px'
+                        }}>▼</div>
+                      )}
+                      <div style={{
+                        width: '100px',
+                        height: '100px',
+                        margin: '0 auto',
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <svg viewBox="0 0 64 64" style={{ position: 'absolute', width: '100%', height: '100%' }}>
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="26"
+                            fill="none"
+                            stroke={isLowest ? '#ef4444' : isHighest ? '#10b981' : '#374151'}
+                            strokeWidth="4"
+                            strokeDasharray={`${(fillPct / 100) * 163.4} 163.4`}
+                            strokeLinecap="round"
+                            transform="rotate(-90 32 32)"
+                          />
+                        </svg>
+                        <div style={{
+                          fontSize: digit === currentDigit ? '36px' : '28px',
+                          fontWeight: 900,
+                          color: digit === currentDigit ? '#3b82f6' : isHighest ? '#10b981' : isLowest ? '#ef4444' : '#f8fafc',
+                          position: 'relative'
+                        }}>
+                          {digit}
+                        </div>
+                      </div>
+                      <div style={{
+                        marginTop: '8px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        color: isHighest ? '#10b981' : isLowest ? '#ef4444' : '#9ca3af'
+                      }}>
+                        {pct.toFixed(1)}%
                       </div>
                     </div>
-                  </div>
-                  <div
-                    className={`${styles.digitPercentage} ${
-                      isLowest ? styles.lowest : isHighest ? styles.highest : ""
-                    }`}
-                  >
-                    {percentage.toFixed(1)}%
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-          <div className={styles.analysisStats}>
-            Highest: <span className={styles.statHighest}>{maxPercentage.toFixed(2)}%</span> | Lowest:{" "}
-            <span className={styles.statLowest}>{minPercentage.toFixed(2)}%</span>
-          </div>
-        </section>
-
-        <section className={styles.analysisSection}>
-          <h2 className={styles.sectionTitle}>Digit Comparison</h2>
-          <div className={styles.digitSelector}>
-            <div className={styles.selectorLabel}>Select a digit to analyze:</div>
-            <div className={styles.digitButtons}>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
-                <button
-                  key={digit}
-                  className={`${styles.digitBtn} ${selectedDigit === digit ? styles.selected : ""}`}
-                  onClick={() => setSelectedDigit(digit)}
-                >
-                  {digit}
-                </button>
-              ))}
-            </div>
-          </div>
-          {selectedDigit !== null && (
-            <div className={styles.comparisonAnalysis}>
-              <div className={styles.comparisonGrid}>
-                <div className={`${styles.statCard} ${styles.over}`}>
-                  <div className={styles.statValue}>{selectedDigitAnalysis.over.toFixed(1)}%</div>
-                  <div className={styles.statLabel}>Over {selectedDigit}</div>
-                </div>
-                <div className={`${styles.statCard} ${styles.under}`}>
-                  <div className={styles.statValue}>{selectedDigitAnalysis.under.toFixed(1)}%</div>
-                  <div className={styles.statLabel}>Under {selectedDigit}</div>
-                </div>
-                <div className={`${styles.statCard} ${styles.equal}`}>
-                  <div className={styles.statValue}>{selectedDigitAnalysis.equal.toFixed(1)}%</div>
-                  <div className={styles.statLabel}>Equal {selectedDigit}</div>
-                </div>
+                  )
+                })}
               </div>
-            </div>
-          )}
-        </section>
-
-        <section className={styles.analysisSection}>
-          <h2 className={styles.sectionTitle}>Even/Odd Pattern</h2>
-          <div className={styles.eoGrid}>
-            <div className={`${styles.statCard} ${styles.even}`}>
-              <div className={styles.statValue}>{evenOddAnalysis.even.toFixed(1)}%</div>
-              <div className={styles.statLabel}>Even</div>
-            </div>
-            <div className={`${styles.statCard} ${styles.odd}`}>
-              <div className={styles.statValue}>{evenOddAnalysis.odd.toFixed(1)}%</div>
-              <div className={styles.statLabel}>Odd</div>
-            </div>
-          </div>
-          <div className={styles.patternSection}>
-            <h3 className={styles.patternTitle}>Last 50 Digits Pattern</h3>
-            <div className={styles.patternGrid}>
-              {lastDisplayedDigits.map((digit, index) => (
-                <div key={index} className={`${styles.patternBox} ${digit % 2 === 0 ? styles.even : styles.odd}`}>
-                  {digit % 2 === 0 ? "E" : "O"}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.analysisSection}>
-          <h2 className={styles.sectionTitle}>Market Movement</h2>
-          <div className={styles.rfGrid}>
-            <div className={`${styles.statCard} ${styles.rise}`}>
-              <div className={styles.statValue}>{riseFallAnalysis.rise.toFixed(1)}%</div>
-              <div className={styles.statLabel}>Rise</div>
-            </div>
-            <div className={`${styles.statCard} ${styles.fall}`}>
-              <div className={styles.statValue}>{riseFallAnalysis.fall.toFixed(1)}%</div>
-              <div className={styles.statLabel}>Fall</div>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.analysisSection}>
-          <h2 className={styles.sectionTitle}>Last Digits Stream</h2>
-          <div className={styles.lastDigitsContainer}>
-            <div className={styles.lastDigitsTable}>
-              <div className={styles.digitsHeader}>
-                <span className={styles.headerLabel}>Latest digits ({displayCount} showing)</span>
+              <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: '14px' }}>
+                Highest: <span style={{ color: '#10b981', fontWeight: 700 }}>{maxPercentage.toFixed(2)}%</span>
+                {' | '}
+                Lowest: <span style={{ color: '#ef4444', fontWeight: 700 }}>{minPercentage.toFixed(2)}%</span>
               </div>
-              <div className={styles.digitsContent}>
-                <div className={styles.digitsGrid}>
-                  {lastDisplayedDigits.map((digit, index) => (
-                    <div
-                      key={index}
-                      className={`${styles.digitItem} ${digit % 2 === 0 ? styles.evenDigit : styles.oddDigit} ${
-                        index === lastDisplayedDigits.length - 1 ? styles.latest : ""
-                      }`}
-                      title={`Position ${displayCount - index}: ${digit}`}
+            </section>
+
+            {/* Digit Comparison */}
+            <section style={{
+              background: 'rgba(31, 41, 55, 0.8)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(55, 65, 81, 0.5)',
+              borderRadius: '24px',
+              padding: '40px'
+            }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '24px', textAlign: 'center' }}>
+                Digit Comparison
+              </h2>
+              <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+                <div style={{ color: '#9ca3af', marginBottom: '12px' }}>Select a digit:</div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setSelectedDigit(d)}
+                      style={{
+                        background: selectedDigit === d ? '#3b82f6' : '#1f2937',
+                        border: `2px solid ${selectedDigit === d ? '#3b82f6' : '#374151'}`,
+                        color: selectedDigit === d ? '#fff' : '#f8fafc',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
                     >
-                      <span className={styles.digitValue}>{digit}</span>
-                      {index === lastDisplayedDigits.length - 1 && <span className={styles.latestIndicator}>●</span>}
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {selectedDigit !== null && (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.04))',
+                    border: '2px solid rgba(59, 130, 246, 0.5)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontSize: '32px', fontWeight: 900, color: '#3b82f6', marginBottom: '8px' }}>
+                      {selectedDigitAnalysis.over.toFixed(1)}%
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>
+                      OVER {selectedDigit}
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(8, 145, 178, 0.04))',
+                    border: '2px solid rgba(6, 182, 212, 0.5)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontSize: '32px', fontWeight: 900, color: '#06b6d4', marginBottom: '8px' }}>
+                      {selectedDigitAnalysis.under.toFixed(1)}%
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>
+                      UNDER {selectedDigit}
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(124, 58, 255, 0.04))',
+                    border: '2px solid rgba(139, 92, 246, 0.5)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontSize: '32px', fontWeight: 900, color: '#8b5cf6', marginBottom: '8px' }}>
+                      {selectedDigitAnalysis.equal.toFixed(1)}%
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>
+                      EQUAL {selectedDigit}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Even/Odd Pattern */}
+            <section style={{
+              background: 'rgba(31, 41, 55, 0.8)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(55, 65, 81, 0.5)',
+              borderRadius: '24px',
+              padding: '40px'
+            }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '24px', textAlign: 'center' }}>
+                Even/Odd Pattern
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: '16px',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04))',
+                  border: '2px solid rgba(16, 185, 129, 0.5)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#10b981', marginBottom: '8px' }}>
+                    {evenOddAnalysis.even.toFixed(1)}%
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>EVEN</div>
+                </div>
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.04))',
+                  border: '2px solid rgba(239, 68, 68, 0.5)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#ef4444', marginBottom: '8px' }}>
+                    {evenOddAnalysis.odd.toFixed(1)}%
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>ODD</div>
+                </div>
+              </div>
+              <div>
+                <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>Last 50 Digits Pattern</h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(32px, 1fr))',
+                  gap: '8px'
+                }}>
+                  {lastDisplayedDigits.map((d, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        aspectRatio: '1',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '12px',
+                        fontWeight: 700,
+                        fontSize: '12px',
+                        background: d % 2 === 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                        color: d % 2 === 0 ? '#10b981' : '#ef4444',
+                        border: `1px solid ${d % 2 === 0 ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`
+                      }}
+                    >
+                      {d % 2 === 0 ? 'E' : 'O'}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className={styles.digitsFooter}>
-                <button className={styles.toggleBtn} onClick={() => setShowMore(!showMore)}>
-                  {showMore ? "← Show Less (50)" : "Show More (100) →"}
-                </button>
+            </section>
+
+            {/* Rise/Fall */}
+            <section style={{
+              background: 'rgba(31, 41, 55, 0.8)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(55, 65, 81, 0.5)',
+              borderRadius: '24px',
+              padding: '40px'
+            }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '24px', textAlign: 'center' }}>
+                Market Movement
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: '16px'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.04))',
+                  border: '2px solid rgba(16, 185, 129, 0.5)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#10b981', marginBottom: '8px' }}>
+                    {riseFallAnalysis.rise.toFixed(1)}%
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>RISE</div>
+                </div>
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.04))',
+                  border: '2px solid rgba(239, 68, 68, 0.5)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#ef4444', marginBottom: '8px' }}>
+                    {riseFallAnalysis.fall.toFixed(1)}%
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 700 }}>FALL</div>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        <section className={styles.analysisSection}>
-          <h2 className={styles.sectionTitle}>Statistics</h2>
-          <div className={styles.statsGrid}>
-            <div className={styles.statRow}>
-              <span className={styles.statName}>Total Ticks:</span>
-              <span className={styles.statData}>{tickHistory.length}</span>
-            </div>
-            <div className={styles.statRow}>
-              <span className={styles.statName}>Pip Size:</span>
-              <span className={styles.statData}>{pipSize}</span>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-  )
-}
-
-export default Analysis
+            {/* Last Digits Stream */}
+            <section style={{
+              background: 'rgba(31, 41, 55, 0.8)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(55, 65, 81, 0.5)',
+              borderRadius: '24px',
+              padding: '40px'
+            }}>
+              <h2 style={{ fontSize: '28px', marginBottom: '24px', textAlign: 'center' }}>
+                Last Digits Stream
+              </h2>
+              <div
